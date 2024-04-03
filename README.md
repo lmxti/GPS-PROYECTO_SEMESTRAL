@@ -1,4 +1,16 @@
 
+# [ Proyecto GPS ] Foro estudiantil 
+
+Este proyecto corresponde a la asignatura Gestión de Proyectos de Software y el objetivo principal es desarollar una solución para el problema del entorno educativo en la universidad potenciando la comunicacion y la colaboracion efectiva entre los mismos estudiantes.
+
+
+## Tecnologías
+
+**Client (Frontend):** React & Tailwind CSS
+
+**Server:** Node, Express & MongoDB
+
+
 ## Desarollo inicial de proyecto
 
  - **Inicializacion de proyecto Node en la carpeta backend:**
@@ -153,4 +165,14 @@ server.listen(PORT, () => {
   setupDB();
 })
 ```
+
+
+## Authors
+
+- Lider de proyecto: [@lmxti](https://github.com/lmxti)
+- Programador: [@DJVegaG](https://github.com/DJVegaG)
+- Programador: [@Sebasaraneda](https://github.com/Sebasaraneda)
+- Programador: [@vcntsnhz](https://github.com/vcntsnhz)
+- Analista diseñador: [Javiernvc1](https://github.com/Javiernvc1)
+- Tester: [@VictorHM23](https://github.com/VictorHM23)
 
