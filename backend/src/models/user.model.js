@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 const GENDER = require("../constants/gender.constants.js");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
     {
@@ -26,7 +26,9 @@ const userSchema = new mongoose.Schema(
         joinedAt: { type: Date, default: Date.now, required: true },
         // Imagen de perfil de usuario
         profilePicture: { type: String, default: "default.jpg" },
-        /*<-----------------------------------------------------------------------> */
+
+        /*<---------- Relaciones con otros modelos ----------> */
+        
         // Rol de usuario, por defecto ya es usuario
         roleUser: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
         // Publicaciones del usuario, por defecto es un array vacio "[]"
@@ -41,6 +43,8 @@ const userSchema = new mongoose.Schema(
         followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         // Hashtags que sigue el usuario, por defecto es un array vacio "[]"
         followedHashtags: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+        // Notificaciones del usuario
+        notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notification"}]
     }, 
     { timestamps: true, versionKey: false }
 );

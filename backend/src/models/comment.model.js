@@ -4,28 +4,19 @@ const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
     {
-        id: {
-            type: Number,
-            unique: true,
-        },
-        contentComment: {
-            type: String,
-            required: true,
-        },
-        ImageComment: {
-            type: String,
-        },
-        fileComment: {
-            type: String,
-        },
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        createdAt: {
-            type: Date,
-            required: true,
-        }
+        // Comentario de usuario
+        userComment: { type: String, required: true },
+        // Imagen que se puede incorporar al comentario
+        ImageComment: { type: String },
+        // Archivo que se puede incorporar al comentario
+        fileComment: { type: String },
+        // Fecha en que se realiza comentario
+        createdAt: { type: Date, required: true, default: Date.now },
+
+        /*<---------- Relaciones con otros modelos ----------> */
+
+        // Usuario que realiza el comentario
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     }
 );
 

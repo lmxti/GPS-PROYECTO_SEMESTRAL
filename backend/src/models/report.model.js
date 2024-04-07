@@ -5,30 +5,19 @@ const mongoose = require("mongoose");
 const REPORTS = requiere("../constants/reportType.constants.js");
 const reportSchema = new mongoose.Schema(
     {
-        id: {
-            type: Number,
-            unique: true,
-        },
-        reportType: {
-            type: String,
-            enum: REPORTS,
-            required: true,
-        },
-        contentReport: {
-            type: String,
-            required: true,
-        },
-        dateReport: {
-            type: Date,
-            required: true,
-        },
-        userReport: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        postReport: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Post",
+        // Tipo de reporte
+        reportType: { type: String, enum: REPORTS, required: true },
+        // Contenido de reporte (textual)
+        contentReport: { type: String, required: true },
+        // Fecha en que se realiza reporte
+        dateReport: { type: Date, required: true, default: Date.now },
+
+        /*<---------- Relaciones con otros modelos ----------> */
+
+        // Usuario autor del reporte
+        userReport: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+        // Publicacion/post que ha sido reportada
+        postReport: { type: mongoose.Schema.Types.ObjectId, ref: "Post",
         },
     }
 );

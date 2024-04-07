@@ -20,7 +20,7 @@ const options = {
 async function setupDB() {
   try {
     await mongoose.connect(DB_URL, options);
-    console.log("=> Conexión exitosa a la base de datos");
+    console.log("BBDD => Conexión exitosa a la base de datos");
   } catch (error) {
     handleError(error, "/db.config -> setupDB");
   }

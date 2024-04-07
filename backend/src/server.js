@@ -1,14 +1,46 @@
 const { PORT } = require('./config/env.config.js')
-
 const express = require('express')
-
 const server = express()
-
+const cors = require("cors");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser")
+const indexRoutes = require("./routes/index.routes.js")
 const { setupDB } = require('./config/db.config.js');
+const { createRoles, createDefaultUsers} = require("./config/initial.setup.js");
 
-server.use(express.json());
+async function setupServer(){
+  try {
+    const server = express();
+    server.use(express.json());
+    server.use(cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    }));
+    server.use(cookieParser());
+    server.use(morgan("dev"));
+    server.use(express.urlencoded({ extended: true }));
+    server.use("/api", indexRoutes);
+    server.listen(PORT, () => {
+      console.log(`SERVIDOR => El servidor está corriendo en: http://localhost:${PORT}/api`);
+    })
 
-server.listen(PORT, () => {
-  console.log(`Ejemplo del servidor corriendo en el puerto: ${PORT}`)
-  setupDB();
-})
+  } catch (error) {
+    console.log("Error", error);
+  }
+}
+
+async function setupAPI() {
+  try {
+    await setupDB();
+    await setupServer();
+    await createRoles();
+    await createDefaultUsers();
+    
+  } catch (error) {
+    console.log("Error en setupAPI ",error);
+  }
+}
+
+setupAPI()
+  .then( () => console.log("setupAPI => API web, Servidor y configuracion predeterminada exitosa"))
+  .catch( (error) => console.log("setupAPI => Error -> Ocurrio un error: ", error))
