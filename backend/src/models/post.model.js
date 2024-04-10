@@ -19,6 +19,13 @@ const postSchema = new mongoose.Schema(
         author: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
         // Hashtag que tiene publicación
         hashtags: [ { type: mongoose.Schema.Types.ObjectId, ref: "Hashtag"}],
+        // Interacciones de usuarios
+        interactions: [
+            {
+                user: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+                type: { type: String, enum: ["helpful", "nothelpful"]}
+            }
+        ],
         // Comentarios de la publicación
         comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     }
