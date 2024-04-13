@@ -34,7 +34,12 @@ const userSchema = new mongoose.Schema(
         // Publicaciones del usuario, por defecto es un array vacio "[]"
         posts: [ { type: mongoose.Schema.Types.ObjectId,ref: "Post"} ],
         // Insignias del usuario, por defecto es un array vacio "[]"
-        badges: [ { type: mongoose.Schema.Types.ObjectId, ref: "Badge" }],
+        badges: [
+             { 
+                badge: {type: mongoose.Schema.Types.ObjectId, ref: "Badge"},
+                dateObtained: {type: Date, required}
+            }
+        ],
         // Comentarios pertenecientes al usuario, por defecto es un array vacio "[]"
         Comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment"} ],
         // Seguidos del usuario, por defecto es un array vacio "[]"
