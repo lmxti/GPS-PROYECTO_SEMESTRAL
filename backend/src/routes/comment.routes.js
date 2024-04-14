@@ -1,7 +1,10 @@
+/* <----------------------- DEPENDENCIAS --------------------------> */
 const express = require('express');
 
+/* <----------------------- CONTROLADOR ---------------------------> */
 const commentController = require('../controllers/comment.controller');
 
+/* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
 router.post("/createComment", commentController.createComment);

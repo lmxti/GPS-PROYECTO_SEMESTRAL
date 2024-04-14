@@ -1,9 +1,10 @@
-// Dependencias
+/* <----------------------- DEPENDENCIAS --------------------------> */
 const express = require('express');
-// Controlador de usuarios
+
+/* <----------------------- CONTROLADOR ---------------------------> */
 const userController = require('../controllers/user.controller');
 
-// Enrutador
+/* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
 router.post("/createUser", userController.createUser);

@@ -1,10 +1,10 @@
-/* <----------------------- MODULOS --------------------------> */
+/* <----------------------- DEPENDENCIAS --------------------------> */
 const express = require("express");
 
-/* <--------------------- CONTROLADOR-------------------------> */
+/* <----------------------- CONTROLADOR ---------------------------> */
 const authController = require("../controllers/auth.controller.js");
 
-// Instancia de enrutador
+/* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
 router.post("/login", authController.login);
