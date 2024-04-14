@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
         badges: [
              { 
                 badge: {type: mongoose.Schema.Types.ObjectId, ref: "Badge"},
-                dateObtained: {type: Date, required}
+                dateObtained: {type: Date}
             }
         ],
         // Comentarios pertenecientes al usuario, por defecto es un array vacio "[]"
