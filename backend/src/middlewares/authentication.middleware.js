@@ -1,9 +1,16 @@
 "use strict";
-
+/* <----------------------- MODULOS --------------------------> */
+// jwt: Modulo para generacion y verificacion de tokens 
 const jwt = require("jsonwebtoken");
-const { ACCESS_JWT_SECRET } = require("../config/configEnv");
-const { respondError } = require("../utils/resHandler");
+
+/* <--------------------- V. DE ENTORNO ----------------------> */
+const { ACCESS_JWT_SECRET } = require("../config/env.config.js");
+
+/* <----------------------- FUNCIONES ------------------------> */
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
+// respondError: Funcion para dar respuesta de errores estandarizada
+const { respondError } = require("../utils/resHandler");
 
 /**
  * Verifica el token de acceso
@@ -16,13 +23,7 @@ const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return respondError(
-        req,
-        res,
-        401,
-        "No autorizado",
-        "No hay token valido",
-      );
+      return respondError( req, res, 401, "No autorizado","Token Bearer no valido,");
     }
 
     const token = authHeader.split(" ")[1];

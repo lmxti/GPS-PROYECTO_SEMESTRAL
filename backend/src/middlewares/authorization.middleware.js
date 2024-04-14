@@ -14,9 +14,11 @@ const { handleError } = require("../utils/errorHandler.js");
 async function isAdmin(req, res, next) {
   try {
     const user = await User.findOne({ email: req.email });
-    const roles = await Role.find({ _id: { $in: user.roles } });
+    console.log(user.roleUser);
+    const roles = await Role.find({ _id: { $in: user.roleUser } });
+    console.log(roles);
     for (let i = 0; i < roles.length; i++) {
-      if (roles[i].name === "admin") {
+      if (roles[i].nameRole === "Administrador") {
         next();
         return;
       }
