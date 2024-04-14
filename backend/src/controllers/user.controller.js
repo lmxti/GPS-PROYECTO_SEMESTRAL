@@ -1,8 +1,14 @@
 const User = require("../models/user.model.js");
+/* <----------------------- SERVICIOS ------------------------> */
 const UserService = require("../services/user.service.js");
+
+/* <----------------------- SCHEMA ------------------------> */
 const { userBodySchema, userIdSchema } = require("../schema/user.schema.js");
 
+/* <----------------------- FUNCIONES ------------------------> */
+// Funciones que manejan las respuestas HTTP exitosas/erroneas.
 const { respondSuccess, respondError } = require("../utils/resHandler.js");
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
 
 async function createUser(req, res){
