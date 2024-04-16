@@ -1,5 +1,6 @@
 "use strict";
 
+const { required } = require("joi");
 const mongoose = require("mongoose")
 
 const postSchema = new mongoose.Schema(
@@ -9,14 +10,14 @@ const postSchema = new mongoose.Schema(
         // Contenido o descripcion de publicación.
         description: { type: String, required: true },
         // Imagenes incluidas en publicación
-        images: [{ type: String, required: true}],
+        images: [{ type: String }],
         // Fecha de creación de publicación
         createdAt: { type: Date, required: true, default: Date.now },
 
         /*<---------- Relaciones con otros modelos ----------> */
 
         // Autor de la publicación
-        author: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
+        author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
         // Hashtag que tiene publicación
         hashtags: [ { type: mongoose.Schema.Types.ObjectId, ref: "Hashtag"}],
         // Interacciones de usuarios

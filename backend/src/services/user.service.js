@@ -1,13 +1,15 @@
+/* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+/* <----------------------- FUNCIONES ------------------------> */
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js")
 
-/** --------- CREATE ------------------
+/** 
     * Crea un nuevo usuario en la base de datos
     * @param {Object} "user" es un objeto de usuario con sus datos
     * @returns {Promise} Promesa con el objeto de usuario creado.
 */
-
 async function createUser(user){
     try{
         const {
@@ -52,6 +54,10 @@ async function createUser(user){
     }
 }
 
+/**
+ * 
+ * @returns 
+ */
 async function getUsers(){
     try {
         const users = await User.find()
