@@ -5,6 +5,8 @@ const express = require('express');
 const authRoutes = require("./auth.routes.js");
 const userRoutes = require('./user.routes.js');
 const postRoutes = require("./post.routes.js");
+const badgeRoutes = require('./badge.routes.js');
+const hashtagRoutes = require('./hashtag.routes.js');
 
 /* <------------------------ MIDDLEWARES ---------------------------> */
 const authenticationMiddleware  = require("../middlewares/authentication.middleware.js");
@@ -15,5 +17,7 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/posts", postRoutes);
+router.use("/badges", badgeRoutes);
+router.use("/hashtags", hashtagRoutes);
 
 module.exports = router;
