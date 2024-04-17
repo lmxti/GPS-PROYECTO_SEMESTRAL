@@ -18,4 +18,6 @@ router.get("/getUserPosts/:id", postController.getUserPosts);
 router.put("/updatePost/:id", postController.updatePost);
 router.delete("/deletePost/:id", postController.deletePost);
 
+router.post("/markPostInteraction/:postId", postController.markPostInteraction);
+
 module.exports = router;

@@ -3,12 +3,14 @@ const PostService = require("../services/post.service.js");
 
 /* <----------------------- SCHEMA ------------------------> */
 const { postBodySchema } = require("../schema/post.schema.js");
+const { userIdSchema } = require("../schema/user.schema.js");
 
 /* <----------------------- FUNCIONES ------------------------> */
 // Funciones que manejan las respuestas HTTP exitosas/erroneas.
 const { respondSuccess, respondError } = require("../utils/resHandler.js");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
+const Post = require("../models/post.model.js");
 
 /**
  *  Crea una nueva publicacion utilizando el servicio `PostService.createPost()` con el parametro de 
@@ -132,11 +134,29 @@ async function deletePost(req, res) {
     }
 }
 
+async function markPostInteraction(req, res){
+    try {
+        const { postId } = req.params;
+        const { id, type } = req.body;
+        const { error: errorIdUser} = userIdSchema.validate({id});
+        if(errorIdUser) return respondError(req, res, 400, errorIdUser.message);
+
+        const [interaction, interactionError] = await PostService.markPostInteraction(postId, id, type);
+        if(interactionError) return respondError(req, res, 400, interactionError);
+        if(!interaction) return respondError(req, res, 400, "No existen datos de interaccion");
+        respondSuccess(req, res, 200, { message: "Interaccion exitosa", data: interaction});
+
+    } catch (error) {
+        handleError(error, "post.controller -> markPostInteraction");
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
     getPostByID,
     getUserPosts,
     updatePost,
-    deletePost
+    deletePost,
+    markPostInteraction
 }

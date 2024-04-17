@@ -119,6 +119,44 @@ async function deletePost(id){
         handleError(error, "post.service -> deletePost");
     }
 }
+/**
+ * 
+ * @param {string} postId - El id de publicacion.
+ * @param {string} userId - El id de usuario que interactua con la publicacion.
+ * @param {string} interactionType - El tipo de interacción ("helpful" o "nothelpful").
+ * @returns {Promise<Array>} Promesa que resuelve un arreglo que contiene la publicacion y la interaccion actualizada si tiene exito,si falla retorna `[null, mensaje de error]`
+ */
+async function markPostInteraction(postId, userId, interactionType){
+    try {
+                const postExist = await Post.findById(postId);
+                if(!postExist) return [null, `No se encontro publicacion de id: ${id}`];
+                const userExist = await User.findById(userId);
+                if(!userExist) return [null, `No se encontro usuario de id: ${userId}`];
+                if (interactionType !== "helpful" && interactionType !== "nothelpful") return [null, "El tipo de interacción debe ser 'helpful' o 'nothelpful'"]
+
+                // Busqueda de interacciones previas de usuario con la publicacion
+                const userInteractionIndex = postExist.interactions.findIndex( interaction =>interaction.user.toString() === userId)
+                // Si el usuario ya ha interactuado antes con la publicacion
+                if(userInteractionIndex !== -1){
+                    // Si la interaccion nueva es igual a la previa, se elimina
+                    if(postExist.interactions[userInteractionIndex].type === interactionType){
+                        postExist.interactions.splice(userInteractionIndex, 1);
+                    } else{
+                        // Si la interaccion nueva es distinta a la previa, se actualiza por la nueva.
+                        postExist.interactions[userInteractionIndex].type = interactionType;
+                    }
+                }
+                // Si el usuario no ha interactuado con la publicacion, se agrega
+                else{
+                    postExist.interactions.push({user: userId, type: interactionType});
+                }
+                await postExist.save();
+                return [postExist, null]
+
+    } catch (error) {
+        handleError(error, "post.service -> markPostInteraction")
+    }
+}
 
 
 module.exports = {
@@ -127,5 +165,6 @@ module.exports = {
     getPostByID,
     getUserPosts,
     updatePost,
-    deletePost
+    deletePost,
+    markPostInteraction
 }
