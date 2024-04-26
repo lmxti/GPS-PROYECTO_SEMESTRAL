@@ -94,10 +94,10 @@ async function updatePost(id, body) {
     try {
         const post = await Post.findById(id);
         if(!post) return [null, `No se encontro la publicacion de id: ${id}`];
-        const { title, description, hashtags } = body;
+        const { title, description, hashtags, status } = body;
         const postUpdated = await Post.findByIdAndUpdate(
             id,
-            { title, description, hashtags },
+            { title, description, hashtags, status },
             { new: true }
         );
         return [postUpdated, null];

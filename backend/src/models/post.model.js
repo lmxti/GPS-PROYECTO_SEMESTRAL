@@ -13,6 +13,8 @@ const postSchema = new mongoose.Schema(
         images: [{ type: String }],
         // Fecha de creación de publicación
         createdAt: { type: Date, required: true, default: Date.now },
+        // Estado de publicacion(abierta por default)
+        status: { type: Boolean, default: true},
 
         /*<---------- Relaciones con otros modelos ----------> */
 
