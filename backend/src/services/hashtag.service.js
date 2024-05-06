@@ -1,4 +1,8 @@
+/* <----------------------- MODELOS --------------------------> */
 const Hashtag = require("../models/hashtag.model");
+
+/* <----------------------- FUNCIONES ------------------------> */
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js")
 
 async function createHashtag(hashtag){

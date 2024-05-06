@@ -30,8 +30,6 @@ async function login(credentials){
         if(!userFound) return [null, null, "No se encontro usuario"];
 
         // Busqueda y comparacion entre contrasena ingresada y contrasena de usuario
-        console.log(password);
-        console.log(userFound.password);
         const matchPassword = await User.comparePassword(password, userFound.password);
         if (!matchPassword) return [null, null, "Error de contrasena, intenta nuevamente"];
 

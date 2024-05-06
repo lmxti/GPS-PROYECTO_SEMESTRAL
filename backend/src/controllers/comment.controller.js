@@ -1,11 +1,28 @@
+/* <----------------------- SERVICIOS ------------------------> */
 const CommentService = require('../services/comment.service');
+
+/* <----------------------- SCHEMA ------------------------> */
+// [NOTA]: Revisar incorporacion de schema de COMMENT
+const { userIdSchema } = require("../schema/user.schema.js");
+
+/* <----------------------- FUNCIONES ------------------------> */
+// Funciones que manejan las respuestas HTTP exitosas/erroneas.
 const { respondSuccess, respondError } = require('../utils/resHandler');
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require('../utils/errorHandler');
 
 
+/**
+ * Crea un nuevo comentario utilizando el servicio 'CommentService.createComment()' con el parametro de body
+ * que contiene los campos necesarios y requeridos del comentario.
+ * @param {Object} req - Objeto de solicitud (request) para crear un nuevo comentario a partir de req.body
+ * @param {Object} res -  Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function createComment(req, res) {
     try {
         const { body } = req;
+        //[NOTA] commentSchema...?
         const [newComment, commentError] = await CommentService.createComment(body);
         if (commentError) return respondError(req, res, 400, commentError);
         if (!newComment) return respondError(req, res, 400, 'No se creo el comentario');
@@ -15,7 +32,12 @@ async function createComment(req, res) {
         respondError(req, res, 500, 'No se creo comentario');
     }
 }
-
+/**
+ * Busca y obtiene todos los comentarios creados utilizando el servicio 'CommentService.getComments()'.
+ * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getComments(req, res) {
     try {
         const [comments, errorComments] = await CommentService.getComments();

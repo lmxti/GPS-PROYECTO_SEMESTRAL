@@ -7,6 +7,7 @@ const userRoutes = require('./user.routes.js');
 const postRoutes = require("./post.routes.js");
 const badgeRoutes = require('./badge.routes.js');
 const hashtagRoutes = require('./hashtag.routes.js');
+const commentRoutes = require("./comment.routes.js");
 
 /* <------------------------ MIDDLEWARES ---------------------------> */
 const authenticationMiddleware  = require("../middlewares/authentication.middleware.js");
@@ -19,5 +20,6 @@ router.use("/users", userRoutes);
 router.use("/posts", postRoutes);
 router.use("/badges", badgeRoutes);
 router.use("/hashtags", hashtagRoutes);
+router.use("/comments", commentRoutes);
 
 module.exports = router;

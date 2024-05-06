@@ -1,19 +1,19 @@
 /* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+const Badge = require("../models/badge.model");
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
-const { handleError } = require("../utils/errorHandler.js")
+const { handleError } = require("../utils/errorHandler.js");
 
 /** 
-    * Crea un nuevo usuario en la base de datos
-    * @param {Object} "user" es un objeto de usuario con sus datos
+    * Servicio para crear un usuario utilizando datos proporcionados por el parametro 'user'
+    * @param {Object} user - Objeto que contiene datos necesarios como 'name', surname', 'email', etc. para crear un usuario.
     * @returns {Promise} Promesa con el objeto de usuario creado.
 */
 async function createUser(user){
     try{
-        const {
-            name,
+        const { name,
             surname,
             username,
             description,
@@ -23,17 +23,18 @@ async function createUser(user){
             password,
             joinedAt,
             profilePicture,
-            roleUser
+            roleUser = ["Usuario"],
         } = user;
         const userEmailExists = await User.findOne({email: email})
         if(userEmailExists) return [ null, "Este email ya esta asociado a otro usuario"];
         const userNameExists = await User.findOne({username: username})
         if(userNameExists) return [ null, "Nombre de usuario ya en uso, intenta con otro"];
         const roleFound = await Role.find({nameRole: {$in: roleUser}});
-        if(roleFound.length === 0){
-            return [null, "El rol ingresado no existe"]
-        } 
-        const hisRoleUser = roleFound.map( role => role._id)
+        if(roleFound.length === 0) return [null, "El rol ingresado no existe"];
+        const hisRoleUser = roleFound.map( role => role._id);
+        const badgeNewUser = await Badge.findOne({ nameBadge: "Bienvenida" });
+        if (!badgeNewUser) return [null, "La insignia de bienvenida no está configurada correctamente"];
+
         const newUser = new User({
             name,
             surname,
@@ -45,18 +46,18 @@ async function createUser(user){
             password: await User.encryptPassword(password),
             joinedAt,
             profilePicture,
-            roleUser: hisRoleUser
+            roleUser: hisRoleUser,
         });
+        newUser.badges.push({ badge: badgeNewUser._id , dateObtained: Date.now() });
         await newUser.save();
         return [newUser, null];
     } catch(error){
         handleError(error, "user.service -> createUser")
     }
 }
-
 /**
- * 
- * @returns 
+ * Servicio para obtener todos los usuarios existentes
+ * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[users, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
 async function getUsers(){
     try {
@@ -69,8 +70,12 @@ async function getUsers(){
         handleError(error, "user.service -> getUsers");
     }
 }
-
-async function getUser(id){
+/**
+ * Servicio de busqueda y obtencion de usuario existente a traves de su id
+ * @param {string} id - id de usuario a obtener 
+ * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[user, null] si tiene éxito o `[null, mensaje de error]` si falla.
+ */
+async function getUserByID(id){
     try {
         const user = await User.findById({ _id: id })
             .select("-password")
@@ -82,12 +87,16 @@ async function getUser(id){
         handleError(error, "user.service -> getUser");
     }
 }
-
+/**
+ * Servicio para actualizar los campos de un usuario existente,
+ * @param {string} id - ID de usuario a actualizar 
+ * @param {Object} body - Objeto que contiene los campos a utilizar como 'name','email', etc.
+ * @returns {Promise<Array>} Promesa que resuelve un arreglo que contiene `[userUpdateduserUpdated, null] si tiene éxito o `[null, mensaje de error]` si falla.
+ */
 async function updateUser(id, body) {
     try {
         const userFound = await User.findById(id);
         if (!userFound) return [null, "No existe usuario asociado al id ingresado"];
-
         const {
             name,
             surname,
@@ -115,31 +124,21 @@ async function updateUser(id, body) {
             profilePicture,
             roleUser
         };
+        if (email === userFound.email) delete updateFields.email;
+        if (username === userFound.username) delete updateFields.username;
 
-        // Verificar si el email es el mismo que el actual del usuario
-        if (email === userFound.email) {
-            delete updateFields.email; // Excluir el email de la actualización si es el mismo
-        }
-
-        // Verificar si el nombre de usuario es el mismo que el actual del usuario
-        if (username === userFound.username) {
-            delete updateFields.username; // Excluir el username de la actualización si es el mismo
-        }
-
-        // Realizar la actualización con los campos actualizados
-        const userUpdated = await User.findByIdAndUpdate(
-            id,
-            updateFields,
-            { new: true }
-        );
-        
+        const userUpdated = await User.findByIdAndUpdate(id,updateFields,{ new: true });
         return [userUpdated, null];
     } catch (error) {
         handleError(error, "user.service -> updateUser");
         return [null, "Error al actualizar el usuario"];
     }
 }
-
+/**
+ * Servicio para eliminar un usuario existente por su ID
+ * @param {string} id - ID de usuario a eliminar
+ * @returns {Promise<Array>} Promesa que resuelve un arreglo que contiene `[userDeleted, null] si tiene éxito o `[null, mensaje de error]` si falla.
+ */
 async function deleteUser(id){
     try {
         const userDeleted = await User.findByIdAndDelete(id);
@@ -153,7 +152,7 @@ async function deleteUser(id){
 module.exports = {
     createUser,
     getUsers,
-    getUser,
+    getUserByID,
     updateUser,
     deleteUser
 }

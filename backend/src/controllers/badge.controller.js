@@ -10,6 +10,7 @@ const { handleError } = require('../utils/errorHandler');
 
 async function createBadge(req, res) {
     try {
+        console.log(req);
         const { nameBadge, descriptionBadge } = req.body;
         const { error: bodyError } = badgeBodySchema.validate(req.body);
         if (bodyError) return respondError(req, res, 400, bodyError.message);
@@ -18,10 +19,7 @@ async function createBadge(req, res) {
         const imageBuffer = req.file.buffer;
         const base64Image = imageBuffer.toString('base64');
 
-        const badge = {
-            nameBadge,
-            descriptionBadge,
-            imageBadge: base64Image
+        const badge = { nameBadge, descriptionBadge, imageBadge: base64Image
         }
 
         const [newBadge, badgeError] = await BadgeService.createBadge(badge);

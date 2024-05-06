@@ -44,11 +44,10 @@ const userBodySchema = Joi.object({
         "string.min": "La contrasena debe tener al menos 5 caracteres"
     }),
     roleUser: Joi.array().items(Joi.string().valid(...ROLES))
-    .required()
     .messages({
         "string.empty": "El rol no puede estar vacio",
         "string.base": "El rol debe ser de tipo texto",
-        "any.only": "El rol debe ser valido"
+        "any.only": "El rol debe ser valido, solo se permite Usuario, Administrador o Moderador"
     })
 }).messages({
     "object.unknow" : "No se permiten campos adicionales"

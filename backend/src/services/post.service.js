@@ -20,7 +20,7 @@ async function createPost(post) {
     try {
         const { title, description, images, author, hashtags } = post;
         const userExists = await User.findOne({ _id: author })
-        if(!userExists) return [null, "El autor de publicacion no existe"];
+        if(!userExists) return [null, "Id de usuario a crear publicacion no existe, verifica id."];
         const newPost = new Post({
             title,
             description,
@@ -85,9 +85,6 @@ async function getUserPosts(id){
  * Servicio para actualizar los campos de una publicación existente.
  * @param {string} id - ID de la publicación a actualizar.
  * @param {Object} body - Objeto que contiene los campos a actualizar.
- * @param {string} body.title - Nuevo título de la publicación.
- * @param {string} body.description - Nueva descripción de la publicación.
- * @param {Array} body.hashtags - Nuevo arreglo de hashtags asociados a la publicación.
  * @returns {Promise<Array>} Promesa que resuelve un arreglo que contiene `[postUpdated, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
 async function updatePost(id, body) {
@@ -128,36 +125,33 @@ async function deletePost(id){
  */
 async function markPostInteraction(postId, userId, interactionType){
     try {
-                const postExist = await Post.findById(postId);
-                if(!postExist) return [null, `No se encontro publicacion de id: ${id}`];
-                const userExist = await User.findById(userId);
-                if(!userExist) return [null, `No se encontro usuario de id: ${userId}`];
-                if (interactionType !== "helpful" && interactionType !== "nothelpful") return [null, "El tipo de interacción debe ser 'helpful' o 'nothelpful'"]
+        const postExist = await Post.findById(postId);
+        if(!postExist) return [null, `No se encontro publicacion de id: ${id}`];
+        const userExist = await User.findById(userId);
+        if(!userExist) return [null, `No se encontro usuario de id: ${userId}`];
+        if (interactionType !== "helpful" && interactionType !== "nothelpful") return [null, "El tipo de interacción debe ser 'helpful' o 'nothelpful'"]
 
-                // Busqueda de interacciones previas de usuario con la publicacion
-                const userInteractionIndex = postExist.interactions.findIndex( interaction =>interaction.user.toString() === userId)
-                // Si el usuario ya ha interactuado antes con la publicacion
-                if(userInteractionIndex !== -1){
-                    // Si la interaccion nueva es igual a la previa, se elimina
-                    if(postExist.interactions[userInteractionIndex].type === interactionType){
-                        postExist.interactions.splice(userInteractionIndex, 1);
-                    } else{
-                        // Si la interaccion nueva es distinta a la previa, se actualiza por la nueva.
-                        postExist.interactions[userInteractionIndex].type = interactionType;
-                    }
-                }
-                // Si el usuario no ha interactuado con la publicacion, se agrega
-                else{
-                    postExist.interactions.push({user: userId, type: interactionType});
-                }
-                await postExist.save();
-                return [postExist, null]
-
+        // Busqueda de interacciones previas de usuario con la publicacion
+        const userInteractionIndex = postExist.interactions.findIndex( interaction =>interaction.user.toString() === userId)
+        // Si el usuario ya ha interactuado antes con la publicacion
+        if(userInteractionIndex !== -1){
+            // Si la interaccion nueva es igual a la previa, se elimina
+            if(postExist.interactions[userInteractionIndex].type === interactionType){
+                postExist.interactions.splice(userInteractionIndex, 1);
+            } else{
+                // Si la interaccion nueva es distinta a la previa, se actualiza por la nueva.
+                postExist.interactions[userInteractionIndex].type = interactionType;
+            }
+        }
+        else{
+            postExist.interactions.push({user: userId, type: interactionType});
+        }
+        await postExist.save();
+        return [postExist, null]
     } catch (error) {
         handleError(error, "post.service -> markPostInteraction")
     }
 }
-
 
 module.exports = {
     createPost,

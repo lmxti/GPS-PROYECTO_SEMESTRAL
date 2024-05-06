@@ -1,6 +1,5 @@
 const { PORT } = require('./config/env.config.js')
 const express = require('express')
-const server = express()
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser")

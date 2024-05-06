@@ -10,22 +10,30 @@ const { userIdSchema } = require("../schema/user.schema.js");
 const { respondSuccess, respondError } = require("../utils/resHandler.js");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
-const Post = require("../models/post.model.js");
 
 /**
  *  Crea una nueva publicacion utilizando el servicio `PostService.createPost()` con el parametro de 
  * body que contiene campos como title, description y author.
- * @param {Object} req -  Objeto de solitiud (request) para crear una nueva publicacion en `req.body`.
+ * @param {Object} req -  Objeto de solitiud (request) para crear una nueva publicacion a partir de `req.body`.
  * @param {Object} res -  Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
  * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
  */
 async function createPost(req, res) {
     try {
-        const { body } = req;
-        const { error: bodyError} = postBodySchema.validate(body);
+        const { title, description, author, hashtags } = req.body;
+        console.log("Este es el req: ", req);
+        const { error: bodyError} = postBodySchema.validate(req.body);
         if(bodyError) return respondError(req, res, 400, bodyError.message);
-        const [newPost, PostError ] = await PostService.createPost(body);
-        console.log("esto es newPost", newPost);
+
+        let base64Image = null;
+        if (req.file) {
+            const imageBuffer = req.file.buffer;
+            base64Image = imageBuffer.toString("base64");
+        }
+
+        const post = { title, description, author, hashtags, images: base64Image };
+
+        const [newPost, PostError ] = await PostService.createPost(post);
         if(PostError) return respondError(req, res, 400, PostError);
         if(!newPost) return respondError(req, res, 400, "No existen datos newPost");
         respondSuccess(req, res, 201, { message: "Publicacion creada", data: newPost});
@@ -34,7 +42,6 @@ async function createPost(req, res) {
         respondError(req, res, 500, "No se creo publicación");
     }
 }
-
 /**
  * Obtiene todas las publicaciones existentes utilizando el servicio `PostService.getPosts()`.
  * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
@@ -53,7 +60,6 @@ async function getPosts(req, res){
         respondError(req, res, 500, "post.controller-> Error de busqueda de publicaciones");
     }
 }
-
 /**
  * Busca y obtiene una publicacion existente utilizando el servicio `PostService.getPostByID()`
  * utilizando el id de la publicacion.
@@ -93,7 +99,6 @@ async function getUserPosts(req, res){
         respondError(req, res, 500, `post.controller-> Error de busqueda de publicaciones de usuario`);
     }
 }
-
 /**
  *  Busca y actualiza los campos de una publicacion existente utilizando el servicio `PostService.updatePost()`
  * que utiliza el id de la publicacion a editar y el body que contiene las modificaciones.
@@ -104,17 +109,22 @@ async function getUserPosts(req, res){
 async function updatePost(req, res){
     try {
         const { id } = req.params;
-        const { body } = req;
-        const [post, postError] = await PostService.updatePost(id, body);
+        const { title, description, author, hashtags  } = req.body;
+        let base64Image = null;
+        if (req.file) {
+            const imageBuffer = req.file.buffer;
+            base64Image = imageBuffer.toString("base64");
+        }
+        const post = { title, description, author, hashtags};
+        const [updatedPost, postError] = await PostService.updatePost(id, post);
         if(postError) return respondError(req, res, 400, postError);
-        if(!post) return respondError(req, res, 400, "No se encontro publicacion");
+        if(!updatedPost) return respondError(req, res, 400, "No se encontro publicacion");
         respondSuccess(req, res, 200, { message: "Publicacion actualizada", data: post});
     } catch (error) {
         handleError(error, "post.controller -> updatePost");
         respondError(req, res, 500, "post.controller-> Error al actualizar publicacion");
     }
 }
-
 /**
  * Busca y elimina una publicacion existente utilizando el servicio `PostService.deletePost()` que utiliza el id
  * de la publicacion a eliminar.
@@ -134,6 +144,13 @@ async function deletePost(req, res) {
     }
 }
 
+/**
+ * Agrega o quita reaccion(helful o nothelpful) de usuario a publicacion utilizando el servicio 'PostService.markPostInteraction()'
+ * que recibe el id de publicacion como parametro de la solicitud y el id junto a la reaccion que provienen del cuerpo de la solicitud(body)
+ * @param {Object} req - EL objeto de la solicitud (request) contiene en su parametro id de publicacion y en el body id y reaccion de usuario.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function markPostInteraction(req, res){
     try {
         const { postId } = req.params;

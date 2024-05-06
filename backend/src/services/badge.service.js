@@ -1,14 +1,15 @@
+/* <----------------------- MODELOS --------------------------> */
 const Badge = require('../models/badge.model');
+const User = require("../models/user.model");
+
+/* <----------------------- FUNCIONES ------------------------> */
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require('../utils/errorHandler');
 
 async function createBadge(badge){
     try{
         const { nameBadge, descriptionBadge, imageBadge } = badge;
-        const newBadge = new Badge({
-            nameBadge,
-            descriptionBadge,
-            imageBadge
-        });
+        const newBadge = new Badge({ nameBadge, descriptionBadge, imageBadge });
         await newBadge.save();
         return [newBadge, null];
     }catch(error){
@@ -68,7 +69,25 @@ async function deleteBadge(id){
         handleError(error, 'badge.service -> deleteBadge');
         return [null, 'No se pudo eliminar la insignia'];
     }
+}
 
+async function assignBadge(idBadge, idUser){
+    try {
+        const badgeFound = await Badge.findById(idBadge);
+        if(!badgeFound) return [null, "No se encontro insignia"]
+
+        const userFound = await User.findById(idUser);
+        if(!userFound) return [null, "No se encontro usuario"]
+
+        const userHasThisBadge = userFound.badges.some(item => item.badge.toString() === idBadge);
+        if (userHasThisBadge) return [null, "El usuario ya tiene esta insignia"];
+        userFound.badges.push({badge: idBadge, dateObtained: Date.now()})
+        await userFound.save();
+        return [userFound, null];
+    } catch (error) {
+        handleError(error, 'badge.service -> assignBadge');
+        return [null, 'No fue posible dar insignia'];
+    }
 }
 
 module.exports = {
@@ -76,5 +95,6 @@ module.exports = {
     getBadges,
     getBadgeById,
     updateBadge,
-    deleteBadge
+    deleteBadge,
+    assignBadge
 }

@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/createUser", userController.createUser);
 router.get("/getUsers", userController.getUsers);
-router.get("/getUser/:id", userController.getUser);
+router.get("/getUserByID/:id", userController.getUserByID);
 router.put("/updateUser/:id", userController.updateUser);
 router.delete("/deleteUser/:id",[authenticationMiddleware, authorizationMiddleware.isAdmin], userController.deleteUser);
 

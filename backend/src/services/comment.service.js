@@ -1,30 +1,35 @@
-const Comment = require("../models/comment.model");
+/* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
-const { handleError } = require("../utils/errorHandler.js");
+const Post = require("../models/post.model.js");
+const Comment = require("../models/comment.model");
 
-/** --------- CREATE ------------------
- * Crea un nuevo comentario en la base de datos
- * @param {Object} "comment" es un objeto de comentario con sus datos
- * @returns {Promise} Promesa con el objeto de comentario creado.
+/* <----------------------- FUNCIONES ------------------------> */
+// handleError: Funcion de registro y manejo de errores de manera centralizada 
+const { handleError } = require("../utils/errorHandler.js")
+
+/**
+ * Servicio para crear un comentario e incorporarlo a publicacion, recibe el id de publicacion para revisar
+ * si admite comentarios basado en el 'status' del post.
+ * @param {Object} bodyComment - Objeto que contiene datos de comentario a crear.
+ * @param {string} bodyComment.userComment - Comentario textual de usuario.
+ * @param {string} bodyComment.imageComment - Imagen de comentario (opcional).
+ * @param {string} bodyComment.fileComment - Archivo de comentario (opcional).
+ * @param {string} bodyComment.userId - Id de usuario que realiza comentario.
+ * @param {string} bodyComment.postId - Id de publicacion que se comenta.
+ * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[newComment, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-
-async function createComment(comment){
+async function createComment(bodyComment){
     try{
-        const {
-            userComment,
-            ImageComment,
-            fileComment,
-            user
-        } = comment;
-        const userFound = await User.findById(user);
+        const { userComment, ImageComment, fileComment, userId, postId } = bodyComment;
+        const userFound = await User.findById(userId);
         if(!userFound) return [ null, "Usuario no encontrado"];
-        const newComment = new Comment({
-            userComment,
-            ImageComment,
-            fileComment,
-            user
-        });
+        const postFound = await Post.findById(postId);
+        if (!postFound) return [ null, "Publicacion no encontrada"];
+        if(!postFound.status) return [null, "La publicacion esta cerrada y no permite comentarios."];
+        const newComment = new Comment({ userComment, ImageComment, fileComment, userId, postId });
         await newComment.save();
+        postFound.comments.push(newComment._id);
+        await postFound.save();
         return [newComment, null];
     }
     catch(error){

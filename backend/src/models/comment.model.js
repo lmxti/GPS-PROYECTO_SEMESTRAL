@@ -16,7 +16,9 @@ const commentSchema = new mongoose.Schema(
         /*<---------- Relaciones con otros modelos ----------> */
 
         // Usuario que realiza el comentario
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", requird: true},
+        // Publicacion que comenta usuario
+        postId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true}
     }
 );
 

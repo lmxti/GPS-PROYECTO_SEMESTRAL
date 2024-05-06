@@ -11,12 +11,18 @@ const { respondSuccess, respondError } = require("../utils/resHandler.js");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
 
+/**
+ * Crea un usuario validando el id y utilizando el servicio 'UserService.createUser()' con el parametro
+ * de body que contiene los campos basicos de usuario.
+ * @param {Object} req -  Objeto de solitiud (request) para crear un usuario a partir de `req.body`.
+ * @param {Object} res -  Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function createUser(req, res){
     try{
         const { body } = req;
         const { error: bodyError } = userBodySchema.validate(body);
         if (bodyError) return respondError(req, res, 400, bodyError.message);
-
         const [newUser, UserError ] = await UserService.createUser(body);
         if (UserError) return respondError(req, res, 400, UserError);
         if (!newUser) return respondError(req, res, 400, "No se creo el usuario");
@@ -26,7 +32,12 @@ async function createUser(req, res){
         respondError(req, res, 500, "No se creo usuario");
     }      
 }
-
+/**
+ * Obtiene todos los usuarios existentes utilizando el servicio 'UserService.getUsers()'
+ * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getUsers(req, res){
     try {
         const [users, errorUsers] = await UserService.getUsers();
@@ -40,21 +51,33 @@ async function getUsers(req, res){
 
     }
 }
-
-async function getUser(req, res){
+/**
+ * busca y obtiene un usuario existente utilizando el servicio 'UserService.getUserByID()' que utiliza
+ * el id proveniente de los parametros.
+ * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
+async function getUserByID(req, res){
     try{
         const { params } = req;
         const { error: paramsError } = userIdSchema.validate(params);
         if(paramsError) return respondError(req, res, 400, paramsError.message);
-        const [ user, userError ] = await UserService.getUser(params.id);
+        const [ user, userError ] = await UserService.getUserByID(params.id);
         if(userError) return respondError(req, res, 404, userError);
         respondSuccess(req, res, 200, user);
     } catch(error){
-        handleError(error, "user.controller -> getUser");
+        handleError(error, "user.controller -> getUserByID");
         respondError(req, res, 500, "No se pudo encontrar usuario");
     }
 }
-
+/**
+ * Busca y actualiza campos de datos de usuario existente utilizando el servicio 'UserService.updateUser()' que
+ * recibe como parametros el id de usuario a modificar y el body que contiene los campos a modificar.
+ * @param {Object} req - El objeto de solicitud (request) contiene el id en `req.params` y las modificaciones en el body de la solicitud
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP
+ * @returns 
+ */
 async function updateUser(req, res){
     try {
         const { id } = req.params;
@@ -68,7 +91,14 @@ async function updateUser(req, res){
         respondError(req, res, 500, "No se actualizo usuario")
     }
 }
-
+/**
+ * Busca y elimina un usuario existente utilizando el servicio 'UserService.deleteUser()' que recibe como parametro
+ * el id de usuario a eliminar.
+ * @param {Object} req - EL objeto de la solicitud (request) contiene el id de publicacion en `req.params`.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ * 
+ */
 async function deleteUser(req, res){
     try {
         const { id } = req.params;
@@ -81,11 +111,10 @@ async function deleteUser(req, res){
     }
 }
 
-
 module.exports = {
     createUser,
     getUsers,
-    getUser,
+    getUserByID,
     updateUser,
     deleteUser
 }
