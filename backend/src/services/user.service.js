@@ -6,6 +6,9 @@ const Badge = require("../models/badge.model");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
 
+/* <----------------------- TRIGGERS ------------------------> */
+const { badgeForRol } = require("../triggers/badge.trigger.js");
+
 /** 
     * Servicio para crear un usuario utilizando datos proporcionados por el parametro 'user'
     * @param {Object} user - Objeto que contiene datos necesarios como 'name', surname', 'email', etc. para crear un usuario.
@@ -29,11 +32,15 @@ async function createUser(user){
         if(userEmailExists) return [ null, "Este email ya esta asociado a otro usuario"];
         const userNameExists = await User.findOne({username: username})
         if(userNameExists) return [ null, "Nombre de usuario ya en uso, intenta con otro"];
+
         const roleFound = await Role.find({nameRole: {$in: roleUser}});
         if(roleFound.length === 0) return [null, "El rol ingresado no existe"];
+
+
         const hisRoleUser = roleFound.map( role => role._id);
-        const badgeNewUser = await Badge.findOne({ nameBadge: "Bienvenida" });
-        if (!badgeNewUser) return [null, "La insignia de bienvenida no está configurada correctamente"];
+
+        const badgeId = await badgeForRol(roleFound.nameRole);
+        if (!badgeId) return [null, "No se encontró una insignia correspondiente para este rol"];
 
         const newUser = new User({
             name,
@@ -47,8 +54,10 @@ async function createUser(user){
             joinedAt,
             profilePicture,
             roleUser: hisRoleUser,
+            badges: [{ badge: badgeId, dateObtained: Date.now()}]
         });
-        newUser.badges.push({ badge: badgeNewUser._id , dateObtained: Date.now() });
+
+
         await newUser.save();
         return [newUser, null];
     } catch(error){

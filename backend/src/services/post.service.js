@@ -4,7 +4,13 @@ const User = require("../models/user.model");
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
-const { handleError } = require("../utils/errorHandler.js")
+const { handleError } = require("../utils/errorHandler.js");
+
+/* <----------------------- UTILS ------------------------> */
+const { saveImagePost, saveHashtagsPost } = require("../utils/generalUtils.js");
+
+/* <----------------------- TRIGGERS ------------------------> */
+const { checkAchievementsPost } = require("../triggers/achievements.trigger.js");
 
 /**
  * Servicio para crear una publicacion utilizando datos proporcionados
@@ -16,19 +22,20 @@ const { handleError } = require("../utils/errorHandler.js")
  * @param {Array} post.hashtags - Arreglo de hashtags asociados a la publicación.
  * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[newPost, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-async function createPost(post) {
+async function createPost(post, file = null) {
     try {
-        const { title, description, images, author, hashtags } = post;
+        const { title, description, author, hashtags } = post;
         const userExists = await User.findOne({ _id: author })
         if(!userExists) return [null, "Id de usuario a crear publicacion no existe, verifica id."];
-        const newPost = new Post({
-            title,
-            description,
-            images,
-            author,
-            hashtags
-        })
+        // Guardado de imagenes subidas(localmente)
+        const images = await saveImagePost(file);
+        // Obtencion/creacion de hashtags
+        const hashtagsIDs = await saveHashtagsPost(hashtags);
+        const newPost = new Post({ title, description, images, author, hashtags: hashtagsIDs })
         await newPost.save();
+
+        checkAchievementsPost(author);
+
         return [newPost, null]
     } catch (error) {
         handleError(error, "post.service -> createPost");

@@ -20,20 +20,11 @@ const { handleError } = require("../utils/errorHandler.js");
  */
 async function createPost(req, res) {
     try {
-        const { title, description, author, hashtags } = req.body;
-        console.log("Este es el req: ", req);
+        const { title, description, author, hashtags} = req.body;
         const { error: bodyError} = postBodySchema.validate(req.body);
         if(bodyError) return respondError(req, res, 400, bodyError.message);
-
-        let base64Image = null;
-        if (req.file) {
-            const imageBuffer = req.file.buffer;
-            base64Image = imageBuffer.toString("base64");
-        }
-
-        const post = { title, description, author, hashtags, images: base64Image };
-
-        const [newPost, PostError ] = await PostService.createPost(post);
+        const post = { title, description, author, hashtags };
+        const [newPost, PostError ] = await PostService.createPost(post, req.file);
         if(PostError) return respondError(req, res, 400, PostError);
         if(!newPost) return respondError(req, res, 400, "No existen datos newPost");
         respondSuccess(req, res, 201, { message: "Publicacion creada", data: newPost});

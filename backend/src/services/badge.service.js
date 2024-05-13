@@ -10,6 +10,8 @@ async function createBadge(badge){
     try{
         const { nameBadge, descriptionBadge, imageBadge } = badge;
         const newBadge = new Badge({ nameBadge, descriptionBadge, imageBadge });
+        const newBadgeExists = await Badge.findOne({nameBadge: nameBadge});
+        if(newBadgeExists) return [null, "Ya existe una badge con este nombre"];
         await newBadge.save();
         return [newBadge, null];
     }catch(error){

@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser")
 const indexRoutes = require("./routes/index.routes.js")
 const { setupDB } = require('./config/db.config.js');
-const { createRoles, createDefaultUsers} = require("./config/initial.setup.js");
+const { createRoles, createDefaultUsers, createBadgeRoles} = require("./config/initial.setup.js");
 
 async function setupServer(){
   try {
@@ -33,6 +33,7 @@ async function setupAPI() {
     await setupDB();
     await setupServer();
     await createRoles();
+    await createBadgeRoles();
     await createDefaultUsers();
     
   } catch (error) {

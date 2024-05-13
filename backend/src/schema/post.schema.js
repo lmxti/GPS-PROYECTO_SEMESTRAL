@@ -25,6 +25,12 @@ const postBodySchema = Joi.object({
         "string.base": "El autor debe ser de tipo texto"
     }).regex(/^[0-9a-fA-F]{24}$/).messages({
         "string.pattern.base": "El ID del autor debe ser un ID válido"
+    }),
+    hashtags: Joi.alternatives().try(
+        Joi.array().items(Joi.string()), // Permitir un array de cadenas
+        Joi.string() // Permitir una cadena individual
+    ).messages({
+        "string.base": "Los hashtags deben ser de tipo texto o un array de textos",
     })
 })
 

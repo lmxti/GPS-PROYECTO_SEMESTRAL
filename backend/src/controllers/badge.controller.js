@@ -8,9 +8,16 @@ const { respondSuccess, respondError } = require('../utils/resHandler');
 // handleError: Funcion de registro y manejo de errores de manera centralizada
 const { handleError } = require('../utils/errorHandler');
 
+/**
+ * Crea una nueva badge manenjando y utilizando el servicio de `BadgeService.createBadge()` con el parametro
+ *  de badge que contiene los campos como el nombre de la badge `nameBadge` y su descripcion `descriptionBadge`.
+ * @param {Object} req - Objeto de solicitud (request) para crear nueva publicacion.
+ * @param {*} res  - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ *  @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function createBadge(req, res) {
     try {
-        console.log(req);
+        // Falta verificacion al crear badge, en caso de mandar una que tenga el mismo nombre.
         const { nameBadge, descriptionBadge } = req.body;
         const { error: bodyError } = badgeBodySchema.validate(req.body);
         if (bodyError) return respondError(req, res, 400, bodyError.message);
@@ -19,13 +26,10 @@ async function createBadge(req, res) {
         const imageBuffer = req.file.buffer;
         const base64Image = imageBuffer.toString('base64');
 
-        const badge = { nameBadge, descriptionBadge, imageBadge: base64Image
-        }
-
+        const badge = { nameBadge, descriptionBadge, imageBadge: base64Image}
         const [newBadge, badgeError] = await BadgeService.createBadge(badge);
         if (badgeError) return respondError(req, res, 400, badgeError);
         if (!newBadge) return respondError(req, res, 400, 'No se creo la insignia');
-
         respondSuccess(req, res, 201, newBadge);
     }catch (error) {
         handleError(error, 'badge.controller -> createBadge');

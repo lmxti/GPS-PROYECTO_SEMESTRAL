@@ -1,8 +1,15 @@
 "use strict";
 
-// Importamos los modelos de role y user
+/* <----------------------- MODELOS --------------------------> */
+const Badge = require("../models/badge.model.js");
 const Role = require("../models/role.model.js");
 const User = require("../models/user.model.js");
+
+/* <----------------------- TRIGGERS ------------------------> */
+const { badgeForRol } = require("../triggers/badge.trigger.js");
+
+/* <----------------------- UTILS ------------------------> */
+const { readFileBase64 } = require("../utils/generalUtils.js");
 
 /**
  * Crea los roles por defecto en la base de datos.
@@ -27,6 +34,33 @@ async function createRoles() {
       new Role({ nameRole: "Moderador" }).save()
     ]);
     console.log("initial.setup -> createRoles: Se han creado los roles default del sistema ");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function createBadgeRoles(){
+  try {
+    const count = await Badge.estimatedDocumentCount();
+    if (count > 0) {
+      return;
+    }
+
+    const usuarioImage = readFileBase64("src/uploads/badges/usuario.png");
+    const adminImage = readFileBase64("src/uploads/badges/administrador.png");
+    const moderadorImage = readFileBase64("src/uploads/badges/moderador.png");
+
+    if (!usuarioImage || !adminImage || !moderadorImage) {
+      console.error("Error: No se pudieron leer las imágenes de las insignias.");
+      return;
+    }
+
+    await Promise.all([
+      new Badge({ nameBadge: "Usuario", descriptionBadge:"Usuario de la comunidad", imageBadge: readFileBase64("src/uploads/badges/usuario.png") }).save(),
+      new Badge({ nameBadge: "Administrador", descriptionBadge:"Administrador de la comunidad", imageBadge: readFileBase64("src/uploads/badges/administrador.png") }).save(),
+      new Badge({ nameBadge: "Moderador", descriptionBadge:"Moderador de la comunidad", imageBadge: readFileBase64("src/uploads/badges/moderador.png") }).save(),
+    ])
+    console.log("initial.setup -> createBadgeRoles: Se crearon las insignas default para cada tipo de rol: Usuario, Moderador y Administrador");
   } catch (error) {
     console.error(error);
   }
@@ -65,6 +99,7 @@ async function createDefaultUsers() {
         email: "admin@localhost.com",
         password: await User.encryptPassword("admin"),
         roleUser: [admin._id],
+        badges: [{ badge: await badgeForRol(admin.nameRole)}]
       }).save(),
       /* <-------------------------------- USUARIO  DEFAULT --------------------------------> */
       new User({
@@ -77,6 +112,7 @@ async function createDefaultUsers() {
         email: "user@localhost.com",
         password: await User.encryptPassword("user"),
         roleUser: [user._id],
+        badges: [{ badge: await badgeForRol(user.nameRole)}]
       }).save(),
       /* <--------------------------- USUARIO MODERADOR DEFAULT ---------------------------> */
       new User({
@@ -89,8 +125,10 @@ async function createDefaultUsers() {
         email: "moderador@localhost.com",
         password: await User.encryptPassword("moderador"),
         roleUser: [moderador._id],
+        badges: [{ badge: await badgeForRol(moderador.nameRole)}]
       }).save()
     ]);
+
     console.log("initial.setup -> createDefaultUsers: Se han creado los usuarios default del sistema: administrador, usuario y moderador");
   } catch (error) {
     console.error(error);
@@ -100,4 +138,5 @@ async function createDefaultUsers() {
 module.exports = {
   createRoles,
   createDefaultUsers,
+  createBadgeRoles
 };
