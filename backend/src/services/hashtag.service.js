@@ -7,7 +7,8 @@ const { handleError } = require("../utils/errorHandler.js")
 
 async function createHashtag(hashtag){
     try{
-        const { nameHashtag } = hashtag;
+        let { nameHashtag } = hashtag;
+        nameHashtag = nameHashtag.toLowerCase();
         const hashtagExists = await Hashtag.findOne({nameHashtag: nameHashtag});
         if(hashtagExists) return [null, "Hashtag ya existe"];
         const newHashtag = new Hashtag({nameHashtag});

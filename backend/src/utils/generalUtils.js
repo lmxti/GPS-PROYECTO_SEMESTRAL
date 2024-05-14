@@ -41,18 +41,20 @@ async function saveImagePost(file){
 async function saveHashtagsPost(hashtags){
   const hashtagsIDs = [];
   if (typeof hashtags === 'string') {
-      let hashtag = await Hashtag.findOne({ nameHashtag: hashtags });
+      const hashtagLower = hashtags.toLowerCase();
+      let hashtag = await Hashtag.findOne({ nameHashtag: hashtagLower });
       if (!hashtag) {
-          hashtag = new Hashtag({ nameHashtag: hashtags });
+          hashtag = new Hashtag({ nameHashtag: hashtagLower });
           await hashtag.save();
       }
       hashtagsIDs.push(hashtag._id);
   } else if (Array.isArray(hashtags) && hashtags.length > 0) {
       for (const hashtagItem of hashtags) {
+        const hashtagLower = hashtagItem.toLowerCase();
           let hashtag = null;
-          let hashtagExist = await Hashtag.findOne({ nameHashtag: hashtagItem });
+          let hashtagExist = await Hashtag.findOne({ nameHashtag: hashtagLower });
           if (!hashtagExist) {
-              hashtag = new Hashtag({ nameHashtag: hashtagItem });
+              hashtag = new Hashtag({ nameHashtag: hashtagLower });
               await hashtag.save();
           } else {
               hashtag = hashtagExist;
