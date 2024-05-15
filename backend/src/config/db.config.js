@@ -1,10 +1,12 @@
+/* <----------------------- MODULOS --------------------------> */
 // Importamos connect desde mongoose para conectarnos a la base de datos
 const mongoose = require("mongoose");
-// Configuracion de variables de entorno
+
+/* <--------------------- V. DE ENTORNO ----------------------> */
 const { DB_URL } = require("./env.config.js");
 
 
-// Opciones de configuracion de la conexion a la base de datos
+// Configuracion de la base de datos
 const options = {
   // useNewUrlParser: true, OBSOLETA
   // useUnifiedTopology: true, OBSOLETA
@@ -16,7 +18,6 @@ const options = {
  *@returns {Promise<void>}
  *@throws {Error}
  */
-
 async function setupDB() {
   try {
     await mongoose.connect(DB_URL, options);

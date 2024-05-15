@@ -24,7 +24,7 @@ async function createPost(req, res) {
         const { error: bodyError} = postBodySchema.validate(req.body);
         if(bodyError) return respondError(req, res, 400, bodyError.message);
         const post = { title, description, author, hashtags };
-        const [newPost, PostError ] = await PostService.createPost(post, req.file);
+        const [newPost, PostError ] = await PostService.createPost(post, req.files);
         if(PostError) return respondError(req, res, 400, PostError);
         if(!newPost) return respondError(req, res, 400, "No existen datos newPost");
         respondSuccess(req, res, 201, { message: "Publicacion creada", data: newPost});
@@ -134,7 +134,6 @@ async function deletePost(req, res) {
         handleError(error, "post.controller -> deletePost");
     }
 }
-
 /**
  * Agrega o quita reaccion(helful o nothelpful) de usuario a publicacion utilizando el servicio 'PostService.markPostInteraction()'
  * que recibe el id de publicacion como parametro de la solicitud y el id junto a la reaccion que provienen del cuerpo de la solicitud(body)

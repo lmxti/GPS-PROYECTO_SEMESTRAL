@@ -1,7 +1,9 @@
 /* <----------------------- SERVICIOS ------------------------> */
 const BadgeService = require('../services/badge.service');
+
 /* <----------------------- SCHEMA ------------------------> */
 const { badgeBodySchema } = require('../schema/badge.schema');
+
 /* <----------------------- FUNCIONES ------------------------> */
 // Funciones que manejan las respuestas HTTP exitosas/erroneas.
 const { respondSuccess, respondError } = require('../utils/resHandler');
@@ -12,12 +14,11 @@ const { handleError } = require('../utils/errorHandler');
  * Crea una nueva badge manenjando y utilizando el servicio de `BadgeService.createBadge()` con el parametro
  *  de badge que contiene los campos como el nombre de la badge `nameBadge` y su descripcion `descriptionBadge`.
  * @param {Object} req - Objeto de solicitud (request) para crear nueva publicacion.
- * @param {*} res  - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @param {Object} res  - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
  *  @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
  */
 async function createBadge(req, res) {
     try {
-        // Falta verificacion al crear badge, en caso de mandar una que tenga el mismo nombre.
         const { nameBadge, descriptionBadge } = req.body;
         const { error: bodyError } = badgeBodySchema.validate(req.body);
         if (bodyError) return respondError(req, res, 400, bodyError.message);
@@ -36,7 +37,12 @@ async function createBadge(req, res) {
         respondError(req, res, 500, 'No se creo insignia');
     }
 }
-
+/**
+ * Obtiene todas las insignias utilizando el servicio `BadgeService.getBadges()`.
+ * @param {Object} req - Objeto de solitiud (request) para obtener todas las badges(insignias).
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getBadges(req, res) {
     try {
         const [badges, badgesError] = await BadgeService.getBadges();
@@ -49,7 +55,13 @@ async function getBadges(req, res) {
         respondError(req, res, 500, 'No se encontraron insignias');
     }
 }
-
+/**
+ * Obtiene una insignia por su ID utilizando el servicio `BadgeService.getBadgeById(id)`.
+ * @param {Object} req - Objeto de solicitud para obtener una insignia por su ID.
+ * @param {string} req.params.id - ID de la insignia que se desea obtener.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getBadgeById(req, res) {
     try {
         const { id } = req.params;
@@ -70,19 +82,18 @@ async function getBadgeById(req, res) {
         respondError(req, res, 500, 'No se encontro la insignia');
     }
 }
-
+/**
+ * Actualiza una insignia existente utilizando el servicio `BadgeService.updateBadge(id, badge)`.
+ * @param {Object} req - Objeto de solicitud para actualizar una insignia.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function updateBadge(req, res) {
     try {
         const { id } = req.params;
-        const { nameBadge, descriptionBadge, imageBadge } = req.body;
-        const imageBuffer = req.file.buffer;
-        const base64Image = imageBuffer.toString('base64');
-        const badge = {
-            nameBadge,
-            descriptionBadge,
-            imageBadge: base64Image
-        }
-        const [updatedBadge, badgeError] = await BadgeService.updateBadge(id, badge);
+        const { body, file } = req;
+
+        const [updatedBadge, badgeError] = await BadgeService.updateBadge(id, body, file);
         if (badgeError) return respondError(req, res, 400, badgeError);
         if (!updatedBadge) return respondError(req, res, 400, 'No se encontro insignia asociada al id ingresado');
 
@@ -92,7 +103,13 @@ async function updateBadge(req, res) {
         respondError(req, res, 500, 'No se pudo actualizar insignia');
     }
 }
-
+/**
+ * Elimina una insignia existente utilizando el servicio `BadgeService.deleteBadge(id))`.
+ * @param {Object} req - Objeto de solicitud para eliminar badge(insignia).
+ * @param {string} req.params.id - ID de la insignia que se desea eliminar.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function deleteBadge(req, res) {
     try {
         const { id } = req.params;
@@ -106,7 +123,13 @@ async function deleteBadge(req, res) {
         respondError(req, res, 500, 'No se pudo eliminar insignia');
     }
 }
-
+/**
+ * Obtiene la imagen de una insignia por su ID utilizando el servicio `BadgeService.getBadgeById(id).
+ * @param {Object} req - Objeto de solicitud para obtener la imagen de una insignia por su ID.
+ * @param {string} req.params.id - ID de la insignia cuya imagen se desea obtener.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getBadgeImage(req, res){
     try {
         const { id } = req.params;

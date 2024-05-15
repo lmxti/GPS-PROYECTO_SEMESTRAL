@@ -1,9 +1,9 @@
-/* <----------------------- MODELOS --------------------------> */
-const User = require("../models/user.model.js");
-
 /* <----------------------- MODULOS --------------------------> */
 // jwt: Modulo para generacion y verificacion de tokens 
 const jwt = require("jsonwebtoken")
+
+/* <----------------------- MODELOS --------------------------> */
+const User = require("../models/user.model.js");
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 

@@ -11,10 +11,7 @@ async function setupServer(){
   try {
     const server = express();
     server.use(express.json());
-    server.use(cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    }));
+    server.use(cors({ origin: 'http://localhost:3000', credentials: true }));
     server.use(cookieParser());
     server.use(morgan("dev"));
     server.use(express.urlencoded({ extended: true }));
@@ -35,7 +32,6 @@ async function setupAPI() {
     await createRoles();
     await createBadgeRoles();
     await createDefaultUsers();
-    
   } catch (error) {
     console.log("Error en setupAPI ",error);
   }

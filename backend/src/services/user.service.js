@@ -1,7 +1,7 @@
 /* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
-const Badge = require("../models/badge.model");
+
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");

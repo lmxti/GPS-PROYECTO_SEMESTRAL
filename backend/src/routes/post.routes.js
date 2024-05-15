@@ -1,4 +1,4 @@
-/* <----------------------- DEPENDENCIAS --------------------------> */
+/* <----------------------- MODULOS --------------------------> */
 const express = require('express');
 
 /* <----------------------- CONTROLADOR ---------------------------> */
@@ -12,7 +12,7 @@ const subirImagen = require("../middlewares/handleMulter.middleware.js");
 /* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
-router.post("/createPost",[subirImagen.single('images')], postController.createPost);
+router.post("/createPost",[subirImagen.array('images')], postController.createPost);
 router.get("/getPosts", postController.getPosts);
 router.get("/getPostByID/:id", postController.getPostByID);
 router.get("/getUserPosts/:id", postController.getUserPosts);

@@ -1,4 +1,4 @@
-/* <----------------------- DEPENDENCIAS --------------------------> */
+/* <----------------------- MODULOS --------------------------> */
 const express = require('express');
 
 /* <-------------------- RUTAS ESPECIFICAS ------------------------> */
@@ -11,6 +11,7 @@ const commentRoutes = require("./comment.routes.js");
 
 /* <------------------------ MIDDLEWARES ---------------------------> */
 const authenticationMiddleware  = require("../middlewares/authentication.middleware.js");
+const authorizationMiddleware  = require("../middlewares/authorization.middleware.js");
 
 /* <------------------- ENRUTADOR SECUNDARIO ----------------------> */
 const router = express.Router();

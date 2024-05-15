@@ -1,8 +1,10 @@
 "use strict";
-
+/* <----------------------- MODULOS --------------------------> */
 const mongoose = require("mongoose");
-const GENDER = require("../constants/gender.constants.js");
 const bcrypt = require("bcryptjs");
+
+/* <----------------------- CONSTANTES --------------------------> */
+const GENDER = require("../constants/gender.constants.js");
 
 const userSchema = new mongoose.Schema(
     {

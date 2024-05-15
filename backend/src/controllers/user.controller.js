@@ -1,4 +1,3 @@
-const User = require("../models/user.model.js");
 /* <----------------------- SERVICIOS ------------------------> */
 const UserService = require("../services/user.service.js");
 

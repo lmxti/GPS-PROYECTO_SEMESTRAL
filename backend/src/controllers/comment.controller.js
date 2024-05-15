@@ -50,7 +50,13 @@ async function getComments(req, res) {
         respondError(req, res, 500, 'No se pudo encontrar comentarios');
     }
 }
-
+/**
+ * Busca y obtiene un comentario utilizando el servicio 'CommentService.getComment(params.id)'.
+ * @param {Object} req - Objeto de solicitud (request) para buscar comentario.
+ * @param {string} req.params.id - ID del comentario que se desea obtener.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningun valor explicito.
+ */
 async function getComment(req, res) {
     try {
         const { params } = req;
@@ -62,7 +68,14 @@ async function getComment(req, res) {
         respondError(req, res, 500, 'No se pudo encontrar comentario');
     }
 }
-
+/**
+ * Actualiza un comentario por su ID utilizando el servicio `CommentService.updateComment(id, body)`.
+ * @param {Object} req - Objeto de solicitud para actualizar un comentario.
+ * @param {string} req.params.id - ID del comentario que se desea actualizar.
+ * @param {Object} req.body - Cuerpo de la solicitud que contiene los datos actualizados del comentario.
+ * @param {Object} res - Objeto de respuesta que contiene información sobre la respuesta HTTP.
+ * @returns 
+ */
 async function updateComment(req, res) {
     try {
         const { id } = req.params;
@@ -76,7 +89,13 @@ async function updateComment(req, res) {
         respondError(req, res, 500, 'No se pudo actualizar comentario');
     }
 }
-
+/**
+ * Elimina un comentario por su ID utilizando el servicio `CommentService.deleteComment(id)`.
+ * @param {Object} req - Objeto de solicitud para eliminar un comentario.
+ * @param {string} req.params.id - ID del comentario que se desea eliminar.
+ * @param {Object} res - Objeto de respuesta que contiene información sobre la respuesta HTTP.
+ * @returns {Promise<void>} Una promesa que no devuelve ningún valor explícito.
+ */
 async function deleteComment(req, res) {
     try {
         const { id } = req.params;
@@ -89,8 +108,13 @@ async function deleteComment(req, res) {
         respondError(req, res, 500, 'No se pudo eliminar comentario');
     }
 }
-
-
+/**
+ * Obtiene todos los comentarios realizados por un usuario específico utilizando el servicio `CommentService.getCommentsByUser(id)`.
+ * @param {Object} req - Objeto de solicitud para obtener comentarios por usuario.
+ * @param {string} req.params.id - ID del usuario cuyos comentarios se desean obtener.
+ * @param {Object} res - Objeto de respuesta que contiene información sobre la respuesta HTTP.
+ * @returns {Promise<void>} Una promesa que no devuelve ningún valor explícito.
+ */
 async function getCommentsByUser(req, res) {
     try {
         const { params } = req;
@@ -104,8 +128,14 @@ async function getCommentsByUser(req, res) {
         respondError(req, res, 500, 'No se pudo encontrar comentarios');
     }
 }   
-
-
+/**
+ * Edita un comentario existente utilizando el servicio `CommentService.editComment(id, body)`.
+ * @param {Object} req - Objeto de solicitud para editar un comentario.
+ * @param {string} req.params.id - ID del comentario que se desea editar.
+ * @param {Object} req.body - Cuerpo de la solicitud con los datos actualizados del comentario.
+ * @param {Object} res - Objeto de respuesta que contiene información sobre la respuesta HTTP.
+ * @returns {Promise<void>} Una promesa que no devuelve ningún valor explícito.
+ */
 async function editComment(req, res) {
     try {
         const { id } = req.params;

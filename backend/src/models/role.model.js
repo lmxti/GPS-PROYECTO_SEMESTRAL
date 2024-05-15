@@ -1,6 +1,8 @@
 "user strict"
-
+/* <----------------------- MODULOS --------------------------> */
 const mongoose = require("mongoose");
+
+/* <----------------------- CONSTANTES --------------------------> */
 const ROLES = require("../constants/role.constants.js");
 
 const roleSchema = new mongoose.Schema(

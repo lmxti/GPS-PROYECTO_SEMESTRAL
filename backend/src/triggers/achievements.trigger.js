@@ -4,6 +4,9 @@
 const User = require("../models/user.model");
 const Post = require("../models/post.model");
 
+/* <----------------------- SERVICIOS ------------------------> */
+const BadgeService = require("../services/badge.service.js");
+
 
 async function checkAchievementsPost(userId){
     try {
@@ -13,6 +16,7 @@ async function checkAchievementsPost(userId){
         switch (postsUser) {
             case 1:
                 console.log("Usuario debe recibir logro por primera publicacion");
+                await BadgeService.assignBadge("66451777c4695387db79f9a4", userId);
                 break;
             case 10:
                 console.log("Usuario debe recibir logro por tener 10 publicaciones");

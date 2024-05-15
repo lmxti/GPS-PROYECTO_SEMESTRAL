@@ -1,6 +1,6 @@
 "use strict";
-
-const mongoose = require("mongoose")
+/* <----------------------- MODULOS --------------------------> */
+const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema(
     {

@@ -104,7 +104,6 @@ async function getReportsByType(req, res) {
     }
 }
 
-
 module.exports = {
     createReport,
     getReports,

@@ -22,16 +22,18 @@ const { checkAchievementsPost } = require("../triggers/achievements.trigger.js")
  * @param {Array} post.hashtags - Arreglo de hashtags asociados a la publicación.
  * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[newPost, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-async function createPost(post, file = null) {
+async function createPost(post, files = []) {
     try {
         const { title, description, author, hashtags } = post;
         const userExists = await User.findOne({ _id: author })
         if(!userExists) return [null, "Id de usuario a crear publicacion no existe, verifica id."];
-        // Guardado de imagenes subidas(localmente)
-        const images = await saveImagePost(file);
-        // Obtencion/creacion de hashtags
+
+        const fileNames = await Promise.all(
+            files.map( file => saveImagePost(file) )
+        );
         const hashtagsIDs = await saveHashtagsPost(hashtags);
-        const newPost = new Post({ title, description, images, author, hashtags: hashtagsIDs })
+
+        const newPost = new Post({ title, description, images:fileNames, author, hashtags: hashtagsIDs })
         await newPost.save();
 
         checkAchievementsPost(author);
@@ -68,7 +70,6 @@ async function getPostByID(id) {
         handleError(error, "post.service -> getPostByID");
     }
 }
-
 /**
  * Servicio de busqueda y obtencion de todas las publicaciones de un usuario especifico
  * @param {string} id id del usuario del cual se obtendran publicaciones
@@ -87,7 +88,6 @@ async function getUserPosts(id){
         handleError(error, "post.service -> getUserPosts")
     }
 }
-
 /**
  * Servicio para actualizar los campos de una publicación existente.
  * @param {string} id - ID de la publicación a actualizar.

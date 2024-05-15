@@ -1,8 +1,12 @@
-/* <----------------------- DEPENDENCIAS --------------------------> */
+/* <----------------------- MODULOS --------------------------> */
 const express = require('express');
 
 /* <----------------------- CONTROLADOR ---------------------------> */
 const hashtagController = require('../controllers/hashtag.controller');
+
+/* <------------------------ MIDDLEWARES ---------------------------> */
+const authenticationMiddleware  = require("../middlewares/authentication.middleware.js");
+const authorizationMiddleware  = require("../middlewares/authorization.middleware.js");
 
 /* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();

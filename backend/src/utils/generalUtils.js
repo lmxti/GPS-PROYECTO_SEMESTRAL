@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs').promises;
 const uuid = require('uuid');
 
 /* <----------------------- MODELOS --------------------------> */
@@ -9,8 +9,7 @@ const Hashtag = require("../models/hashtag.model");
  * @param {string} filePath - La ruta del archivo que se va a leer.
  * @returns {string|null} - La representacion base64 del archivo o null si ocurre un error.
  */
-// DEBERIA SER ASYNC??? REVISAR
-function readFileBase64(filePath) {
+async function readFileBase64(filePath) {
   try {
     // Lee el archivo de forma sincrónica y lo convierte a base64
     const fileData = fs.readFileSync(filePath);
@@ -21,23 +20,26 @@ function readFileBase64(filePath) {
     return null;
   }
 };
-
 /**
- * 
- * @param {*} file 
- * @returns 
+ *  Guarda la imagen de una publicacion en el sistema de archivos
+ * @param {Object} file  - Objeto que contiene la informacion del archivo de imagen.
+ * @returns {String|null} - Nombre de archivo de imagen guardado, o null si no se proporciono ningun archivo.
  */
 async function saveImagePost(file){
   if (file) {
     const imageBuffer = file.buffer;
     const extension = file.originalname.split('.').pop();
     const fileName = `${uuid.v4()}.${extension}`;
-    fs.writeFileSync(`src/uploads/images/${fileName}`, imageBuffer);
+    await fs.writeFile(`src/uploads/images/${fileName}`, imageBuffer);
     return fileName;
   }
   return null;
 }
-
+/**
+ * Guarda los hashtags en la base de datos, asegurándose de que no haya duplicados y devolviendo los IDs correspondientes.
+ * @param {string | string[]} hashtags - Los hashtags a guardar, puede ser una cadena o un array de cadenas.
+ * @returns {Promise<string[]>} - Un array de IDs de los hashtags guardados.
+ */
 async function saveHashtagsPost(hashtags){
   const hashtagsIDs = [];
   if (typeof hashtags === 'string') {
