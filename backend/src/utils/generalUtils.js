@@ -35,6 +35,21 @@ async function saveImagePost(file){
   }
   return null;
 }
+
+async function saveImageProfile(file){
+  if (file) {
+    const imageBuffer = file.buffer;
+    const extension = file.originalname.split('.').pop();
+    const fileName = `${uuid.v4()}.${extension}`;
+    await fs.writeFile(`src/uploads/profiles/${fileName}`, imageBuffer);
+    return fileName;
+  }
+  return null;
+}
+
+
+
+
 /**
  * Guarda los hashtags en la base de datos, asegurándose de que no haya duplicados y devolviendo los IDs correspondientes.
  * @param {string | string[]} hashtags - Los hashtags a guardar, puede ser una cadena o un array de cadenas.
@@ -70,5 +85,6 @@ async function saveHashtagsPost(hashtags){
 module.exports = {
   readFileBase64,
   saveImagePost,
-  saveHashtagsPost
+  saveHashtagsPost,
+  saveImageProfile
 };

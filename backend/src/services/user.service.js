@@ -6,6 +6,9 @@ const Role = require("../models/role.model");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js");
 
+/* <----------------------- UTILS ------------------------> */
+const { saveImageProfile } = require("../utils/generalUtils.js");
+
 /* <----------------------- TRIGGERS ------------------------> */
 const { badgeForRol } = require("../triggers/badge.trigger.js");
 
@@ -14,7 +17,7 @@ const { badgeForRol } = require("../triggers/badge.trigger.js");
     * @param {Object} user - Objeto que contiene datos necesarios como 'name', surname', 'email', etc. para crear un usuario.
     * @returns {Promise} Promesa con el objeto de usuario creado.
 */
-async function createUser(user){
+async function createUser(user, file = null){
     try{
         const { name,
             surname,
@@ -42,6 +45,8 @@ async function createUser(user){
         const badgeId = await badgeForRol(roleFound.nameRole);
         if (!badgeId) return [null, "No se encontró una insignia correspondiente para este rol"];
 
+        const imgPicture = await saveImageProfile(file);
+
         const newUser = new User({
             name,
             surname,
@@ -52,7 +57,7 @@ async function createUser(user){
             email,
             password: await User.encryptPassword(password),
             joinedAt,
-            profilePicture,
+            profilePicture: imgPicture ,
             roleUser: hisRoleUser,
             badges: [{ badge: badgeId, dateObtained: Date.now()}]
         });

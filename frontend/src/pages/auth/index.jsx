@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import LoginForm from "../../components/LoginForm";
+import LoginForm from "@/components/LoginForm";
 import RegisterForm from '@/components/RegisterForm';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Login = () => {
+const Auth = () => {
 
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [showLoginForm, setShowLoginForm] = useState(true);
@@ -30,8 +30,7 @@ const Login = () => {
 
     return (
         <div className="min-h-screen  bg-slate-800 flex justify-center items-center text-black">
-            <div className='py-12 px-12 bg-white rounded-2xl shadow-xl z-20'>
-
+            <div className='py-12 px-12  bg-white rounded-2xl shadow-xl z-20'>
                 <AnimatePresence mode='wait'>
                     {showLoginForm ? 
                     (
@@ -50,4 +49,4 @@ const Login = () => {
     );
 }
 
-export default Login;
+export default Auth;

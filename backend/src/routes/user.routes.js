@@ -12,7 +12,7 @@ const subirImagen = require("../middlewares/handleMulter.middleware.js");
 /* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
-router.post("/createUser", userController.createUser);
+router.post("/createUser", subirImagen.single('profilePicture'), userController.createUser);
 router.get("/getUsers", userController.getUsers);
 router.get("/getUserByID/:id", userController.getUserByID);
 router.put("/updateUser/:id", userController.updateUser);

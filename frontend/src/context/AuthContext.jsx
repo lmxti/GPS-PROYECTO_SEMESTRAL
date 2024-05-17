@@ -12,7 +12,7 @@ export function AuthProvider( { children }){
 
     useEffect(() => {
         if (!isAuthenticated) {
-          router.push('/auth/login');
+          router.push('/auth');
         }
       }, [isAuthenticated, router]);
 

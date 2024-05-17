@@ -6,9 +6,6 @@ const API_URL = 'http://localhost:3001/api/';
 
 const instance = axios.create({
     baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json'
-    },
     withCredentials: true
 });
 
@@ -18,6 +15,12 @@ instance.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${ token }`;
         }
+
+        // Si la solicitud incluye datos de tipo FormData, establece el encabezado 'Content-Type' en 'multipart/form-data'
+        if (config.data instanceof FormData) {
+            config.headers['Content-Type'] = 'multipart/form-data';
+        }
+        
         return config;
     },
     (error) => {
