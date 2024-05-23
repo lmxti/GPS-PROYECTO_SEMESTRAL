@@ -39,18 +39,18 @@ async function createBadgeRoles(){
     const count = await Badge.estimatedDocumentCount();
     if (count > 0) return;
 
-    const usuarioImage = readFileBase64("src/uploads/badges/usuario.png");
-    const adminImage = readFileBase64("src/uploads/badges/administrador.png");
-    const moderadorImage = readFileBase64("src/uploads/badges/moderador.png");
+    const usuarioImage = await readFileBase64("src/uploads/badges/usuario.png");
+    const adminImage =  await readFileBase64("src/uploads/badges/administrador.png");
+    const moderadorImage = await readFileBase64("src/uploads/badges/moderador.png");
 
     if (!usuarioImage || !adminImage || !moderadorImage) {
       console.error("Error: No se pudieron leer las imágenes de las insignias.");
       return;
     }
     await Promise.all([
-      new Badge({ nameBadge: "Usuario", descriptionBadge:"Usuario de la comunidad", imageBadge: readFileBase64("src/uploads/badges/usuario.png") }).save(),
-      new Badge({ nameBadge: "Administrador", descriptionBadge:"Administrador de la comunidad", imageBadge: readFileBase64("src/uploads/badges/administrador.png") }).save(),
-      new Badge({ nameBadge: "Moderador", descriptionBadge:"Moderador de la comunidad", imageBadge: readFileBase64("src/uploads/badges/moderador.png") }).save(),
+      new Badge({ nameBadge: "Usuario", descriptionBadge:"Usuario de la comunidad", imageBadge: usuarioImage }).save(),
+      new Badge({ nameBadge: "Administrador", descriptionBadge:"Administrador de la comunidad", imageBadge: adminImage }).save(),
+      new Badge({ nameBadge: "Moderador", descriptionBadge:"Moderador de la comunidad", imageBadge: moderadorImage }).save(),
     ])
     console.log("initial.setup -> createBadgeRoles: Se crearon las insignas default para cada tipo de rol: Usuario, Moderador y Administrador");
   } catch (error) {

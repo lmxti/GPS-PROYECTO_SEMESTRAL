@@ -7,7 +7,7 @@ const commentSchema = new mongoose.Schema(
         // Comentario de usuario
         userComment: { type: String, required: true },
         // Imagen que se puede incorporar al comentario
-        ImageComment: { type: String },
+        imageComment: { type: String },
         // Archivo que se puede incorporar al comentario
         fileComment: { type: String },
         // Fecha en que se realiza comentario
