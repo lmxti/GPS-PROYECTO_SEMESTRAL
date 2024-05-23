@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
         // Fecha en la que usuario se registra
         joinedAt: { type: Date, default: Date.now, required: true },
         // Imagen de perfil de usuario
-        profilePicture: { type: String, default: "default.jpg" },
+        profilePicture: { type: String },
 
         /*<---------- Relaciones con otros modelos ----------> */
         
