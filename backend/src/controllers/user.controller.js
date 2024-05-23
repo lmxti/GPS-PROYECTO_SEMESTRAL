@@ -51,7 +51,7 @@ async function getUsers(req, res){
     }
 }
 /**
- * busca y obtiene un usuario existente utilizando el servicio 'UserService.getUserByID()' que utiliza
+ * Busca y obtiene un usuario existente utilizando el servicio 'UserService.getUserByID()' que utiliza
  * el id proveniente de los parametros.
  * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
  * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
@@ -70,6 +70,26 @@ async function getUserByID(req, res){
         respondError(req, res, 500, "No se pudo encontrar usuario");
     }
 }
+/**
+ * Obtiene la imagen de perfil de un usuario por su ID y la envía como respuesta al cliente.
+ * @param {Object} req - El objeto de solicitud (request) no se utiliza en esta funcion.
+ * @param {Object} res - Objeto de respuesta (response) que contiene informacion sobre respuesta HTTP.
+ * @returns 
+ */
+async function getUserImageByID(req, res){
+    try {
+        const { id } = req.params;
+        const [filePath, error] = await UserService.getUserImageByID(id);
+        if (error) return respondError(req, res, 404, error);
+
+        res.sendFile(filePath);
+    } catch (error) {
+        handleError(error, "user.controller -> getUserImageByID");
+        respondError(req, res, 500, "No se pudo encontrar la imagen de perfil del usuario");
+    }
+}
+
+
 /**
  * Busca y actualiza campos de datos de usuario existente utilizando el servicio 'UserService.updateUser()' que
  * recibe como parametros el id de usuario a modificar y el body que contiene los campos a modificar.
@@ -114,6 +134,7 @@ module.exports = {
     createUser,
     getUsers,
     getUserByID,
+    getUserImageByID,
     updateUser,
     deleteUser
 }

@@ -12,6 +12,9 @@ const { saveImageProfile } = require("../utils/generalUtils.js");
 /* <----------------------- TRIGGERS ------------------------> */
 const { badgeForRol } = require("../triggers/badge.trigger.js");
 
+const fs = require('fs');
+const path = require('path');
+
 /** 
     * Servicio para crear un usuario utilizando datos proporcionados por el parametro 'user'
     * @param {Object} user - Objeto que contiene datos necesarios como 'name', surname', 'email', etc. para crear un usuario.
@@ -102,6 +105,25 @@ async function getUserByID(id){
     }
 }
 /**
+ * Servicio que obtiene la imagen de perfil de un usuario por su ID y devuelve la ruta del archivo de imagen.
+ * @param {string} id - ID del usuario del que se desea obtener la imagen de perfil.
+ * @returns {Promise<Array>} Una promesa que resuelve a un arreglo que contiene `[filePath, null]` si tiene éxito o `[null, mensaje de error]` si falla.
+ */
+async function getUserImageByID(id){
+    try {
+        const user = await User.findById(id).select('profilePicture');
+        if (!user || !user.profilePicture) return [null, "No se encontró la imagen de perfil del usuario"];
+
+        const filePath = path.join(process.cwd(), 'src/uploads/profiles', user.profilePicture);
+        if (!fs.existsSync(filePath)) return [null, "La imagen no existe en el servidor"];
+
+        return [filePath, null];
+    } catch (error) {
+        handleError(error, "user.service -> getUserImageByID");
+        return [null, "Error al obtener la imagen de perfil del usuario"];
+    }
+}
+/**
  * Servicio para actualizar los campos de un usuario existente,
  * @param {string} id - ID de usuario a actualizar 
  * @param {Object} body - Objeto que contiene los campos a utilizar como 'name','email', etc.
@@ -167,6 +189,7 @@ module.exports = {
     createUser,
     getUsers,
     getUserByID,
+    getUserImageByID,
     updateUser,
     deleteUser
 }
