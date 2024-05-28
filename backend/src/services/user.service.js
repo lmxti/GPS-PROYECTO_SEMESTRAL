@@ -20,6 +20,7 @@ const path = require('path');
     * @param {Object} user - Objeto que contiene datos necesarios como 'name', surname', 'email', etc. para crear un usuario.
     * @returns {Promise} Promesa con el objeto de usuario creado.
 */
+
 async function createUser(user, file = null){
     try{
         const { name,
