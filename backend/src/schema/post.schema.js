@@ -14,11 +14,11 @@ const postBodySchema = Joi.object({
         "any.required": "La descripcion es un campo requerido",
         "string.base": "La descripcion debe ser de tipo texto"
     }),
-    images: Joi.array().items(Joi.string().required()).messages({
-        "string.empty": "Los requisitos no pueden estar vacios",
-        "any.required": "Los requisitos son un campo requerido",
-        "string.base": "Los requisitos deben ser de tipo texto",
-    }),
+    // images: Joi.array().items(Joi.string()).messages({
+    //     "string.empty": "Las imagenes no pueden estar vacios",
+    //     "any.required": "Las imagenes son un campo requerido",
+    //     "string.base": "Las imagenes deben ser de tipo string",
+    // }),
     author: Joi.string().required().messages({
         "string.empty": "El autor no puede estar vacío",
         "any.required": "El autor es un campo requerido",

@@ -1,9 +1,19 @@
-import { useState } from 'react';
+/* <----------------------- MODULOS --------------------------> */
 import StepWizard from 'react-step-wizard';
+
+/* <----------------------- FUNCIONES --------------------------> */
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
+/* <----------------------- SERVICIOS  --------------------------> */
 import { register } from "../services/user.service"
 
 
 const RegisterForm = ({ toggleForm }) => {
+
+    const router = useRouter();
+
+    // Seteo de campos de formulario de registro
     const [formData, setFormData] = useState({
         name: '',
         surname: '',
@@ -15,6 +25,23 @@ const RegisterForm = ({ toggleForm }) => {
         profilePicture: '',
     });
 
+    // Seteo de campos completos en 'false' por default
+    const [isStep1Valid, setIsStep1Valid] = useState(false);
+    const [isStep2Valid, setIsStep2Valid] = useState(false);
+
+    useEffect( ( ) => {
+        setIsStep1Valid(formData.email && formData.password && formData.username);
+        if (isStep1Valid) {
+            console.log("STEP 1 completado");
+        }
+        setIsStep2Valid(formData.name && formData.surname && formData.birthdate && formData.gender);
+        if (isStep2Valid) {
+            console.log("STEP 2 completado");
+        }
+    }, [formData]);
+
+    
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -23,6 +50,8 @@ const RegisterForm = ({ toggleForm }) => {
         });
     };
 
+
+    
     const handleFileChange = (e, fieldName) => {
         if (fieldName === 'profilePicture') {
             const file = e.target.files[0];
@@ -37,6 +66,7 @@ const RegisterForm = ({ toggleForm }) => {
                 [name]: value
             });
         }
+        console.log(formData.profilePicture);
     };
 
     const handleSubmit = async (e) => {
@@ -45,6 +75,7 @@ const RegisterForm = ({ toggleForm }) => {
             console.log('Registrando usuario con los datos:', formData);
             await register(formData);
             console.log("Registro existoso");
+            toggleForm();
         } catch (error) {
             console.log(error);
         }
@@ -65,8 +96,8 @@ const RegisterForm = ({ toggleForm }) => {
             </div>
 
             <StepWizard transitions={{}} nav={<StepNav/>}>
-                <Step1 formData={formData} handleChange={handleChange} />
-                <Step2 formData={formData} handleChange={handleChange} />
+                <Step1 formData={formData} handleChange={handleChange} isStep1Valid={isStep1Valid}  />
+                <Step2 formData={formData} handleChange={handleChange} isStep2Valid={isStep2Valid}/>
                 <Step3 formData={formData} handleFileChange={handleFileChange} handleChange={handleChange} handleSubmit={handleSubmit} />
             </StepWizard>
 
@@ -80,10 +111,12 @@ const RegisterForm = ({ toggleForm }) => {
     );
 };
 
-const Step1 = ({ formData, handleChange, nextStep }) => (
+
+
+const Step1 = ({ formData, handleChange, nextStep, isStep1Valid }) => (
     <div className="space-y-4">
         <p className="w-80 text-center text-sm mb-8 font-semibold text-gray-700 tracking-wide cursor-pointer">
-            Bienvenido, para poder registrarte necesitamos validar la siguiente informacion basica. 
+            Bienvenido, para poder registrarte necesitamos validar la siguiente información básica. 
         </p>
         <input type="email" name="email" placeholder="Email" required onChange={handleChange} value={formData.email}
             className="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
@@ -92,12 +125,12 @@ const Step1 = ({ formData, handleChange, nextStep }) => (
         <input type="text" name="username" placeholder="Nombre de Usuario" required onChange={handleChange} value={formData.username}
             className="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
         <div className="text-center mt-6 flex justify-center">
-            <button type="button" onClick={nextStep} className="text-lg w-full p-4 text-white bg-gray-400 rounded-2xl">Siguiente</button>
+            <button type="button" onClick={nextStep} className={`text-lg w-full p-4 text-white rounded-2xl ${isStep1Valid ? 'bg-blue-500 cursor-pointer' : 'bg-red-300 cursor-not-allowed'}`} disabled={!isStep1Valid}>Siguiente</button>
         </div>
     </div>
 );
 
-const Step2 = ({ formData, handleChange, nextStep, previousStep }) => (
+const Step2 = ({ formData, handleChange, nextStep, previousStep, isStep2Valid }) => (
     <div className="space-y-4">
         <p className="w-80 text-center text-sm mb-8 font-semibold text-gray-700 tracking-wide cursor-pointer">
             Necesitamos saber un poco más de ti, completa lo siguiente para ello.
@@ -121,7 +154,7 @@ const Step2 = ({ formData, handleChange, nextStep, previousStep }) => (
         </div>
         <div className="text-center mt-6 flex justify-center space-x-4">
             <button type="button" onClick={previousStep} className="text-lg w-full p-4 text-white bg-gray-400 rounded-2xl">Atrás</button>
-            <button type="button" onClick={nextStep} className="text-lg w-full p-4 text-white bg-gray-400 rounded-2xl">Siguiente</button>
+            <button type="button" onClick={nextStep} className={`text-lg w-full p-4 text-white rounded-2xl ${isStep2Valid ? 'bg-blue-500' : 'bg-red-300  cursor-not-allowed'}`} disabled={!isStep2Valid}>Siguiente</button>
         </div>
     </div> 
 );
@@ -151,5 +184,8 @@ const Step3 = ({ formData, handleFileChange, previousStep, handleSubmit }) => (
 
     </div> 
 );
+
+
+
 
 export default RegisterForm;
