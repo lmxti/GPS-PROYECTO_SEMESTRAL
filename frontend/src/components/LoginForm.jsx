@@ -1,8 +1,9 @@
+/* <----------------------- FUNCIONES --------------------------> */
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+
+/* <----------------------- SERVICIOS  --------------------------> */
 import { login } from '../services/auth.service.js'
-
-
 
 const LoginForm = ( { toggleForm } ) => {
 
@@ -20,7 +21,7 @@ const LoginForm = ( { toggleForm } ) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log("Las credenciales son: ", credentials);
+            // console.log("Las credenciales son: ", credentials);
             await login(credentials);
             router.push("/")
 

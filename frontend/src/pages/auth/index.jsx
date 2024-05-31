@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from '@/components/RegisterForm';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/router';
+
 
 const Auth = () => {
+    const router = useRouter();
 
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [showLoginForm, setShowLoginForm] = useState(true);
@@ -17,11 +20,8 @@ const Auth = () => {
     }, []);
 
     if(userLoggedIn){
-        return (
-            <>
-                <h1>Ya estás logeado</h1>
-            </>
-        );
+        router.push("/")
+
     }
 
     const toggleForm  = () => {

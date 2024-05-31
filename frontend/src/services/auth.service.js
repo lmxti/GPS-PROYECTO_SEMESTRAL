@@ -1,6 +1,8 @@
 /* <----------------------- MODULOS --------------------------> */
 import axios from './root.service';
 import cookies from 'js-cookie';
+
+/* <----------------------- FUNCIONES --------------------------> */
 import { jwtDecode } from 'jwt-decode';
 
 export const login = async( { email, password } ) => {
