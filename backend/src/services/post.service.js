@@ -51,7 +51,12 @@ async function getPosts() {
     try{
         const posts = await Post.find()
         if(!posts) return [null, "No se encontraron publicaciones"];
-        return[posts, null];
+
+        const postsWithImages = posts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`)
+        }));
+        return[postsWithImages, null];
     }catch(error){
         handleError(error, "post.service -> getPosts");
     }
