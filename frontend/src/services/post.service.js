@@ -6,9 +6,18 @@ const headers = {
 
 export const createPost = async(postData) => {
     try {
-        const response = await axios.post("/posts/createPost", postData, headers);
-        return response.data;
+        return  response = await axios.post("/posts/createPost", postData, headers);
     } catch (error) {
         console.log("FRONTEND: Error en post.service -> createPost", error);
+    }
+}
+
+export const getPosts = async() => {
+    try {
+        const response = await axios.get("/posts/getPosts")
+        return response.data
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> getPosts", error);
+
     }
 }

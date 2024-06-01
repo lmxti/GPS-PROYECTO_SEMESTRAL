@@ -3,11 +3,9 @@ import { getHashtags } from "@/services/hashtag.service";
 
 const HashtagsTopics = () => {
     const [hashtags, setHashtags] = useState([]);
-
     const getHashtagsList = async () => {
         try {
             const response = await getHashtags();
-            console.log(response);
             setHashtags(response.data.data.data);
         } catch (error) {
             console.error("Error fetching hashtags:", error);
@@ -15,6 +13,11 @@ const HashtagsTopics = () => {
     }
 
     const showHashtags = () => {
+        
+        if (!hashtags || hashtags.length === 0) {
+            return null; // O muestra un mensaje alternativo si prefieres
+        }
+
         return hashtags.map((hashtag, index) => (
             <li
                 key={index}
@@ -30,7 +33,7 @@ const HashtagsTopics = () => {
     }, []);
 
     return (
-        <div className="max-w-2xl mt-10  mx-2">
+        <div className="">
             <h1 className="text-3xl font-bold text-center mb-6">Hashtags</h1>
             <ul className="list-none p-0 flex flex-wrap">
                 {showHashtags()}
