@@ -1,49 +1,47 @@
-import { useRouter } from 'next/router';
-import NavBar from '../components/NavBar.jsx';
+/* <----------------------- FUNCIONES --------------------------> */
+import { useState, useEffect } from 'react';
+
+/* <---------------------- COMPONENTES -------------------------> */
 import CreatePost from '@/components/CreatePost.jsx';
 import HashtagsTopics from '@/components/HashtagsTopics.jsx'
 import PostViewer from '@/components/PostViewer.jsx';
 
+/* <---------------------- COMPONENTES  -------------------------> */
+import NavBar from '@/components/nav/NavBar.jsx';
+import SideNav  from '@/components/nav/SideNav.jsx';
+import Resources from '@/components/Resources';
+
+
+
+
+
+
 export default function Home() {
+
+  const [update, setUpdate] = useState(false);
+
+  const updatePosts = () => {
+    setUpdate(!update);
+  };
+
   return (
     <main>
-      <NavBar />
+      <NavBar/>
       <div className = "grid grid-cols-5 ">
 
-        <div className = "col-start-1 col-end-2">
-            <div className='bg-amber-400'>
-                <h1>Enlaces</h1>
-                <ul>
-                  <li>Enlace1</li>
-                  <li>Enlace2</li>
-                  <li>Enlace3</li>
-                </ul>
-            </div>
-
-            <div className='bg-amber-600'>
-              <HashtagsTopics/>
-            </div>
-
-            <div className='bg-amber-500'>
-              <h1>Recursos</h1>
-              <ul>
-                  <li>Recurso1</li>
-                  <li>Recurso2</li>
-                  <li>Recurso3</li>
-                </ul>
-            </div>
+        <div className = "col-start-1 col-end-2 sticky top-0 h-screen overflow-y-auto">
+            <SideNav/>
+            <HashtagsTopics/>
+            <Resources/>
         </div>
 
-        <div className = "bg-blue-300 col-start-2 col-end-5">
-          <CreatePost/>
-          <div className='bg-green-400 h-full'>
-              <PostViewer/>
-          </div>
+        <div className = "col-start-2 col-end-5 space-y-4">
+          <CreatePost updatePosts={updatePosts}/>
+          <PostViewer key={update}/>
         </div>
 
 
         <div className = "col-span-1">
-          <h1>Sin contenido</h1>
         </div>
         
       </div>

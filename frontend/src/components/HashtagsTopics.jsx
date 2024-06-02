@@ -1,4 +1,10 @@
+/* <----------------------- FUNCIONES --------------------------> */
 import { useState, useEffect } from "react";
+
+
+import Typography from '@mui/material/Typography';
+
+/* <----------------------- SERVICIOS  -----------------------> */
 import { getHashtags } from "@/services/hashtag.service";
 
 const HashtagsTopics = () => {
@@ -19,11 +25,8 @@ const HashtagsTopics = () => {
         }
 
         return hashtags.map((hashtag, index) => (
-            <li
-                key={index}
-                className="inline-block py-2 px-4 bg-gray-200 rounded-lg mb-2 mr-2 shadow-md hover:bg-gray-300 whitespace-nowrap"
-            >
-                {hashtag.nameHashtag}
+            <li key={index} className="inline-block py-1 px-4 bg-gray-200 rounded-lg mb-2 mr-2">
+                #{hashtag.nameHashtag}
             </li>
         ));
     }
@@ -33,8 +36,8 @@ const HashtagsTopics = () => {
     }, []);
 
     return (
-        <div className="">
-            <h1 className="text-3xl font-bold text-center mb-6">Hashtags</h1>
+        <div className="p-6 border-b text-center">
+            <Typography variant="h5" gutterBottom>Hashtags</Typography>
             <ul className="list-none p-0 flex flex-wrap">
                 {showHashtags()}
             </ul>

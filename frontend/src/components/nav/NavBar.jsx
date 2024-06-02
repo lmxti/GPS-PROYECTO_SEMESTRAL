@@ -14,7 +14,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Avatar from '@mui/material/Avatar';
-import CircularProgress from '@mui/material/CircularProgress';
 
 /* <----------------------- ICONOS --------------------------> */
 import MenuIcon from '@mui/icons-material/Menu';
@@ -27,8 +26,8 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 
 /* <----------------------- SERVICIOS  -----------------------> */
-import { logout } from "../services/auth.service.js"
-import { getUserInformation, getUserImage } from "../services/user.service.js"
+import { logout } from "../../services/auth.service.js"
+import { getUserInformation, getUserImage } from "../../services/user.service.js"
 
 /* <----------------------- CONTEXTO  -----------------------> */
 import { useAuth } from '@/context/AuthContext.jsx';
@@ -146,17 +145,12 @@ export default function PrimarySearchAppBar() {
 
   return (
       <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="sticky">
         <Toolbar>
-
-        {/* Icono de menu */}
-          <IconButton size="large" edge="start" color="inherit" aria-label="open drawer" sx={{ mr: 2 }}>
-            <HomeIcon />
-          </IconButton>
         
         {/* Texto barra de navegacion */}
           <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {dataUser.name}
+            Proyecto GPS
           </Typography>
 
         {/* Barra de busqueda */}
