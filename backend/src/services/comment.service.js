@@ -7,6 +7,9 @@ const Comment = require("../models/comment.model");
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
 const { handleError } = require("../utils/errorHandler.js")
 
+/* <----------------------- UTILS ------------------------> */
+const { saveImagePost } = require("../utils/generalUtils.js");
+
 /**
  * Servicio para crear un comentario e incorporarlo a publicacion, recibe el id de publicacion para revisar
  * si admite comentarios basado en el 'status' del post.
@@ -18,9 +21,9 @@ const { handleError } = require("../utils/errorHandler.js")
  * @param {string} bodyComment.postId - Id de publicacion que se comenta.
  * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[newComment, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-async function createComment(bodyComment){
+async function createComment(comment, files = []) {
     try{
-        const { userComment, ImageComment, fileComment, userId, postId } = bodyComment;
+        const { userComment, userId, postId } = comment;
         const userFound = await User.findById(userId);
         if(!userFound) return [ null, "Usuario no encontrado"];
 
@@ -28,7 +31,11 @@ async function createComment(bodyComment){
         if (!postFound) return [ null, "Publicacion no encontrada"];
         if(!postFound.status) return [null, "La publicacion esta cerrada y no permite comentarios."];
 
-        const newComment = new Comment({ userComment, ImageComment, fileComment, userId, postId });
+        const fileComment = await Promise.all(
+            files.map( file => saveImagePost(file) )
+        );
+
+        const newComment = new Comment({ userComment, imageComment:fileComment, userId, postId });
         const savedComment = await newComment.save();
 
         postFound.comments.push(savedComment._id);
@@ -41,6 +48,7 @@ async function createComment(bodyComment){
     }
     catch(error){
         handleError(error, "comment.service -> createComment")
+        return [null, error.message];
     }
 }
 
@@ -60,8 +68,14 @@ async function getComment(id) {
     const comment = await Comment.findById(id)
       .populate("userId", "name username")
       .exec();
-    if (!comment) return [null, "Comentario no encontrado"];
-    return [comment, null];
+      const commentData = {
+        ...comment.toObject(),
+        imageComment: comment.imageComment.map(image => `http://localhost:3001/uploads/images/${image}`),
+        userId: { id: comment.userId._id, name: comment.userId.name, username: comment.userId.username }
+      };
+      if (!comment) return [null, "Comentario no encontrado"];
+      return [commentData, null];
+
   } catch (error) {
     handleError(error, "comment.service -> getComment");
     return [null, error.message];

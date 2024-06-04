@@ -12,7 +12,7 @@ const subirImagen = require("../middlewares/handleMulter.middleware.js");
 /* <------------------- ENRUTADOR TERCIARIO -----------------------> */
 const router = express.Router();
 
-router.post("/createComment", subirImagen.single('ImageComment'),commentController.createComment);
+router.post("/createComment", [subirImagen.array('imageComment')],commentController.createComment);
 router.get("/getComments", commentController.getComments);
 router.get("/getComment/:id", commentController.getComment);
 router.put("/updateComment/:id", commentController.updateComment);

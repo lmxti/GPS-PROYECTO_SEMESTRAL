@@ -21,9 +21,9 @@ const { handleError } = require('../utils/errorHandler');
  */
 async function createComment(req, res) {
     try {
-        const { body } = req;
-        //[NOTA] commentSchema...?
-        const [newComment, commentError] = await CommentService.createComment(body);
+        const { userComment, userId, postId } = req.body;
+        const comment = { userComment, userId, postId };
+        const [newComment, commentError] = await CommentService.createComment(comment, req.files);
         if (commentError) return respondError(req, res, 400, commentError);
         if (!newComment) return respondError(req, res, 400, 'No se creo el comentario');
         respondSuccess(req, res, 201, newComment);
