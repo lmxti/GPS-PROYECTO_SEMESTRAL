@@ -30,29 +30,31 @@ async function createRoles() {
     console.error(error);
   }
 }
+
 /**
  * Crea las insignias por defecto en la base de datos si no existen.
  * @returns {Promise<void>} Una promesa que se resuelve una vez que se han creado las insignias por defecto.
  */
-async function createBadgeRoles(){
+async function createBadgeRoles() {
   try {
     const count = await Badge.estimatedDocumentCount();
     if (count > 0) return;
 
     const usuarioImage = await readFileBase64("src/uploads/badges/usuario.png");
-    const adminImage =  await readFileBase64("src/uploads/badges/administrador.png");
+    const adminImage = await readFileBase64("src/uploads/badges/administrador.png");
     const moderadorImage = await readFileBase64("src/uploads/badges/moderador.png");
 
     if (!usuarioImage || !adminImage || !moderadorImage) {
       console.error("Error: No se pudieron leer las imágenes de las insignias.");
       return;
     }
+
     await Promise.all([
-      new Badge({ nameBadge: "Usuario", descriptionBadge:"Usuario de la comunidad", imageBadge: usuarioImage }).save(),
-      new Badge({ nameBadge: "Administrador", descriptionBadge:"Administrador de la comunidad", imageBadge: adminImage }).save(),
-      new Badge({ nameBadge: "Moderador", descriptionBadge:"Moderador de la comunidad", imageBadge: moderadorImage }).save(),
-    ])
-    console.log("initial.setup -> createBadgeRoles: Se crearon las insignas default para cada tipo de rol: Usuario, Moderador y Administrador");
+      new Badge({ nameBadge: "Usuario", descriptionBadge: "Usuario de la comunidad", imageBadge: usuarioImage }).save(),
+      new Badge({ nameBadge: "Administrador", descriptionBadge: "Administrador de la comunidad", imageBadge: adminImage }).save(),
+      new Badge({ nameBadge: "Moderador", descriptionBadge: "Moderador de la comunidad", imageBadge: moderadorImage }).save()
+    ]);
+    console.log("initial.setup -> createBadgeRoles: Se crearon las insignias default para cada tipo de rol: Usuario, Moderador y Administrador");
   } catch (error) {
     console.error(error);
   }
@@ -65,7 +67,7 @@ async function createBadgeRoles(){
 async function createDefaultUsers() {
   try {
     const count = await User.estimatedDocumentCount();
-    if (count > 0)  return;
+    if (count > 0) return;
 
     const admin = await Role.findOne({ nameRole: "Administrador" });
     const user = await Role.findOne({ nameRole: "Usuario" });
@@ -83,7 +85,7 @@ async function createDefaultUsers() {
         email: "admin@localhost.com",
         password: await User.encryptPassword("admin"),
         roleUser: [admin._id],
-        badges: [{ badge: await badgeForRol(admin.nameRole)}]
+        badges: [{ badge: await badgeForRol(admin.nameRole) }]
       }).save(),
       /* <-------------------------------- USUARIO  DEFAULT --------------------------------> */
       new User({
@@ -96,7 +98,7 @@ async function createDefaultUsers() {
         email: "user@localhost.com",
         password: await User.encryptPassword("user"),
         roleUser: [user._id],
-        badges: [{ badge: await badgeForRol(user.nameRole)}]
+        badges: [{ badge: await badgeForRol(user.nameRole) }]
       }).save(),
       /* <--------------------------- USUARIO MODERADOR DEFAULT ---------------------------> */
       new User({
@@ -109,7 +111,7 @@ async function createDefaultUsers() {
         email: "moderador@localhost.com",
         password: await User.encryptPassword("moderador"),
         roleUser: [moderador._id],
-        badges: [{ badge: await badgeForRol(moderador.nameRole)}]
+        badges: [{ badge: await badgeForRol(moderador.nameRole) }]
       }).save()
     ]);
     console.log("initial.setup -> createDefaultUsers: Se han creado los usuarios default del sistema: administrador, usuario y moderador");
