@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 /* <----------------------- SERVICIOS  --------------------------> */
-import { login } from '../services/auth.service.js'
+import { login } from '../../services/auth.service.js'
 
 const LoginForm = ( { toggleForm } ) => {
 

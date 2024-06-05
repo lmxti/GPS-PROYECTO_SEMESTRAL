@@ -1,8 +1,12 @@
+/* <----------------------- FUNCIONES --------------------------> */
 import { useState, useEffect } from 'react';
-import LoginForm from "@/components/LoginForm";
-import RegisterForm from '@/components/RegisterForm';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
+
+/* <---------------------- COMPONENTES -------------------------> */
+import LoginForm from "@/components/form/LoginForm";
+import RegisterForm from '@/components/form/RegisterForm';
+
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 const Auth = () => {

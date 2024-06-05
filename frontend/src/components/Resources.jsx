@@ -6,7 +6,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 
 export default function Resources() {
   return (
-    <div className='block p-6'>
+    <div className='block p-6 mx-4'>
       <ul className='space-y-4'>
 
         <li className=''>

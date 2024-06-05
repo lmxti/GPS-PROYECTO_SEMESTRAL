@@ -29,14 +29,11 @@ import IconButton from '@mui/material/IconButton';
 import { logout } from "../../services/auth.service.js"
 import { getUserInformation, getUserImage } from "../../services/user.service.js"
 
-/* <----------------------- CONTEXTO  -----------------------> */
-import { useAuth } from '@/context/AuthContext.jsx';
 
-
-export default function PrimarySearchAppBar() {
+export default function PrimarySearchAppBar( { userId }) {
 
   const router = useRouter();
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   const [dataUser, setDataUser] = useState('');
   const [imageUser, setImageUser] = useState('');
@@ -44,15 +41,16 @@ export default function PrimarySearchAppBar() {
   const getDataUser = async () => {
     try {
 
-      const response = await getUserInformation(user.id);
+      const response = await getUserInformation(userId);
       setDataUser(response.data.data);
-      console.log(dataUser);
+      console.log("Lol ",dataUser);
       
-      const responseImage = await getUserImage(user.id);
-      setImageUser(responseImage);
+      const imageUrl = await getUserImage(userId);
+      setImageUser(imageUrl);
 
     } catch (error) {
       console.log(error);
+      setImageUser('');
     }
   };
 
