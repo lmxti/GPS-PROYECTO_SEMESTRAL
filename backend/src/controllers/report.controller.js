@@ -103,6 +103,7 @@ async function getReportsByType(req, res) {
         respondError(req, res, 500, 'No se pudo encontrar reportes');
     }
 }
+//
 
 module.exports = {
     createReport,
