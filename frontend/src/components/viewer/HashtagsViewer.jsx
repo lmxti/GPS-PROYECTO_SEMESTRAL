@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getHashtags } from "@/services/hashtag.service";
 
-const HashtagsTopics = () => {
+const HashtagsViewer = () => {
     const [hashtags, setHashtags] = useState([]);
     const getHashtagsList = async () => {
         try {
@@ -45,4 +45,4 @@ const HashtagsTopics = () => {
     );
 }
 
-export default HashtagsTopics;
+export default HashtagsViewer;

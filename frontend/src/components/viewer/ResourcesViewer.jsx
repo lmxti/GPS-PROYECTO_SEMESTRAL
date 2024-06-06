@@ -4,7 +4,7 @@ import HelpIcon from '@mui/icons-material/Help';
 import BalanceIcon from '@mui/icons-material/Balance';
 import SecurityIcon from '@mui/icons-material/Security';
 
-export default function Resources() {
+export default function ResourcesViewer() {
   return (
     <div className='block p-6 mx-4'>
       <ul className='space-y-4'>
