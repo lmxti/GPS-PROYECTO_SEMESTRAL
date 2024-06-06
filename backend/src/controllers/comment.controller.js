@@ -150,6 +150,20 @@ async function editComment(req, res) {
     }
 }
 
+async function getCommentsByPost(req, res) {
+    try {
+        const { params } = req;
+        const [comments, errorComments] = await CommentService.getCommentsByPost(params.id);
+        if (errorComments) return respondError(res, 500, 'Error al buscar comentarios');
+        comments.length === 0
+            ? respondSuccess(req, res, 200, 'No existen comentarios en la bbdd')
+            : respondSuccess(req, res, 200, { message: 'Se encontraron los siguientes comentarios: ', data: comments });
+    } catch (error) {
+        handleError(error, 'comment.controller -> getCommentsByPost');
+        respondError(req, res, 500, 'No se pudo encontrar comentarios');
+    }
+}
+
 module.exports = {
     createComment,
     getComments,
@@ -157,5 +171,6 @@ module.exports = {
     updateComment,
     deleteComment,
     getCommentsByUser,
-    editComment
+    editComment,
+    getCommentsByPost,
 };

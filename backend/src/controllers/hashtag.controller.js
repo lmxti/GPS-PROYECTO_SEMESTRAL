@@ -58,7 +58,7 @@ async function getHashtags(req, res){
 async function getHashtagById(req, res){
     try{
         const {params} = req;
-        const [ hashtag, hashtagError ] = await HashtagService.getHashtag(params.id);
+        const [ hashtag, hashtagError ] = await HashtagService.getHashtagById(params.id);
         if(hashtagError) return respondError(req, res, 404, hashtagError);
         respondSuccess(req, res, 200, hashtag);
     } catch(error){

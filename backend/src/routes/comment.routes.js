@@ -19,5 +19,6 @@ router.put("/updateComment/:id", commentController.updateComment);
 router.delete("/deleteComment/:id", commentController.deleteComment);
 router.get("/getCommentsByUser/:id", commentController.getCommentsByUser);
 router.put("/editComment/:id", commentController.editComment);
+router.get("/getCommentsByPost/:id", commentController.getCommentsByPost);
 
 module.exports = router;

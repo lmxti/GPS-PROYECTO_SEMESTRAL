@@ -135,6 +135,28 @@ async function getCommentsByUser(userId) {
   }
 }
 
+async function getCommentsByPost(postId) {
+  try {
+    const comments = await Comment.find({ postId })
+      .populate("userId", "name username")
+      .exec();
+    if (!comments) return [null, "No se encontraron comentarios en la bbdd"];
+
+    const commentsWithImages = comments.map(comment => {
+      const commentData = {
+        ...comment.toObject(),
+        imageComment: comment.imageComment.map(image => `http://localhost:3001/uploads/images/${image}`),
+        userId: { id: comment.userId._id, name: comment.userId.name, username: comment.userId.username }
+      }
+      return commentData;
+    })
+    return [commentsWithImages, null];
+  } catch (error) {
+    handleError(error, "comment.service -> getCommentsByPost");
+    return [null, error.message];
+  }
+}
+
 module.exports = {
   createComment,
   getComments,
@@ -142,4 +164,5 @@ module.exports = {
   updateComment,
   deleteComment,
   getCommentsByUser,
+  getCommentsByPost,
 };
