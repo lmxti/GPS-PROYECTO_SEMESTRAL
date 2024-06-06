@@ -14,7 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getPosts, deletePost, markInteraction } from "@/services/post.service";
 
-import ImageModal from "./modal/ImageModal";
+import ImageModal from "../modal/ImageModal";
 
 
 const PostViewer = ( {userId} ) => {
@@ -90,23 +90,37 @@ const PostViewer = ( {userId} ) => {
   const handleReaction = async (postId, reactionType) => {
     try {
       // Llama a markInteraction para enviar la interacción del usuario al servidor
-      await markInteraction(postId, { id: userId, type: reactionType });
-      // Actualiza el estado local de las publicaciones
+      const response = await markInteraction(postId, { id: userId, type: reactionType });
+  
+      // Actualiza el estado local de las publicaciones con la respuesta del servidor
       setPosts((prevPosts) =>
-        prevPosts.map((post) => {
-          if (post._id === postId) {
-            return {
-              ...post,
-              userReaction: post.userReaction === reactionType ? null : reactionType,
-            };
-          }
-          return post;
-        })
+        prevPosts.map((post) =>
+          post._id === response.data._id ? response.data : post
+        )
       );
+      getDataPosts();
     } catch (error) {
       console.error("Error marking interaction:", error);
     }
   };
+
+
+  const renderInteractionButton = (post, reactionType, buttonText) => {
+    const isReacted = post.interactions.some(
+      (interaction) => interaction.user === userId && interaction.type === reactionType
+    );
+  
+    return (
+      <button
+        onClick={() => handleReaction(post._id, reactionType)}
+        className={`rounded-lg border px-3 py-1 text-xs font-semibold 
+          ${isReacted ? "bg-blue-500 text-white" : ""}`}
+      >
+        {buttonText}
+      </button>
+    );
+  };
+  
   
 
 
@@ -152,17 +166,8 @@ const PostViewer = ( {userId} ) => {
         <div className="px-4 py-2">
           <div className="flex space-x-4 md:space-x-8">
 
-            <button onClick={() => handleReaction(post._id, "helpful")}
-                className={`rounded-lg border px-3 py-1 text-xs font-semibold ${ post.userReaction === "helpful" ? "bg-blue-500 text-white" : "" }`}
-            >
-              Util
-            </button>
-
-            <button onClick={() => handleReaction(post._id, "nothelpful")}
-              className={`rounded-lg border px-3 py-1 text-xs font-semibold ${ post.userReaction === "nothelpful" ? "bg-blue-500 text-white" : "" }`}
-            >
-              No util
-            </button>
+          {renderInteractionButton(post, "helpful", "Útil")}
+          {renderInteractionButton(post, "nothelpful", "No útil")}
           </div>
         </div>
 
