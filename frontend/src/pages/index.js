@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 
 /* <---------------------- COMPONENTES -------------------------> */
 import PostForm from '@/components/form/PostForm.jsx';
-import HashtagsTopics from '@/components/HashtagsTopics.jsx'
-import PostViewer from '@/components/PostViewer.jsx';
+import HashtagsViewer from '@/components/viewer/HashtagsViewer.jsx'
+import PostViewer from '@/components/viewer/PostViewer.jsx';
 
 /* <---------------------- COMPONENTES  -------------------------> */
 import NavBar from '@/components/nav/NavBar.jsx';
 import SideNav  from '@/components/nav/SideNav.jsx';
-import Resources from '@/components/Resources';
+import ResourcesViewer from '@/components/viewer/ResourcesViewer.jsx';
 
 
 /* <----------------------- CONTEXTO  -----------------------> */
@@ -35,8 +35,8 @@ export default function Home() {
 
         <div className = "col-start-1 col-end-2 sticky top-0 h-screen overflow-y-auto">
             <SideNav/>
-            <HashtagsTopics/>
-            <Resources/>
+            <HashtagsViewer/>
+            <ResourcesViewer/>
         </div>
 
         <div className = "col-start-2 col-end-5 space-y-4">
