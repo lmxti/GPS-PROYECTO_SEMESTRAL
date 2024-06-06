@@ -7,11 +7,11 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
 const SideNav = () => {
   return (
-    <div className='block p-6 border-b'>
+    <div className=' p-6 mx-4 border-b'>
       <ul className='space-y-4'>
 
         <li className='py-2 px-4 rounded transition hover:bg-zinc-100 '>
-          <a href="#" className=''>
+          <a href="#" >
             <HomeIcon fontSize={"large"}/> Inicio
           </a>
         </li>

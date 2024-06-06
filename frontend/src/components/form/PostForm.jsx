@@ -11,19 +11,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 /* <----------------------- ICONOS --------------------------> */
 import SendIcon from '@mui/icons-material/Send';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import CloseIcon from '@mui/icons-material/Close';
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getHashtags } from "@/services/hashtag.service";
 import { createPost } from "@/services/post.service";
 
-/* <----------------------- CONTEXTO  -----------------------> */
-import { useAuth } from '@/context/AuthContext.jsx';
 
+const PostForm = ( { updatePosts, userId } ) => {
 
-
-const CreatePost = ( { updatePosts } ) => {
-
-  const { user } = useAuth();
   const creatableRef = useRef(null);
 
   /**<-------------------------- SETEO ESTADO DE CARGA ------------------------------>*/
@@ -31,13 +27,12 @@ const CreatePost = ( { updatePosts } ) => {
 
   /**<------------- SETEO DE CAMPOS DE FORMULARIO PARA CREAR PUBLICA----------------->*/
   const [postValues, setPostValues] = useState({
-    author: user.id,
+    author: userId,
     title: "",
     description: "",
     images: [],
     hashtags: []
   });
-
 
   /** <-----------------------  SOLICITUD Y SETEO DE HASHTAGS ----------------------->*/
   const [hashtagValues, setHashtagValues] = useState([]);
@@ -82,45 +77,72 @@ const CreatePost = ( { updatePosts } ) => {
     setPostValues(prevState => ({ ...prevState, images: [...prevState.images, ...files] }));
   };
 
+  const handleRemoveImage = (e) => {
+    setPostValues(prevState => ({
+      ...prevState,
+      images: prevState.images.filter( (_, i) => i !== e)
+    }));
+  }
 
+  // Construccion de objeto `FormData` que almacena los datos/campos del formulario para enviar solicitud
+  const prepareFormData = () => {
+    const formData = new FormData();
+    formData.append("author", postValues.author);
+    formData.append("title", postValues.title);
+    formData.append("description", postValues.description);
+    postValues.hashtags.forEach(hashtag => {
+      formData.append("hashtags[]", hashtag);
+    });
+    postValues.images.forEach(image => {
+      formData.append("images", image);
+    });
+    return formData;
+  };
 
+  // Reestablecimiento de valores del formulario a sus valores iniciales.
+  const resetForm = () => {
+    setPostValues({
+      author: userId,
+      title: "",
+      description: "",
+      images: [],
+      hashtags: []
+    });
+    creatableRef.current.clearValue();
+  };
 
+  /** <------------  MANEJO DEL ENVIO DE FORMULARIO PARA CREAR PUBLICACION ----------->*/
   const onSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Iniciar la animación de carga
+    setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("author", postValues.author);
-      formData.append("title", postValues.title);
-      formData.append("description", postValues.description);
-      postValues.hashtags.forEach((hashtag) => {
-        formData.append("hashtags[]", hashtag);
-      });
-      postValues.images.forEach((image) => {
-        formData.append("images", image);
-      });
+      const formData = prepareFormData();
       await createPost(formData);
       await getDataHashtags();
-      updatePosts(); // Actualizar las publicaciones después de crear una nueva
+      updatePosts();
+      resetForm();
     } catch (error) {
-      console.log(error);
+      console.log("[Error onSubmit] -> ",error);
     } finally {
-      setPostValues({
-        author: user.id,
-        title: "",
-        description: "",
-        images: [],
-        hashtags: []
-      });
-      creatableRef.current.clearValue();
-      setIsLoading(false); // Detener la animación de carga
+      setIsLoading(false);
+    }
+  };
+
+  const determineImageSize = () => {
+    const numImages = postValues.images.length;
+    if (numImages === 1) {
+      return "w-full";
+    } else if (numImages === 2) {
+      return "w-1/2";
+    } else {
+      return "w-28 h-28 object-cover rounded-md";
     }
   };
 
   return (
-    <>
-      <div className='flex flex-row p-4 max-w-4xl mx-auto space-x-2 bg-zinc-100 mt-4 rounded shadow-md'>
+      <div className='flex flex-row p-4 max-w-3xl mx-auto space-x-2 bg-zinc-100 mt-4 rounded shadow-md'>
         <form className="flex flex-col w-full" encType="multipart/form-data">
+
           <input placeholder='Titulo' name="title" value={postValues.title} onChange={handleChange}
             className='p-2 mb-2 border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 focus:outline-none focus:border-blue-500 flex w-full'>
           </input>
@@ -129,17 +151,19 @@ const CreatePost = ( { updatePosts } ) => {
             className="p-2 mb-2 border-2 rounded-md px-4 py-2 leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-blue-500" >
           </textarea>
 
-          <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-2">
             {postValues.images.map((image, index) => (
               <div key={index} className="relative">
-                <img src={URL.createObjectURL(image)} alt={`upload-${index}`} className="w-full h-40 object-cover rounded-md aspect-w-16 aspect-h-9" />
+                <img src={URL.createObjectURL(image)} alt={`upload-${index}`} className="w-28 h-28 object-cover rounded-md" />
+                <button type="button" className="absolute top-2 right-0 bg-white hover:bg-cyan-200 rounded-full py-0.5 px-1" onClick={() => handleRemoveImage(index)}>
+                  <CloseIcon fontSize="small" />
+                </button>
               </div>
             ))}
           </div>
 
           <div className='flex flex-row items-center justify-end space-x-2'>
-
-              <Creatable ref={creatableRef} isClearable isMulti placeholder="Selecciona hashtags" options={hashtagValues} onChange={handleHashtagChange} className="rounded flex-grow sm:text-sm sm:leading-5" />
+              <Creatable ref={creatableRef} isClearable isMulti placeholder="Selecciona hashtags" options={hashtagValues} onChange={handleHashtagChange} className="rounded flex-grow sm:text-sm sm:leading-5" instanceId="hashtag-select" />
     
               <label htmlFor="image-input" className="bg-white px-4 flex justify-center items-center h-full cursor-pointer rounded hover:bg-sky-500 duration-150 ease-in-out" title='Agregar imagen'>
                 <AddPhotoAlternateIcon />
@@ -149,13 +173,11 @@ const CreatePost = ( { updatePosts } ) => {
               <Button variant="contained" endIcon={<SendIcon />} className="rounded px-8 py-2" onClick={onSubmit} disabled={isLoading}>
                     {isLoading ? <CircularProgress size={24} /> : "Publicar"} {/* Mostrar animación de carga */}
               </Button>
-
           </div>
+  
         </form>
-
       </div>
-    </>
   )
 }
 
-export default CreatePost;
+export default PostForm;

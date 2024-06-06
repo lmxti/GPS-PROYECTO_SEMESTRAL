@@ -66,7 +66,6 @@ async function getPosts() {
 
         // Busca los hashtags por sus IDs y obtén solo sus nombres
         const hashtags = await Hashtag.find({ _id: { $in: [...HashtagsIds] } }, 'nameHashtag');
-        console.log(hashtags);
 
         // Mapea los hashtags para acceder a ellos por su ID
         const hashtagsMap = hashtags.reduce((acc, hashtag) => {

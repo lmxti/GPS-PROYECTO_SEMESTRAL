@@ -7,10 +7,17 @@ import { es } from 'date-fns/locale';
 import Avatar from '@mui/material/Avatar';
 import Skeleton from '@mui/material/Skeleton';
 
-/* <----------------------- SERVICIOS  -----------------------> */
-import { getPosts } from "@/services/post.service";
+/* <----------------------- ICONOS --------------------------> */
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const PostViewer = () => {
+/* <----------------------- SERVICIOS  -----------------------> */
+import { getPosts, deletePost, markInteraction } from "@/services/post.service";
+
+import ImageModal from "./modal/ImageModal";
+
+
+const PostViewer = ( {userId} ) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true); // Nuevo estado para manejar la carga
 
@@ -19,6 +26,7 @@ const PostViewer = () => {
       const response = await getPosts();
       const sortedPosts = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setPosts(sortedPosts);
+      console.log(sortedPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -33,20 +41,10 @@ const PostViewer = () => {
     return formatDistanceToNow(date, { addSuffix: true, locale: es }); // Retorna la diferencia relativa con la fecha actual
   };
 
-  const getGridColumns = (imageCount) => {
-    if (imageCount === 1) {
-      return 1;
-    } else if (imageCount === 2 || imageCount === 4) {
-      return 2;
-    } else {
-      return 3; 
-    }
-  };
-
   const showSkeletons = () => (
     <div >
       {Array.from(new Array(3)).map((_, index) => (
-        <div key={index} className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-4 p-4">
+        <div key={index} className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-4 p-4">
 
           <div className="flex w-full items-center justify-between border-b pb-3">
             <div className="flex items-center space-x-3">
@@ -79,21 +77,62 @@ const PostViewer = () => {
     </div>
   );
 
-  const showPosts = () => {
+  const handleDeletePost = async (postId) => {
+    try {
+      await deletePost(postId);
+      setPosts(posts.filter(post => post._id !== postId));
+
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  const handleReaction = async (postId, reactionType) => {
+    try {
+      // Llama a markInteraction para enviar la interacción del usuario al servidor
+      await markInteraction(postId, { id: userId, type: reactionType });
+      // Actualiza el estado local de las publicaciones
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post._id === postId) {
+            return {
+              ...post,
+              userReaction: post.userReaction === reactionType ? null : reactionType,
+            };
+          }
+          return post;
+        })
+      );
+    } catch (error) {
+      console.error("Error marking interaction:", error);
+    }
+  };
+  
+
+
+
+  const showPosts = ( ) => {
     return posts.map((post) => (
-      <div key={post._id} className="max-w-4xl mx-auto bg-zinc-100 shadow-lg rounded-lg overflow-hidden mb-4 p-4">
+      <div key={post._id} className={`max-w-3xl mx-auto bg-zinc-100 shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
 
         <div className="flex w-full items-center justify-between border-b pb-3">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8 rounded-full bg-slate-400" />
-            <p className="text-lg font-bold text-slate-700">{post.author.name}</p>
-            <p className="text-xs text-neutral-500">{formatRelativeDate(post.createdAt)}</p>
+            <div>
+              <p className="text-lg font-bold text-slate-700">{post.author.name}</p>
+              <p className="text-xs text-neutral-500">Publicado {formatRelativeDate(post.createdAt)}</p>
+            </div>
           </div>
 
           <div className="flex items-center space-x-8">
             {/* Aca van los botones de editar, o mas opciones */}
-              Editar
-              Eliminar
+            {post.author.id === userId ? (
+              <IconButton aria-label="delete" size="small" onClick={() => handleDeletePost(post._id)}>
+                    <DeleteIcon fontSize="inherit" />
+              </IconButton>
+            ) : (
+              <p>...</p>
+            )}
           </div>
         </div>
 
@@ -102,11 +141,7 @@ const PostViewer = () => {
           <div className="text-sm text-neutral-600">{post.description}</div>
         </div>
 
-        <div className={`grid grid-cols-${getGridColumns(post.images.length)} gap-4 mt-2`}>
-          {post.images.map((imageUrl, index) => (
-            <img key={index} src={imageUrl} alt={`Image ${index}`} className="w-full h-full rounded-lg object-cover shadow-lg" />
-          ))}
-        </div>
+        <ImageModal images={post.images} />
 
         <div className="flex flex-wrap border-b pb-3 pt-4">
           {post.hashtags.map((hashtag, index) => (
@@ -116,18 +151,18 @@ const PostViewer = () => {
 
         <div className="px-4 py-2">
           <div className="flex space-x-4 md:space-x-8">
-            <div className="flex cursor-pointer items-center transition hover:text-slate-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-              </svg>
-              <span>125</span>
-            </div>
-            <div className="flex cursor-pointer items-center transition hover:text-slate-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="mr-1.5 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-              </svg>
-              <span>4</span>
-            </div>
+
+            <button onClick={() => handleReaction(post._id, "helpful")}
+                className={`rounded-lg border px-3 py-1 text-xs font-semibold ${ post.userReaction === "helpful" ? "bg-blue-500 text-white" : "" }`}
+            >
+              Util
+            </button>
+
+            <button onClick={() => handleReaction(post._id, "nothelpful")}
+              className={`rounded-lg border px-3 py-1 text-xs font-semibold ${ post.userReaction === "nothelpful" ? "bg-blue-500 text-white" : "" }`}
+            >
+              No util
+            </button>
           </div>
         </div>
 
@@ -141,7 +176,7 @@ const PostViewer = () => {
 
   return (
     <div>
-      {loading ? showSkeletons() : (Array.isArray(posts) && posts.length > 0 ? showPosts() : <p>No posts available</p>)}
+      {loading ? showSkeletons() : (Array.isArray(posts) && posts.length > 0 ? showPosts() : showSkeletons()  )}
     </div>
   );
 };

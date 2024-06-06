@@ -36,7 +36,7 @@ const HashtagsTopics = () => {
     }, []);
 
     return (
-        <div className="p-6 border-b text-center">
+        <div className="p-6 mx-4 border-b text-center">
             <Typography variant="h5" gutterBottom>Hashtags</Typography>
             <ul className="list-none p-0 flex flex-wrap">
                 {showHashtags()}

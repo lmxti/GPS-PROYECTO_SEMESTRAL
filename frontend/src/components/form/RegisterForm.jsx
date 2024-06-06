@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 /* <----------------------- SERVICIOS  --------------------------> */
-import { register } from "../services/user.service"
+import { register } from "../../services/user.service"
 
 
 const RegisterForm = ({ toggleForm }) => {
