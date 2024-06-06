@@ -15,6 +15,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { getPosts, deletePost, markInteraction } from "@/services/post.service";
 
 import ImageModal from "../modal/ImageModal";
+import CommentViewer from "./CommentViewer";
+import CommentForm from "../form/CommentsForm";
 
 
 const PostViewer = ( {userId} ) => {
@@ -169,6 +171,15 @@ const PostViewer = ( {userId} ) => {
           {renderInteractionButton(post, "helpful", "Útil")}
           {renderInteractionButton(post, "nothelpful", "No útil")}
           </div>
+        </div>
+
+        
+        <div className="flex-wrap border-b pb-3 pt-4">
+          <CommentForm postId={post._id} />
+        </div>
+
+        <div className="px-4 py-2">
+            <CommentViewer postId={post._id} userId={userId}/>
         </div>
 
       </div>
