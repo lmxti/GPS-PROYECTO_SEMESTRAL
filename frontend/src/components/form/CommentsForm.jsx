@@ -11,6 +11,9 @@ import { createComment } from "@/services/comments.service.js";
 import { useAuth } from "@/context/AuthContext.jsx";
 
 /* <----------------------- ICONOS --------------------------> */
+import IconButton from '@mui/material/IconButton';
+import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
+import SendIcon from '@mui/icons-material/Send';
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 const CreateComments = ({ postId }) => {
@@ -65,33 +68,22 @@ const CreateComments = ({ postId }) => {
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <div className="flex items-stretch">
-          <input
-            name="userComment"
-            id="userComment"
-            cols="30"
-            rows="10"
-            value={comment.userComment}
-            onChange={handleInputChange}
+        <div className="flex space-x-2">
+
+          <input name="userComment" id="userComment" placeholder="Escribe un comentario" cols="30" rows="10" value={comment.userComment} onChange={handleInputChange}
             className="p-2 mb-2 border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 focus:outline-none focus:border-blue-500 flex-grow"
-            placeholder="Escribe un comentario"
           />
-          <label
-            htmlFor="imageComment"
-            className="bg-white px-6 mb-2 flex items-center border-2 border-1-0 rounded-r-md hover:bg-sky-500 duration-150 ease-in-out cursor-pointer"
-            title="Agregar imagen"
-          >
-            <AddPhotoAlternateIcon className="m-auto" />
-            <input
-              type="file"
-              name="image"
-              id="imageComment"
-              onChange={(e) =>
-                setComment({ ...comment, imageComment: e.target.files })
-              }
-              className="hidden"
-            />
+
+          <label htmlFor="imageComment" title="Agregar imagen" className="bg-white px-6 mb-2 flex items-center border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
+            <AddToPhotosIcon/>
+            <input type="file" name="image" id="imageComment" className="hidden" onChange={(e) => setComment({ ...comment, imageComment: e.target.files }) }/>
           </label>
+
+          <IconButton type="submit" className="bg-white w-fit px-6 mb-2 h-fit rounded border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
+              <SendIcon/>
+          </IconButton>
+
+
         </div>
 
         <div className="grid grid-cols-2 gap-2 mb-2">
@@ -105,7 +97,6 @@ const CreateComments = ({ postId }) => {
               />
             ))}
         </div>
-        <Button type="submit">Comentar</Button>
       </form>
     </div>
   );

@@ -25,7 +25,7 @@ const PostForm = ( { updatePosts, userId } ) => {
   /**<-------------------------- SETEO ESTADO DE CARGA ------------------------------>*/
   const [isLoading, setIsLoading] = useState(false);
 
-  /**<------------- SETEO DE CAMPOS DE FORMULARIO PARA CREAR PUBLICA----------------->*/
+  /**<------------- SETEO DE CAMPOS DE FORMULARIO PARA CREAR PUBLICACION----------------->*/
   const [postValues, setPostValues] = useState({
     author: userId,
     title: "",
@@ -33,6 +33,13 @@ const PostForm = ( { updatePosts, userId } ) => {
     images: [],
     hashtags: []
   });
+
+  /**<------------- SETEO DE ESTADO DE HABILITACION DEL BOTON DE ENVIO ----------------->*/
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
+  useEffect(() => {
+    setIsSubmitDisabled(postValues.title.trim() === "" || postValues.description.trim() === "");
+  }, [postValues.title, postValues.description]);
 
   /** <-----------------------  SOLICITUD Y SETEO DE HASHTAGS ----------------------->*/
   const [hashtagValues, setHashtagValues] = useState([]);
@@ -128,16 +135,6 @@ const PostForm = ( { updatePosts, userId } ) => {
     }
   };
 
-  const determineImageSize = () => {
-    const numImages = postValues.images.length;
-    if (numImages === 1) {
-      return "w-full";
-    } else if (numImages === 2) {
-      return "w-1/2";
-    } else {
-      return "w-28 h-28 object-cover rounded-md";
-    }
-  };
 
   return (
       <div className='flex flex-row p-4 max-w-3xl mx-auto space-x-2 bg-zinc-100 mt-4 rounded shadow-md'>
@@ -170,7 +167,7 @@ const PostForm = ( { updatePosts, userId } ) => {
                 <input id="image-input" type="file" name="images" multiple onChange={handleImageChange} className="hidden"/>
               </label>
 
-              <Button variant="contained" endIcon={<SendIcon />} className="rounded px-8 py-2" onClick={onSubmit} disabled={isLoading}>
+              <Button variant="contained" endIcon={<SendIcon />} className="rounded px-8 py-2" onClick={onSubmit} disabled={isLoading || isSubmitDisabled}>
                     {isLoading ? <CircularProgress size={24} /> : "Publicar"} {/* Mostrar animación de carga */}
               </Button>
           </div>

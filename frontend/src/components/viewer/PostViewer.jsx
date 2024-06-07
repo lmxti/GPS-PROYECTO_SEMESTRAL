@@ -6,17 +6,26 @@ import { es } from 'date-fns/locale';
 /* <---------------- COMPONENTES MATERIAL UI ------------------> */
 import Avatar from '@mui/material/Avatar';
 import Skeleton from '@mui/material/Skeleton';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 
 /* <----------------------- ICONOS --------------------------> */
-import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import CommentIcon from '@mui/icons-material/Comment';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getPosts, deletePost, markInteraction } from "@/services/post.service";
 
+
+
 import ImageModal from "../modal/ImageModal";
 import CommentViewer from "./CommentViewer";
 import CommentForm from "../form/CommentsForm";
+
+import UserAvatar from "../UserAvatar.jsx";
 
 
 const PostViewer = ( {userId} ) => {
@@ -26,9 +35,11 @@ const PostViewer = ( {userId} ) => {
   const getDataPosts = async () => {
     try {
       const response = await getPosts();
-      const sortedPosts = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setPosts(sortedPosts);
-      console.log(sortedPosts);
+      if (response.data.data) {
+        const sortedPosts = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setPosts(sortedPosts);
+        console.log(sortedPosts);
+      }
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -108,18 +119,16 @@ const PostViewer = ( {userId} ) => {
 
 
   const renderInteractionButton = (post, reactionType, buttonText) => {
-    const isReacted = post.interactions.some(
-      (interaction) => interaction.user === userId && interaction.type === reactionType
-    );
+    const isReacted = post.interactions.some((interaction) => interaction.user === userId && interaction.type === reactionType );
+    const count = post.interactions.filter(interaction => interaction.type === reactionType).length;
   
     return (
-      <button
-        onClick={() => handleReaction(post._id, reactionType)}
-        className={`rounded-lg border px-3 py-1 text-xs font-semibold 
-          ${isReacted ? "bg-blue-500 text-white" : ""}`}
+      <Button onClick={() => handleReaction(post._id, reactionType)}
+        className={`rounded-lg border px-3 py-1 text-xs font-semibold bg-sky-600 hover:bg-sky-900 text-white ${isReacted ? "bg-sky-900" : "bg-sky-600"}`}
       >
-        {buttonText}
-      </button>
+        {buttonText === 'Útil' ?<TaskAltIcon/> : <RemoveCircleOutlineIcon/>}
+        {buttonText} ({count})
+      </Button>
     );
   };
   
@@ -133,7 +142,7 @@ const PostViewer = ( {userId} ) => {
 
         <div className="flex w-full items-center justify-between border-b pb-3">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-8 w-8 rounded-full bg-slate-400" />
+            <UserAvatar userId={post.author.id} />
             <div>
               <p className="text-lg font-bold text-slate-700">{post.author.name}</p>
               <p className="text-xs text-neutral-500">Publicado {formatRelativeDate(post.createdAt)}</p>
@@ -165,12 +174,22 @@ const PostViewer = ( {userId} ) => {
           ))}
         </div>
 
-        <div className="px-4 py-2">
-          <div className="flex space-x-4 md:space-x-8">
+        <div className="px-4 py-2 flex justify-between">
+          <div className="flex space-x-4 ">
 
           {renderInteractionButton(post, "helpful", "Útil")}
           {renderInteractionButton(post, "nothelpful", "No útil")}
+          <Button className="bg-sky-600 hover:bg-sky-900 text-white">
+            <CommentIcon/>
+          </Button>
           </div>
+
+          <div>
+            <Button className="bg-sky-600 hover:bg-sky-900 text-white">
+              <BookmarkIcon/>
+            </Button>
+          </div>
+
         </div>
 
         

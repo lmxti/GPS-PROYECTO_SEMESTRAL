@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 /* <----------------------- COMPONENTES --------------------------> */
-import Avatar from "@mui/material/Avatar";
+import UserAvatar from "../UserAvatar";
 
 /* <----------------------- ICONOS --------------------------> */
 import IconButton from '@mui/material/IconButton';
@@ -19,10 +19,12 @@ const ShowComments = ({ postId, userId }) => {
   const fetchComments = async () => {
     try {
       const response = await getComments(postId);
-      const sortedComments = response.data.data.data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setComments(sortedComments);
+      if (response.data.data.data) {
+        const sortedComments = response.data.data.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setComments(sortedComments);
+      }
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -62,7 +64,7 @@ const ShowComments = ({ postId, userId }) => {
             <div key={comment._id} className="mb-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
-                  <Avatar className="h-8 w-8 rounded-full bg-slate-400" />
+                  <UserAvatar userId={comment.userId.id} />
                   <p className="font-semibold text-slate-800">
                     {comment.userId.name}
                   </p>

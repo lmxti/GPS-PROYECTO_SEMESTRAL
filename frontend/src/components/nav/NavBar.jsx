@@ -2,6 +2,11 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+
+/* <---------------------- COMPONENTES ------------------------> */
+import UserAvatar from '../UserAvatar.jsx';
+
+
 /* <---------------- COMPONENTES MATERIAL UI ------------------> */
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
@@ -33,24 +38,17 @@ import { getUserInformation, getUserImage } from "../../services/user.service.js
 export default function PrimarySearchAppBar( { userId }) {
 
   const router = useRouter();
-  // const { user } = useAuth();
 
   const [dataUser, setDataUser] = useState('');
   const [imageUser, setImageUser] = useState('');
 
   const getDataUser = async () => {
     try {
-
       const response = await getUserInformation(userId);
       setDataUser(response.data.data);
-      console.log("Lol ",dataUser);
       
-      const imageUrl = await getUserImage(userId);
-      setImageUser(imageUrl);
-
     } catch (error) {
       console.log(error);
-      setImageUser('');
     }
   };
 
@@ -187,7 +185,7 @@ export default function PrimarySearchAppBar( { userId }) {
 
             {/* Avatar */}
             <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
-            <Avatar src={imageUser} />
+              <UserAvatar userId={userId} />
             </IconButton>
             
           </Box>
