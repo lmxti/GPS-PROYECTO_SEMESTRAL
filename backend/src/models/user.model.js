@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema(
         // Seguidores del usuario, por defecto es un array vacio "[]"
         followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         // Hashtags que sigue el usuario, por defecto es un array vacio "[]"
-        followedHashtags: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+        followedHashtags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Hashtag"}],
         // Notificaciones del usuario
         notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notification"}]
     }, 

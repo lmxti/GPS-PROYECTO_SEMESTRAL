@@ -18,5 +18,6 @@ router.get("/getUserByID/:id", userController.getUserByID);
 router.put("/updateUser/:id", userController.updateUser);
 router.delete("/deleteUser/:id", userController.deleteUser);
 router.get("/getUserImageByID/:id", userController.getUserImageByID);
+router.get("/getUserFollowedHashtags/:id", userController.getUserFollowedHashtags);
 
 module.exports = router;

@@ -185,11 +185,22 @@ async function deleteUser(id){
     }
 }
 
+async function getUserFollowedHashtags(id){
+    try {
+        const user = await User.findById(id).populate("followedHashtags").exec();
+        if(!user) return [null, "No se encontro usuario asociado al id ingresado"];
+        return [user.followedHashtags, null];
+    } catch (error) {
+        handleError(error, "user.service -> getUserFollowedHashtags");
+    }
+}
+
 module.exports = {
     createUser,
     getUsers,
     getUserByID,
     getUserImageByID,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserFollowedHashtags
 }

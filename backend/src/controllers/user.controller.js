@@ -138,11 +138,24 @@ async function deleteUser(req, res){
     }
 }
 
+async function getUserFollowedHashtags(req, res) {
+    try {
+        const { id } = req.params;
+        const [followedHashtags, error] = await UserService.getUserFollowedHashtags(id);
+        if (error) return respondError(req, res, 404, error);
+        respondSuccess(req, res, 200, followedHashtags);
+    } catch (error) {
+        handleError(error, "user.controller -> getUserFollowedHashtags");
+        respondError(req, res, 500, "No se pudo obtener los hashtags seguidos por el usuario");
+    }
+}
+
 module.exports = {
     createUser,
     getUsers,
     getUserByID,
     getUserImageByID,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserFollowedHashtags
 }
