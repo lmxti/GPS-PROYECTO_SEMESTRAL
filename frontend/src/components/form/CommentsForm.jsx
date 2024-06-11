@@ -25,7 +25,7 @@ const CreateComments = ({ postId }) => {
     userId: user.id,
     postId: postId,
     userComment: "",
-    imageComment: [],
+    imageComment: null,
   });
 
   /* Funcion para manejar el cambio en el campo de texto */
@@ -33,6 +33,13 @@ const CreateComments = ({ postId }) => {
     setComment({
       ...comment,
       userComment: e.target.value,
+    });
+  };
+
+  const handleImageChange = (e) => {
+    setComment({
+      ...comment,
+      imageComment: e.target.files[0],
     });
   };
 
@@ -44,9 +51,9 @@ const CreateComments = ({ postId }) => {
       formData.append("userComment", comment.userComment);
       formData.append("userId", comment.userId);
       formData.append("postId", comment.postId);
-      Array.from(comment.imageComment).forEach((image) => {
-        formData.append("imageComment", image);
-      });
+      if (comment.imageComment) {
+        formData.append("imageComment", comment.imageComment)
+      }
       await createComment(formData);
       const newCommentEvent = new CustomEvent("newComment", {
         detail: { postId },
@@ -59,7 +66,7 @@ const CreateComments = ({ postId }) => {
         userId: user.id,
         postId: postId,
         userComment: "",
-        imageComment: [],
+        imageComment: null,
       });
     }
   };
@@ -76,7 +83,7 @@ const CreateComments = ({ postId }) => {
 
           <label htmlFor="imageComment" title="Agregar imagen" className="bg-white px-6 mb-2 flex items-center border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
             <AddToPhotosIcon/>
-            <input type="file" name="image" id="imageComment" className="hidden" onChange={(e) => setComment({ ...comment, imageComment: e.target.files }) }/>
+            <input type="file" name="image" id="imageComment" className="hidden" onChange={handleImageChange}/>
           </label>
 
           <IconButton type="submit" className="bg-white w-fit px-6 mb-2 h-fit rounded border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
@@ -88,14 +95,13 @@ const CreateComments = ({ postId }) => {
 
         <div className="grid grid-cols-2 gap-2 mb-2">
           {comment.imageComment &&
-            Array.from(comment.imageComment).map((image, index) => (
               <img
                 key={index}
                 src={URL.createObjectURL(image)}
                 alt="image"
                 className="w-full"
               />
-            ))}
+            }
         </div>
       </form>
     </div>

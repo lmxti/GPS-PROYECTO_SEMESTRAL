@@ -87,7 +87,10 @@ export default function PrimarySearchAppBar( { userId }) {
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
-      <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
+      <MenuItem onClick={()=>{
+        router.push("/profile/profile");
+        handleMenuClose();
+      }}>Perfil</MenuItem>
       <MenuItem onClick={handleMenuClose}>Mi cuenta</MenuItem>
       <MenuItem onClick={ () => {
           logout()
