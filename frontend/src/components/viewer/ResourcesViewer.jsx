@@ -3,10 +3,12 @@ import InfoIcon from '@mui/icons-material/Info';
 import HelpIcon from '@mui/icons-material/Help';
 import BalanceIcon from '@mui/icons-material/Balance';
 import SecurityIcon from '@mui/icons-material/Security';
+import Typography from '@mui/material/Typography';
 
 export default function ResourcesViewer() {
   return (
     <div className='block p-6 mx-4'>
+      <p  className='font-thin text-2xl text-center mb-4'>Recursos</p>
       <ul className='space-y-4'>
 
         <li className=''>

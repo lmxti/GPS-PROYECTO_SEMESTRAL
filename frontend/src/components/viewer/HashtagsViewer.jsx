@@ -17,28 +17,22 @@ const HashtagsViewer = () => {
             console.error("Error fetching hashtags:", error);
         }
     }
-
     const showHashtags = () => {
-        
-        if (!hashtags || hashtags.length === 0) {
-            return null; // O muestra un mensaje alternativo si prefieres
-        }
-
+        if (!hashtags || hashtags.length === 0) return null; 
         return hashtags.map((hashtag, index) => (
-            <li key={index} className="inline-block py-1 px-4 bg-gray-200 rounded-lg mb-2 mr-2">
+            <li key={index} className=" py-2 px-4 text-zinc-500 hover:text-black bg-white hover:bg-zinc-300 rounded-lg font-sans text-xs">
                 #{hashtag.nameHashtag}
             </li>
         ));
     }
-
     useEffect(() => {
         getHashtagsList();
     }, []);
 
     return (
-        <div className="p-6 mx-4 border-b text-center">
-            <Typography variant="h5" gutterBottom>Hashtags</Typography>
-            <ul className="list-none p-0 flex flex-wrap">
+        <div className="p-4 border-b-2 ">
+            <p className='font-thin text-2xl text-center mb-4'>Etiquetas</p>
+            <ul className="flex flex-wrap justify-center gap-2 mt-4">
                 {showHashtags()}
             </ul>
         </div>

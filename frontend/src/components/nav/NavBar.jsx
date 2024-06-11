@@ -63,6 +63,7 @@ export default function PrimarySearchAppBar( { userId }) {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (event) => {
+    console.log("evento: ", event);
     setAnchorEl(event.currentTarget);
   };
 
