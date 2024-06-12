@@ -22,21 +22,31 @@ const CreateComments = ({ postId }) => {
     userId: user.id,
     postId: postId,
     userComment: "",
-    imageComment: [],
+    imageComment: null,
   });
 
+  useEffect(() => {
+    setComment((prevComment) => ({
+      ...prevComment,
+      postId: postId,
+    }));
+  }, [postId]);
+
+  /* Funcion para manejar el cambio en el campo de texto */
   const handleInputChange = (e) => {
-    setComment({
-      ...comment,
+    setComment((prevComment) => ({
+      ...prevComment,
       userComment: e.target.value,
-    });
+    }));
+    console.log(postId);
   };
 
-  const handleFileChange = (e) => {
-    setComment({
-      ...comment,
-      imageComment: e.target.files,
-    });
+  const handleImageChange = (e) => {
+    setComment((prevComment) => ({
+      ...prevComment,
+      imageComment: e.target.files[0],
+    }));
+    console.log(postId);
   };
 
   const onSubmit = async (e) => {
@@ -46,9 +56,9 @@ const CreateComments = ({ postId }) => {
       formData.append("userComment", comment.userComment);
       formData.append("userId", comment.userId);
       formData.append("postId", comment.postId);
-      Array.from(comment.imageComment).forEach((image) => {
-        formData.append("imageComment", image);
-      });
+      if (comment.imageComment) {
+        formData.append("imageComment", comment.imageComment)
+      }
       await createComment(formData);
       const newCommentEvent = new CustomEvent("newComment", {
         detail: { postId },
@@ -61,7 +71,7 @@ const CreateComments = ({ postId }) => {
         userId: user.id,
         postId: postId,
         userComment: "",
-        imageComment: [],
+        imageComment: null,
       });
     }
   };
@@ -69,19 +79,19 @@ const CreateComments = ({ postId }) => {
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <div className="flex space-x-2 items-center">
+      <div className="flex space-x-2 items-center">
           <UserAvatar userId={user.id}/> 
           <FormControl variant="outlined" className="w-full">
             <InputLabel htmlFor="userComment">Escribe un comentario</InputLabel>
             <OutlinedInput id="userComment" name="userComment" value={comment.userComment} onChange={handleInputChange} label="Escribe un comentario"
               endAdornment={
                 <InputAdornment position="end">
-                  <input type="file" id="imageComment" name="imageComment" style={{ display: "none" }}   onChange={(e) => handleFileChange(e) } />
-                  <label htmlFor="imageComment">
+                  <label>
                     <IconButton component="span">
                       <AddToPhotosIcon />
+                      <input type="file" id="imageComment" name="imageComment" style={{ display: "none" }} onChange={handleImageChange} />
                     </IconButton>
-                  </label>
+                    </label>
                   <IconButton type="submit" disabled={!comment.userComment}>
                     <SendIcon />
                   </IconButton>
@@ -93,13 +103,13 @@ const CreateComments = ({ postId }) => {
 
         <div className="grid grid-cols-2 gap-2 mb-2">
           {comment.imageComment &&
-          
-            Array.from(comment.imageComment).map((image, index) => (
-              <img key={index} src={URL.createObjectURL(image)} alt={`Comentario imagen (${index})`} className="w-28 h-28 p-1 bg-zinc- mt-2 shadow object-contain"
+              <img
+                src={URL.createObjectURL(comment.imageComment)}
+                alt="image"
+                className="w-full"
               />
-            ))}
+            }
         </div>
-
       </form>
     </div>
   );

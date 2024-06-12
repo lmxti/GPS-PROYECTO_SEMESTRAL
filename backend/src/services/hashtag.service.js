@@ -1,5 +1,6 @@
 /* <----------------------- MODELOS --------------------------> */
 const Hashtag = require("../models/hashtag.model");
+const User = require("../models/user.model");
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
@@ -79,10 +80,74 @@ async function deleteHashtag(id){
     }
 }
 
+async function userFollowHashtag(userId, hashtagId){
+    try{
+        const hashtag = await Hashtag.findById(hashtagId);
+        if(!hashtag) return [null, "Hashtag no encontrado"];
+
+        const user = await User.findById(userId);
+        if(!user) return [null, "Usuario no encontrado"];
+
+        const isFollowedByUser = hashtag.followedBy.some(
+            (followedUser) => followedUser.toString() === userId
+        )
+
+        if(isFollowedByUser){
+            return [null, "El usuario ya sigue este hashtag"];
+        }
+
+        hashtag.followedBy.push(userId);
+        await hashtag.save();
+
+        const isHashtagFollowedByUser = user.followedHashtags.some(
+            (followedHashtag) => followedHashtag.toString() === hashtagId
+        );
+
+        if(!isHashtagFollowedByUser){
+            user.followedHashtags.push(hashtagId);
+            await user.save();
+        }
+
+        return [hashtag, null];
+    } catch(error){
+        handleError(error, "hashtag.service -> userFollowHashtag")
+    }
+}
+
+async function userUnfollowHashtag(userId, hashtagId){
+    try{
+        const hashtag = await Hashtag.findById(hashtagId);
+        if(!hashtag) return [null, "Hashtag no encontrado"];
+        const user = await User.findById(userId);
+        if(!user) return [null, "Usuario no encontrado"];
+        const userIndexInHashtag = hashtag.followedBy.indexOf(userId);
+        if(userIndexInHashtag > -1) {
+            hashtag.followedBy.splice(userIndexInHashtag, 1);
+            await hashtag.save();
+        } else {
+            return [null, "El usuario no sigue este hashtag"];
+        }
+
+        const hashtagIndexInUser = user.followedHashtags.indexOf(hashtagId);
+        if(hashtagIndexInUser > -1) {
+            user.followedHashtags.splice(hashtagIndexInUser, 1);
+            await user.save();
+        } else {
+            return [null, "El hashtag no está en la lista de seguidos del usuario"];
+        }
+
+        return [hashtag, null];
+    } catch(error){
+        handleError(error, "hashtag.service -> userUnfollowHashtag")
+    }
+}
+
 module.exports = {
     createHashtag,
     getHashtags,
     getHashtagById,
     updateHashtag,
-    deleteHashtag
+    deleteHashtag,
+    userFollowHashtag,
+    userUnfollowHashtag
 }

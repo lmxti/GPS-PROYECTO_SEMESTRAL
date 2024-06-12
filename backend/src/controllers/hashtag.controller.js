@@ -106,10 +106,36 @@ async function deleteHashtag(req, res){
     }
 }
 
+async function userFollowHashtag (req, res){
+    try{
+        const { userId, hashtagId } = req.body;
+        const [hashtag, hashtagError] = await HashtagService.userFollowHashtag(userId, hashtagId);
+        if(hashtagError) return respondError(req, res, 404, hashtagError);
+        respondSuccess(req, res, 200, { message: "Hashtag seguido", data: hashtag});
+    } catch(error){
+        handleError(error, "hashtag.controller -> userFollowHashtag");
+        respondError(req, res, 500, "No se pudo seguir el hashtag");
+    }
+}
+
+async function userUnfollowHashtag (req, res){
+    try{
+        const { userId, hashtagId } = req.body;
+        const [hashtag, hashtagError] = await HashtagService.userUnfollowHashtag(userId, hashtagId);
+        if(hashtagError) return respondError(req, res, 404, hashtagError);
+        respondSuccess(req, res, 200, { message: "Hashtag dejado de seguir", data: hashtag});
+    } catch(error){
+        handleError(error, "hashtag.controller -> userUnfollowHashtag");
+        respondError(req, res, 500, "No se pudo dejar de seguir el hashtag");
+    }
+}
+
 module.exports = {
     createHashtag,
     getHashtags,
     getHashtagById,
     updateHashtag,
-    deleteHashtag
+    deleteHashtag,
+    userFollowHashtag,
+    userUnfollowHashtag
 }

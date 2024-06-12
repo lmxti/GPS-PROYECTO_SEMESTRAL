@@ -42,3 +42,11 @@ export const getUserImage = async (id) => {
         }
     }
 };
+
+export const getUserFollowedHashtags = async (id) => {
+    try {
+        return axios.get(`users/getUserFollowedHashtags/${id}`);
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> getUserFollowedHashtags()");
+    }
+}
