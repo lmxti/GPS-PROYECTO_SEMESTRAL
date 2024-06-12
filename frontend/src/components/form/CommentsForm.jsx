@@ -2,7 +2,7 @@
 import Button from "@mui/material/Button";
 
 /* <----------------------- FUNCIONES --------------------------> */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { createComment } from "@/services/comments.service.js";
@@ -28,19 +28,28 @@ const CreateComments = ({ postId }) => {
     imageComment: null,
   });
 
+  useEffect(() => {
+    setComment((prevComment) => ({
+      ...prevComment,
+      postId: postId,
+    }));
+  }, [postId]);
+
   /* Funcion para manejar el cambio en el campo de texto */
   const handleInputChange = (e) => {
-    setComment({
-      ...comment,
+    setComment((prevComment) => ({
+      ...prevComment,
       userComment: e.target.value,
-    });
+    }));
+    console.log(postId);
   };
 
   const handleImageChange = (e) => {
-    setComment({
-      ...comment,
+    setComment((prevComment) => ({
+      ...prevComment,
       imageComment: e.target.files[0],
-    });
+    }));
+    console.log(postId);
   };
 
   /* Funcion para enviar el comentario */
@@ -81,7 +90,7 @@ const CreateComments = ({ postId }) => {
             className="p-2 mb-2 border-2 rounded-md leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 focus:outline-none focus:border-blue-500 flex-grow"
           />
 
-          <label htmlFor="imageComment" title="Agregar imagen" className="bg-white px-6 mb-2 flex items-center border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
+          <label title="Agregar imagen" className="bg-white px-6 mb-2 flex items-center border-2 border-1-0  hover:bg-sky-500 duration-150 ease-in-out cursor-pointer">
             <AddToPhotosIcon/>
             <input type="file" name="image" id="imageComment" className="hidden" onChange={handleImageChange}/>
           </label>
@@ -96,8 +105,7 @@ const CreateComments = ({ postId }) => {
         <div className="grid grid-cols-2 gap-2 mb-2">
           {comment.imageComment &&
               <img
-                key={index}
-                src={URL.createObjectURL(image)}
+                src={URL.createObjectURL(comment.imageComment)}
                 alt="image"
                 className="w-full"
               />
