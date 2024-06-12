@@ -68,13 +68,9 @@ const HashtagsViewer = () => {
         }
 
     const showHashtags = () => {
-        
-        if (!hashtags || hashtags.length === 0) {
-            return null; // O muestra un mensaje alternativo si prefieres
-        }
-
+        if (!hashtags || hashtags.length === 0) return null; 
         return hashtags.map((hashtag, index) => (
-            <li key={index} className="inline-block py-1 px-4 bg-gray-200 rounded-lg mb-2 mr-2">
+            <li key={index} className=" py-2 px-4 text-zinc-500 hover:text-black bg-white hover:bg-zinc-300 rounded-lg font-sans text-xs">
                 #{hashtag.nameHashtag}
                 <button
                     onClick={() => handleFollow(hashtag._id)}
@@ -83,7 +79,6 @@ const HashtagsViewer = () => {
             </li>
         ));
     }
-
     useEffect(() => {
         getHashtagsList();
         getFollowHashtagsList(user.id);

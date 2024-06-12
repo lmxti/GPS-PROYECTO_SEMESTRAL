@@ -11,10 +11,11 @@ import IconButton from '@mui/material/IconButton';
 
 /* <----------------------- ICONOS --------------------------> */
 import DeleteIcon from '@mui/icons-material/Delete';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import CommentIcon from '@mui/icons-material/Comment';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import IosShareIcon from '@mui/icons-material/IosShare';
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getPosts, deletePost, markInteraction } from "@/services/post.service";
@@ -118,16 +119,16 @@ const PostViewer = ( {userId} ) => {
   };
 
 
-  const renderInteractionButton = (post, reactionType, buttonText) => {
+  const renderInteractionButton = (post, reactionType) => {
     const isReacted = post.interactions.some((interaction) => interaction.user === userId && interaction.type === reactionType );
     const count = post.interactions.filter(interaction => interaction.type === reactionType).length;
-  
     return (
       <Button onClick={() => handleReaction(post._id, reactionType)}
-        className={`rounded-lg border px-3 py-1 text-xs font-semibold bg-sky-600 hover:bg-sky-900 text-white ${isReacted ? "bg-sky-900" : "bg-sky-600"}`}
+        className={`text-black text-xs gap-2 px-3 hover:bg-zinc-300 ${reactionType === 'helpful' ? 'rounded-l-full' :'rounded-r-full'}
+        ${isReacted ? "bg-zinc-300" : ""}`}
       >
-        {buttonText === 'Útil' ?<TaskAltIcon/> : <RemoveCircleOutlineIcon/>}
-        {buttonText} ({count})
+        {reactionType === 'helpful' ? <ThumbUpIcon className="text-black"/> : <ThumbDownIcon className="text-black"/>}
+        ({count})
       </Button>
     );
   };
@@ -138,7 +139,7 @@ const PostViewer = ( {userId} ) => {
 
   const showPosts = ( ) => {
     return posts.map((post) => (
-      <div key={post._id} className={`max-w-3xl mx-auto bg-zinc-100 shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
+      <div key={post._id} className={`max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
 
         <div className="flex w-full items-center justify-between border-b pb-3">
           <div className="flex items-center space-x-3">
@@ -168,7 +169,7 @@ const PostViewer = ( {userId} ) => {
 
         <ImageModal images={post.images} />
 
-        <div className="flex flex-wrap border-b pb-3 pt-4">
+        <div className="flex flex-wrap border-b pb-3 pt-4 space-x-2">
           {post.hashtags.map((hashtag, index) => (
             <button key={index} className="rounded-2xl border bg-neutral-100 px-3 py-1 text-xs font-semibold">#{hashtag.name}</button>
           ))}
@@ -177,15 +178,22 @@ const PostViewer = ( {userId} ) => {
         <div className="px-4 py-2 flex justify-between">
           <div className="flex space-x-4 ">
 
-          {renderInteractionButton(post, "helpful", "Útil")}
-          {renderInteractionButton(post, "nothelpful", "No útil")}
-          <Button className="bg-sky-600 hover:bg-sky-900 text-white">
-            <CommentIcon/>
-          </Button>
+            <div className="bg-zinc-200 rounded-full">
+              {renderInteractionButton(post, "helpful",)}
+              {renderInteractionButton(post, "nothelpful")}
+            </div>
+
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black rounded-full">
+              <CommentIcon/>
+            </Button>
+
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black rounded-full text-xs normal-case px-4 font-bold" startIcon={<IosShareIcon/>}>
+                Compartir
+            </Button>
           </div>
 
           <div>
-            <Button className="bg-sky-600 hover:bg-sky-900 text-white">
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black rounded-full">
               <BookmarkIcon/>
             </Button>
           </div>
