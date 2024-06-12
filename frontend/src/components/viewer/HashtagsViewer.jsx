@@ -1,9 +1,6 @@
 /* <----------------------- FUNCIONES --------------------------> */
 import { useState, useEffect } from "react";
 
-
-import Typography from '@mui/material/Typography';
-
 /* <----------------------- SERVICIOS  -----------------------> */
 import { getHashtags } from "@/services/hashtag.service";
 

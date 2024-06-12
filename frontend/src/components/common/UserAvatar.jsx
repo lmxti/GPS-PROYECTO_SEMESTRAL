@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Avatar from '@mui/material/Avatar';
-import { getUserImage } from "../services/user.service.js"
+import { getUserImage } from "../../services/user.service.js"
 
 const UserAvatar = ({ userId }) => {
   const [image, setImage] = useState('');

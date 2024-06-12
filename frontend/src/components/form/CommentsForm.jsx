@@ -8,7 +8,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 
-import UserAvatar from "../UserAvatar";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 
 /* Servicios y Contexto */

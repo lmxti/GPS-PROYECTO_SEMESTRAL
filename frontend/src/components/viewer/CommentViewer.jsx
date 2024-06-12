@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 /* <----------------------- COMPONENTES --------------------------> */
-import UserAvatar from "../UserAvatar";
+import UserAvatar from "../common/UserAvatar";
 
 /* <----------------------- ICONOS --------------------------> */
 import IconButton from '@mui/material/IconButton';

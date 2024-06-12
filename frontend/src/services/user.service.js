@@ -33,6 +33,12 @@ export const getUserImage = async (id) => {
         const imageUrl = `data:image/jpeg;base64,${base64String}`;
         return imageUrl;
     } catch (error) {
-        console.log("FRONTEND: Error en user.service -> getUserImage()", error);
+        if (error.response && error.response.status === 404) {
+            // Si el servidor devuelve un 404, significa que el usuario no tiene imagen de perfil
+            return null; // Puedes retornar una URL de imagen predeterminada en su lugar
+        } else {
+            console.log("FRONTEND: Error en user.service -> getUserImage()", error);
+            throw error; // Lanza el error para que pueda ser manejado en el componente
+        }
     }
 };

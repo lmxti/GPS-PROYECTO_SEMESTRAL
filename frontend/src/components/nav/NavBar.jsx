@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 
 /* <---------------------- COMPONENTES ------------------------> */
-import UserAvatar from '../UserAvatar.jsx';
+import UserAvatar from "../common/UserAvatar.jsx";
 
 
 /* <---------------- COMPONENTES MATERIAL UI ------------------> */
@@ -63,7 +63,6 @@ export default function PrimarySearchAppBar( { userId }) {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (event) => {
-    console.log("evento: ", event);
     setAnchorEl(event.currentTarget);
   };
 
@@ -92,7 +91,7 @@ export default function PrimarySearchAppBar( { userId }) {
       <MenuItem onClick={handleMenuClose}>Mi cuenta</MenuItem>
       <MenuItem onClick={ () => {
           logout()
-          router.push("/");
+          router.reload();
         }
         }>Cerrar sesión
 
