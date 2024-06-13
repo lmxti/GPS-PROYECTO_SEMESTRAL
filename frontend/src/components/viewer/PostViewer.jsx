@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useRouter } from 'next/router';
+
 
 /* <---------------- COMPONENTES MATERIAL UI ------------------> */
 import Avatar from '@mui/material/Avatar';
@@ -32,6 +34,8 @@ import UserAvatar from "../common/UserAvatar.jsx";
 const PostViewer = ( {userId} ) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true); // Nuevo estado para manejar la carga
+  const router = useRouter();
+
 
   const getDataPosts = async () => {
     try {
@@ -142,7 +146,7 @@ const PostViewer = ( {userId} ) => {
       <div key={post._id} className={`max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
 
         <div className="flex w-full items-center justify-between border-b pb-3">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3" onClick={()=> router.push(`/profile/${post.author.id}`)}>
             <UserAvatar userId={post.author.id} />
             <div>
               <p className="text-lg font-bold text-slate-700">{post.author.name}</p>
@@ -175,7 +179,7 @@ const PostViewer = ( {userId} ) => {
           ))}
         </div>
 
-        <div className="px-4 py-2 flex justify-between">
+        <div className="px-4 py-4 flex justify-between">
           <div className="flex space-x-4 ">
 
             <div className="bg-zinc-200 rounded-full">
@@ -201,7 +205,7 @@ const PostViewer = ( {userId} ) => {
         </div>
 
         
-        <div className="flex-wrap border-b pb-3 pt-4">
+        <div className="flex-wrap border-b pb-3 ">
           <CommentForm postId={post._id} />
         </div>
 

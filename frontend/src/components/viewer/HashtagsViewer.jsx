@@ -60,9 +60,7 @@ const HashtagsViewer = () => {
             return followHashtags.map((hashtag, index) => (
                 <li key={index} className="inline-block py-1 px-4 bg-gray-200 rounded-lg mb-2 mr-2">
                     #{hashtag.nameHashtag}
-                    <button 
-                        onClick={() => handleUnfollow(hashtag._id)}
-                    >Dejar de seguir</button>
+                    <button className="bg-zinc-400 mx-2 px-2 rounded" onClick={() => handleUnfollow(hashtag._id)}>&times;</button>
                 </li>
             ));
         }
@@ -70,12 +68,11 @@ const HashtagsViewer = () => {
     const showHashtags = () => {
         if (!hashtags || hashtags.length === 0) return null; 
         return hashtags.map((hashtag, index) => (
-            <li key={index} className=" py-2 px-4 text-zinc-500 hover:text-black bg-white hover:bg-zinc-300 rounded-lg font-sans text-xs">
+            <li key={index} className=" py-1 px-2 text-zinc-600 hover:text-black bg-zinc-300 hover:bg-zinc-300 rounded-lg font-sans text-xs">
                 #{hashtag.nameHashtag}
-                <button
-                    onClick={() => handleFollow(hashtag._id)}
-                >
-                    <AddBoxOutlinedIcon/></button>
+                <button onClick={() => handleFollow(hashtag._id)} >
+                    <AddBoxOutlinedIcon/>
+                </button>
             </li>
         ));
     }
@@ -87,14 +84,14 @@ const HashtagsViewer = () => {
     return (
         <main>
         <div className="p-6 mx-4 border-b text-center">
-            <Typography variant="h5" gutterBottom>Hashtags</Typography>
-            <ul className="list-none p-0 flex flex-wrap">
+            <p className='font-thin text-2xl text-center mb-4'>Hashtags</p>
+            <ul className="list-none p-0 flex flex-wrap gap-2 justify-center">
                 {showHashtags()}
             </ul>
         </div>
 
         <div className="p-6 mx-4 border-b text-center">
-            <Typography variant="h5" gutterBottom>Hashtags seguidos</Typography>
+            <p className='font-thin text-2xl text-center mb-4'>Hashtags seguidos</p>
             <ul className="list-none p-0 flex flex-wrap">
                 {showFollowHashtags()}
             </ul>

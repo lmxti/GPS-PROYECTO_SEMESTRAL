@@ -19,6 +19,7 @@ const ImageModal = ({ images }) => {
         setSelectedImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     };
 
+
     const calculateGridColumns = (imageCount) => {
         if (imageCount === 1) {
             return 'grid-cols-1';
