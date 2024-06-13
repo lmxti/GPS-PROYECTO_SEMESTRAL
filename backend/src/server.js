@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser")
 const indexRoutes = require("./routes/index.routes.js")
 const { setupDB } = require('./config/db.config.js');
+const path = require('path');
 const { createRoles, createDefaultUsers, createBadgeRoles} = require("./config/initial.setup.js");
 
 async function setupServer(){
@@ -16,6 +17,7 @@ async function setupServer(){
     server.use(morgan("dev"));
     server.use(express.urlencoded({ extended: true }));
     server.use("/api", indexRoutes);
+    server.use('/uploads/images', express.static(path.join(__dirname, 'uploads', 'images')));
     server.listen(PORT, () => {
       console.log(`SERVIDOR => El servidor está corriendo en: http://localhost:${PORT}/api`);
     })

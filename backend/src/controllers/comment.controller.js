@@ -21,9 +21,9 @@ const { handleError } = require('../utils/errorHandler');
  */
 async function createComment(req, res) {
     try {
-        const { body } = req;
-        //[NOTA] commentSchema...?
-        const [newComment, commentError] = await CommentService.createComment(body);
+        const { userComment, userId, postId } = req.body;
+        const comment = { userComment, userId, postId };
+        const [newComment, commentError] = await CommentService.createComment(comment, req.files);
         if (commentError) return respondError(req, res, 400, commentError);
         if (!newComment) return respondError(req, res, 400, 'No se creo el comentario');
         respondSuccess(req, res, 201, newComment);
@@ -150,6 +150,20 @@ async function editComment(req, res) {
     }
 }
 
+async function getCommentsByPost(req, res) {
+    try {
+        const { params } = req;
+        const [comments, errorComments] = await CommentService.getCommentsByPost(params.id);
+        if (errorComments) return respondError(res, 500, 'Error al buscar comentarios');
+        comments.length === 0
+            ? respondSuccess(req, res, 200, 'No existen comentarios en la bbdd')
+            : respondSuccess(req, res, 200, { message: 'Se encontraron los siguientes comentarios: ', data: comments });
+    } catch (error) {
+        handleError(error, 'comment.controller -> getCommentsByPost');
+        respondError(req, res, 500, 'No se pudo encontrar comentarios');
+    }
+}
+
 module.exports = {
     createComment,
     getComments,
@@ -157,5 +171,6 @@ module.exports = {
     updateComment,
     deleteComment,
     getCommentsByUser,
-    editComment
+    editComment,
+    getCommentsByPost,
 };

@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
             }
         ],
         // Comentarios pertenecientes al usuario, por defecto es un array vacio "[]"
-        Comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment"} ],
+        comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment"} ],
         // Seguidos del usuario, por defecto es un array vacio "[]"
         followed: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         // Seguidores del usuario, por defecto es un array vacio "[]"
