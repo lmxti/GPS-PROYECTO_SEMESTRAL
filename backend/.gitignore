@@ -1,2 +1,4 @@
 node_modules
 src/config/.env
+src/uploads/images
+src/uploads/profiles

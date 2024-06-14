@@ -1,6 +1,7 @@
 /* <----------------------- MODELOS --------------------------> */
 const Post = require("../models/post.model");
 const User = require("../models/user.model");
+const Hashtag = require("../models/hashtag.model.js");
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
@@ -51,7 +52,42 @@ async function getPosts() {
     try{
         const posts = await Post.find()
         if(!posts) return [null, "No se encontraron publicaciones"];
-        return[posts, null];
+
+        // Obtén los IDs únicos de los autores
+        const authorIds = [...new Set(posts.map(post => post.author))];
+        // Busca los autores por sus IDs y obtén solo sus nombres
+        const authors = await User.find({ _id: { $in: authorIds } }, 'name');
+
+        // ID de hashtags por publicacion
+        const HashtagsIds = posts.reduce((acc, post) => {
+            post.hashtags.forEach(hashtag => acc.add(hashtag)); // Agregar todos los hashtags de todas las publicaciones
+            return acc;
+        }, new Set());
+
+        // Busca los hashtags por sus IDs y obtén solo sus nombres
+        const hashtags = await Hashtag.find({ _id: { $in: [...HashtagsIds] } }, 'nameHashtag');
+
+        // Mapea los hashtags para acceder a ellos por su ID
+        const hashtagsMap = hashtags.reduce((acc, hashtag) => {
+            acc[hashtag._id] = { id: hashtag._id, name: hashtag.nameHashtag };
+            return acc;
+        }, {});
+
+        // Convierte el array de autores en un objeto para un acceso rápido
+        const authorsMap = authors.reduce((acc, author) => {
+            acc[author._id] = { id: author._id, name: author.name };
+            return acc;
+        }, {});
+
+        const publicationData = posts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            author: { id: post.author, name: authorsMap[post.author].name },
+            hashtags: post.hashtags.map(hashtagId => hashtagsMap[hashtagId])
+        }));
+
+        return[publicationData, null];
+
     }catch(error){
         handleError(error, "post.service -> getPosts");
     }

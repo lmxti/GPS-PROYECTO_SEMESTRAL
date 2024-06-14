@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 
 /* <----------------------- CONSTANTES --------------------------> */
-const REPORTS = requiere("../constants/reportType.constants.js");
+const REPORTS = require("../constants/reportType.constants.js");
 
 const reportSchema = new mongoose.Schema(
     {

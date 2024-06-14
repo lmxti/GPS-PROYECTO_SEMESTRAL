@@ -8,6 +8,10 @@ const notificationSchema = new mongoose.Schema(
         contentNotification: { type: String, required: true },
         // Fecha de notificacion
         dateNotification: { type: Date, required: true },
+        // Usuario al que pertenece la notificacion
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        // Si la notificacion ha sido leida
+        read: { type: Boolean, default: false },
     }
 );
 
