@@ -69,6 +69,7 @@ async function getFollowedPosts(userId) {
     }
 }
 
+
 module.exports = {
     searchPosts,
     getTrendingPosts,
