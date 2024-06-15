@@ -1,5 +1,8 @@
 /* <----------------------- SERVICIOS ------------------------> */
 const AuthService = require("../services/auth.service.js");
+const EmailService = require('../services/email.service.js');
+/* <----------------------- MODELOS --------------------------> */
+const User = require("../models/user.model.js");
 
 /* <------------------------- SCHEMA --------------------------> */
 const { authLoginBodySchema } = require("../schema/auth.shcema.js");
@@ -71,8 +74,66 @@ async function refresh(req, res) {
     }
 }
 
+/**
+ * Controlador para manejar el olvido de contraseña de un usuario.
+ * @param {Object} req - Objeto de solicitud (request) que contiene la información del usuario.
+ * @param {Object} res - Objeto de respuesta (response) que contiene información sobre la respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningún valor explícito
+ */
+async function forgotPassword(req, res) {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return respondError(req, res, 400, "Se requiere correo electrónico");
+        }
+
+        // Generar token y guardar en la base de datos
+        const [user, errorToken] = await AuthService.generateResetToken(email);
+        if (errorToken) {
+            return respondError(req, res, 400, errorToken);
+        }
+
+        // Enviar correo electrónico con el enlace de restablecimiento de contraseña
+        const resetUrl = `${req.protocol}://${req.get('host')}/resetPassword/${user.resetPasswordToken}`;
+        await EmailService.sendResetPasswordEmail(user, resetUrl);
+
+        respondSuccess(req, res, 200, { message: "Correo electrónico de restablecimiento de contraseña enviado" });
+    } catch (error) {
+        handleError(error, "auth.controller -> forgotPassword");
+        respondError(req, res, 500, error.message);
+    }
+}
+
+/**
+ * Controlador para manejar el restablecimiento de contraseña de un usuario.
+ * @param {Object} req - Objeto de solicitud (request) que contiene la información del usuario.
+ * @param {Object} res - Objeto de respuesta (response) que contiene información sobre la respuesta HTTP.
+ * @returns {Promise<void>} Promesa que no devuelve ningún valor explícito
+ */
+async function resetPassword(req, res) {
+    try {
+        const { token, newPassword } = req.body;
+        if (!token || !newPassword) {
+            return respondError(req, res, 400, "Se requiere token y nueva contraseña");
+        }
+
+        // Restablecer la contraseña y guardar en la base de datos
+        const [user, errorReset] = await AuthService.resetPassword(token, newPassword);
+        if (errorReset) {
+            return respondError(req, res, 400, errorReset);
+        }
+
+        respondSuccess(req, res, 200, { message: "Contraseña restablecida con éxito" });
+    } catch (error) {
+        handleError(error, "auth.controller -> resetPassword");
+        respondError(req, res, 400, error.message);
+    }
+}
+
 module.exports = {
     login,
     logout,
-    refresh
+    refresh,
+    forgotPassword,
+    resetPassword
 }

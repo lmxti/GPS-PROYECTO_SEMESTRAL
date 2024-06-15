@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema(
         joinedAt: { type: Date, default: Date.now, required: true },
         // Imagen de perfil de usuario
         profilePicture: { type: String },
+        // Token de restablecimiento de contraseña
+        resetPasswordToken: { type: String },
+        // Fecha de vencimiento del token de restablecimiento de contraseña
+        resetPasswordExpires: { type: Date },
 
         /*<---------- Relaciones con otros modelos ----------> */
         
@@ -57,6 +61,17 @@ const userSchema = new mongoose.Schema(
     }, 
     { timestamps: true, versionKey: false }
 );
+
+// Encripta contrasena de usuario antes de guardarla
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+
 
 // Encripta contrasena de usuario
 userSchema.statics.encryptPassword = async (password) => {
