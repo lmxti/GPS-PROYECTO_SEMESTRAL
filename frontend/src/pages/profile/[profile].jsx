@@ -8,34 +8,30 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import { Button } from "@mui/material";
 
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import CachedIcon from '@mui/icons-material/Cached';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import PostProfileViewer from "@/components/viewer/PostProfileViewer";
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import Avatar from '@mui/material/Avatar';
+
 
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
+    <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
-
 CustomTabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
 };
-
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -45,6 +41,11 @@ function a11yProps(index) {
 
 
 const Profile = () => {
+  const router = useRouter();
+  // Desestructuracion de id de usuario actual.
+  const { user } = useAuth();
+  // Desectructuracion de id de perfil actual.
+  const { profile: id } = router.query;
 
   const [value, setValue] = useState(0);
 
@@ -52,10 +53,7 @@ const Profile = () => {
     setValue(newValue);
   };
 
-  const { user } = useAuth();
 
-  const router = useRouter();
-  const { profile: id } = router.query;
   
   const [profile, setProfile] = useState({});
   const [hashtags, setHashtags] = useState([]);
@@ -65,9 +63,8 @@ const Profile = () => {
       const response = await getUserInformation(id);
       const data = response.data.data;
       setProfile(data);
-      console.log(data);
     } catch (error) {
-      console.log("FRONTEND: Error en Profile -> useEffect()", error);
+      console.log("FRONTEND: Error en Profile -> fetchProfile() -> id:",id, error);
     }
   };
 
@@ -77,16 +74,26 @@ const Profile = () => {
       const data = response.data.data;
       setHashtags(data);
     } catch (error) {
-      console.log("FRONTEND: Error en Profile -> useEffect()", error);
+      console.log("FRONTEND: Error en Profile -> fetchHashtags()", error);
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-    fetchHashtags(user.id);
-  }, []);
-
   const totalSeguidos = (profile.followed ? profile.followed.length : 0) + (hashtags.length);
+
+  useEffect(() => {
+    if (id) {
+      fetchProfile();
+      fetchHashtags(user.id);
+    }
+  }, [id, user.id]);
+
+  useEffect(() => {
+    if (profile.name) {
+      document.title = `Perfil - ${profile.name} ${profile.surname}  `;
+    } else {
+      document.title = "Cargando perfil...";
+    }
+  }, [profile]);
 
   return (
     <>
@@ -110,19 +117,34 @@ const Profile = () => {
 
                 {/* Seccion de en medio - Imagen de usuario */}
                 <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-                    <div className="rounded-ful absolute -top-10 overflow-hidden h-40 w-40 bg-red-200 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600">
-                      <img alt="Profile" className="object-cover h-full w-full" 
+                    <div className="rounded-ful absolute -top-24 overflow-hidden h-56 w-56 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600">
+                      <Avatar src={`http://localhost:3001/uploads/profiles/${profile.profilePicture}`} sx={{ width: '100%', height: '100%' }}></Avatar>
+                      {/* <img alt="Profile" className="object-cover h-full w-full" 
+                        // src={ profile.profilePicture ? `http://localhost:3001/uploads/profiles/${profile.profilePicture}`: 'https://avatarfiles.alphacoders.com/654/65419.jpg'}
                         src={ profile.profilePicture ? `http://localhost:3001/uploads/profiles/${profile.profilePicture}`: 'https://avatarfiles.alphacoders.com/654/65419.jpg'}
-                      />
+
+                      /> */}
                     </div>
                 </div>
 
                 {/* Seccion de la derecha - Botones */}
                 <div className="w-full lg:w-4/12 px-4 lg:order-3">
-                  <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto">
-                    <button className="bg-zinc-500 active:bg-zinc-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
+                  <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto flex justify-center">
+
+                    {/* <button 
+                      className="bg-zinc-500 active:bg-zinc-600 uppercase text-white font-bold  text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
                       seguir
-                    </button>
+                    </button> */}
+                  {profile.badges?.length > 0 
+                      ? profile.badges.map((badge, index) => (
+                          <div key={index} className="flex flex-col items-center  p-4 rounded ">
+                            <img key={index} src={`data:image/png;base64,${badge.imageBadge}`} alt={badge.nameBadge} className="w-20 h-20 object-contain mb-2" title={`${badge.descriptionBadge}`} />
+                            {/* <h4 className="text-lg font-semibold">{badge.nameBadge}</h4> */}
+                            {/* <p className="text-gray-600">{badge.descriptionBadge}</p> */}
+                          </div>
+                    )) : <p>No hay insignias para mostrar</p>
+                  }
+
                   </div>
                 </div>
 
@@ -131,7 +153,7 @@ const Profile = () => {
                   <div className="flex justify-center py-4 lg:pt-4 pt-8">
 
                     {/* Contador de publicaciones del usuario */}
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear">
+                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
                       <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.posts ? profile.posts.length : 0}</span>
                       <span className="text-sm text-blueGray-400">Publicaciones</span>
                     </div>
@@ -142,11 +164,11 @@ const Profile = () => {
                       <span className="text-sm text-blueGray-400">Comments</span>
                     </div> */}
 
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear">
+                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
                       <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{totalSeguidos}</span>
                       <span className="text-sm text-blueGray-400">Seguidos</span>
                     </div>
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear">
+                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
                       <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.followers ? profile.followers.length : 0}</span>
                       <span className="text-sm text-blueGray-400">Seguidores</span>
                     </div>
@@ -173,27 +195,31 @@ const Profile = () => {
                   {profile.description ? profile.description : 'No hay descripcion'}
                 </div>
 
-                <div className="mb-2 text-blueGray-600">
-                <Box sx={{ width: '100%' }}>
-                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Box sx={{ width: '100%', marginTop: 4}}>
+                      <Box sx={{ borderTop:1, borderBottom: 1, borderColor: 'divider'}}>
+                        <Tabs centered value={value} onChange={handleChange}>
+                          <Tab icon={<ViewHeadlineIcon />}  {...a11yProps(0)} />
+                          <Tab icon={<CachedIcon />}  {...a11yProps(1)} />
+                          <Tab icon={<BookmarkIcon />} {...a11yProps(2)} />
+                          <Tab icon={<WorkspacePremiumIcon />} {...a11yProps(3)} />
 
-                      <Tabs centered value={value} onChange={handleChange} aria-label="basic tabs example">
-                        <Tab icon={<ViewHeadlineIcon/>} label="Publicaciones" {...a11yProps(0)} />
-                        <Tab icon={<CachedIcon/>} label="Favoritos" {...a11yProps(1)} />
-                        <Tab icon={<BookmarkIcon/>} label="Guardados" {...a11yProps(2)} />
-                      </Tabs>
-                    </Box>
-                    <CustomTabPanel value={value} index={0}>
-                      Item One
-                    </CustomTabPanel>
-                    <CustomTabPanel value={value} index={1}>
-                      Item Two
-                    </CustomTabPanel>
-                    <CustomTabPanel value={value} index={2}>
-                      Item Three
-                    </CustomTabPanel>
-                </Box>
-                </div>
+                        </Tabs>
+                      </Box>
+                      <CustomTabPanel value={value} index={0}>
+                        {/* <PostProfileViewer key={update} id={id} userId={user.id} updatePosts={updatePosts}/> */}
+                        <PostProfileViewer id={id} userId={user.id} />
+
+                      </CustomTabPanel>
+                      <CustomTabPanel value={value} index={1}>
+                        Item Two
+                      </CustomTabPanel>
+                      <CustomTabPanel value={value} index={2}>
+                        Item Three
+                      </CustomTabPanel>
+                      <CustomTabPanel value={value} index={3}>
+                        Item Four
+                      </CustomTabPanel>
+                  </Box>
               </div>
           </div>
         </div>

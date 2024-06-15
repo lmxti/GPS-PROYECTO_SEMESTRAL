@@ -27,28 +27,30 @@ export default function Home() {
   const updatePosts = () => {
     setUpdate(!update);
   };
+  
+  useEffect( () =>{
+    document.title = 'Inicio'
+  })
 
 
   return (
     <main>
         <NavBar userId={userId}/>
-        <div className = "flex container mx-auto mt-4">
+        <div className = "flex container justify-center mt-4">
 
           <div className='grid grid-cols-1 md:grid-cols-4 md:gap-4'>
+
             <div className='md:col-span-1 md:border-r-2 px-2'>
                   <SideNav/>
                   <HashtagsViewer/>
                   <ResourcesViewer/>
             </div>
 
-            <div className='md:col-span-2'>
+            <div className='md:col-span-3'>
               <PostForm updatePosts={updatePosts} userId={userId}/>
-              <PostViewer key={update} userId={userId}/>
+              <PostViewer key={update} userId={userId} type='ALL'/>
             </div>
 
-            <div className='md:col-span-1'>
-
-            </div>
           </div>
 
       </div>

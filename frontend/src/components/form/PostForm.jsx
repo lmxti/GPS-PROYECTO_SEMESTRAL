@@ -179,7 +179,7 @@ const PostForm = ( { updatePosts, userId } ) => {
           </input>
 
         <div className='relative'>
-          <textarea id="postContent" maxLength={maxCharLimit} rows="4" placeholder="Cuentanos más sobre lo que quieres publicar :-)" onChange={handleChange} name="description" value={postValues.description}
+          <textarea id="postContent" maxLength={maxCharLimit} rows="8" placeholder="Cuentanos más sobre lo que quieres publicar :-)" onChange={handleChange} name="description" value={postValues.description}
             className="w-full p-2 mb-2 border-2 rounded-md bg-zinc-100 leading-5 transition duration-150 ease-in-out sm:text-sm sm:leading-5 resize-none focus:outline-none focus:border-zinc-400" >
           </textarea>
           <p className='absolute right-2 bottom-4 text-xs p-2 text-zinc-400'>
@@ -201,7 +201,7 @@ const PostForm = ( { updatePosts, userId } ) => {
           {/* <--------------------------------------- SECTION IMAGES/HASHTAGS BUTTONS --------------------------------------->*/}
           <div className='flex justify-between space-x-2 mb-4 items-center'>
               {/* <---------------- Botones de archivo/imagen y hashtags ---------------->*/}
-            <div className="flex text-gray-500 ">
+            <div className="flex text-gray-500">
                 {/* Input de archivos/imagenes */}
                 <label htmlFor="image-input" className="cursor-pointer" title='Agregar imagenes'>
                   <svg className="mr-2 hover:text-gray-700 border rounded-full p-1 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -226,12 +226,12 @@ const PostForm = ( { updatePosts, userId } ) => {
 
           </div>
 
-          <div className='flex justify-end space-x-2'>
+          <div className='flex justify-end gap-2 flex-col sm:flex-row'>
              {isSubmitDisabled ? ""
              :
-              <Button onClick={resetForm} className='border-4 p-2 border-gray-500 text-gray-400 hover:text-gray-500 normal-case px-5 bg-gray-100 hover:bg-gray-200'>Cancelar</Button>
+              <Button onClick={resetForm} className='order-last sm:order-1 border-4 p-2 border-gray-500 text-gray-400 hover:text-gray-500 normal-case px-5 bg-gray-100 hover:bg-gray-200'>Cancelar</Button>
              }
-              <Button variant="contained" endIcon={<SendIcon />} className="rounded px-8 py-2" onClick={onSubmit} disabled={isLoading || isSubmitDisabled}>
+              <Button variant="contained" endIcon={<SendIcon />} className="order-first sm:order-2 rounded px-8 py-2" onClick={onSubmit} disabled={isLoading || isSubmitDisabled}>
                     {isLoading ? <CircularProgress size={24} /> : "Publicar"} {/* Mostrar animación de carga */}
               </Button>
           </div>

@@ -148,9 +148,10 @@ export default function PrimarySearchAppBar( { userId }) {
         <Toolbar>
         
         {/* Texto barra de navegacion */}
-          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-            Proyecto GPS
-          </Typography>
+          {/* <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block', fontStyle:'oblique' } }}>
+            FORUM
+          </Typography> */}
+          <Avatar alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} />
 
 
         {/* Barra de busqueda */}

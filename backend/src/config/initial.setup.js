@@ -76,12 +76,12 @@ async function createDefaultUsers() {
     await Promise.all([
       /* <-------------------------- USUARIO ADMINISTRADOR DEFAULT --------------------------> */
       new User({
-        name: "John Doe",
-        surname: "null",
-        username: "adm",
-        description: "Soy el administrador",
+        name: "John",
+        surname: "Doe",
+        username: "administrador",
+        description: "Hola, soy el administrador de la comunidad! :)",
         birthdate: "1990-05-15",
-        gender: "Femenino",
+        gender: "Masculino",
         email: "admin@localhost.com",
         password: await User.encryptPassword("admin"),
         roleUser: [admin._id],
@@ -89,10 +89,10 @@ async function createDefaultUsers() {
       }).save(),
       /* <-------------------------------- USUARIO  DEFAULT --------------------------------> */
       new User({
-        name: "Jane Doe",
-        surname: "null",
-        username: "user123",
-        description: "Soy el usuario",
+        name: "Jane ",
+        surname: "Doe",
+        username: "JaneDoe765",
+        description: "Hola, soy un usuario de la comunidad! sigueme ;)",
         birthdate: "1990-05-15",
         gender: "Otro",
         email: "user@localhost.com",
@@ -102,11 +102,11 @@ async function createDefaultUsers() {
       }).save(),
       /* <--------------------------- USUARIO MODERADOR DEFAULT ---------------------------> */
       new User({
-        name: "Johne Doe",
-        surname: "null",
-        username: "Elmoderador",
+        name: "Myke Doe",
+        surname: "Doe",
+        username: "MkeDoe2000",
         description: "Soy el moderador",
-        birthdate: "1990-05-15",
+        birthdate: "2000-05-15",
         gender: "Masculino",
         email: "moderador@localhost.com",
         password: await User.encryptPassword("moderador"),

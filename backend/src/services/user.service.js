@@ -1,6 +1,7 @@
 /* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+const Badge = require("../models/badge.model.js")
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
@@ -97,9 +98,24 @@ async function getUserByID(id){
         const user = await User.findById({ _id: id })
             .select("-password")
             .populate("roleUser")
+            .populate("badges.badge", "nameBadge descriptionBadge imageBadge")
             .exec();
         if(!user) return [null, "No existe un usuario asociado al id ingresado"];
-        return [user, null]
+        // Mapea los badges para acceder a ellos por su ID
+        const badgesMap = user.badges.map(badgeEntry => ({
+            nameBadge: badgeEntry.badge.nameBadge,
+            descriptionBadge: badgeEntry.badge.descriptionBadge,
+            imageBadge: badgeEntry.badge.imageBadge,
+            dateObtained: badgeEntry.dateObtained
+        }));
+
+        // Construir el objeto de respuesta
+        const responseUser = {
+            ...user.toObject(),
+            badges: badgesMap
+        };
+
+        return [responseUser, null]
     } catch (error) {
         handleError(error, "user.service -> getUser");
     }
