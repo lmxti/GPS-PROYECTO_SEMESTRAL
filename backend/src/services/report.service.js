@@ -131,6 +131,40 @@ async function getReportsByType(reportType){
     }
 }
 
+async function approveReport(id) {
+    try {
+        const updatedReport = await Report.findOneAndUpdate(
+            { _id: id },
+            { status: 'aprobado' },
+            { new: true } // Devuelve el documento modificado
+        );
+        if (!updatedReport) {
+            throw new Error('Reporte no encontrado');
+        }
+        return updatedReport;
+    } catch (error) {
+        console.error('Error al aprobar el reporte:', error);
+        throw error;
+    }
+}
+
+async function rejectReport(id) {
+    try {
+        const updatedReport = await Report.findOneAndUpdate(
+            { _id: id },
+            { status: 'rechazado' },
+            { new: true } // Devuelve el documento modificado
+        );
+        if (!updatedReport) {
+            throw new Error('Reporte no encontrado');
+        }
+        return updatedReport;
+    } catch (error) {
+        console.error('Error al rechazar el reporte:', error);
+        throw error;
+    }
+}
+
 
 
 module.exports = {
@@ -141,6 +175,8 @@ module.exports = {
     deleteReport,
     getReportsByUser,
     getReportsByPost,
-    getReportsByType
+    getReportsByType,
+    approveReport,
+    rejectReport
 };
 

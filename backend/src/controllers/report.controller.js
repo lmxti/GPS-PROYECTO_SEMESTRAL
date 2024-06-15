@@ -103,6 +103,32 @@ async function getReportsByType(req, res) {
         respondError(req, res, 500, 'No se pudo encontrar reportes');
     }
 }
+
+async function approveReport(req, res) {
+    try {
+        const { id } = req.params;
+        const [updatedReport, updateError] = await ReportService.approveReport(id);
+        if (updateError) return respondError(req, res, 400, updateError);
+        if (!updatedReport) return respondError(req, res, 400, 'Reporte no encontrado');
+        respondSuccess(req, res, 200, updatedReport);
+    } catch (error) {
+        handleError(error, 'report.controller -> approveReport');
+        respondError(req, res, 500, 'Error al aprobar el reporte');
+    }
+}
+
+async function rejectReport(req, res) {
+    try {
+        const { id } = req.params;
+        const [updatedReport, updateError] = await ReportService.rejectReport(id);
+        if (updateError) return respondError(req, res, 400, updateError);
+        if (!updatedReport) return respondError(req, res, 400, 'Reporte no encontrado');
+        respondSuccess(req, res, 200, updatedReport);
+    } catch (error) {
+        handleError(error, 'report.controller -> rejectReport');
+        respondError(req, res, 500, 'Error al rechazar el reporte');
+    }
+}
 //
 
 module.exports = {
@@ -114,4 +140,6 @@ module.exports = {
     getReportsByUser,
     getReportsByPost,
     getReportsByType,
+    approveReport,
+    rejectReport
 };
