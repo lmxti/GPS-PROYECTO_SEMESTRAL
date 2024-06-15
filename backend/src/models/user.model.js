@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema(
         // Publicaciones del usuario, por defecto es un array vacio "[]"
         posts: [ { type: mongoose.Schema.Types.ObjectId,ref: "Post"} ],
         // Insignias del usuario, por defecto es un array vacio "[]"
+        savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
+        // Insignias del usuario, por defecto es un array vacio "[]"
         badges: [
              { 
                 badge: {type: mongoose.Schema.Types.ObjectId, ref: "Badge"},
