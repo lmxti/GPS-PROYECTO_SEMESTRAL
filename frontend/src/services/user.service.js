@@ -50,3 +50,12 @@ export const getUserFollowedHashtags = async (id) => {
         console.log("FRONTEND: Error en user.service -> getUserFollowedHashtags()");
     }
 }
+
+export const updateUser = async(id, editedProfile) => {
+    try {
+        const response = await axios.put(`users/updateUser/${id}`, editedProfile)
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> updateUser()");
+    }
+}

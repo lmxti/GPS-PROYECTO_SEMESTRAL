@@ -1,23 +1,36 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { getUserInformation, getUserFollowedHashtags } from "@/services/user.service";
-import { useRouter } from 'next/router';
-import NavBar from "@/components/nav/NavBar";
+/* <----------------------- MODULOS ------------------------------> */
+import PropTypes from 'prop-types'; // Libreria para validad tipos de propiedades(props)
 
-import PropTypes from 'prop-types';
+/* <----------------------- FUNCIONES ---------------------------> */
+import { useState, useEffect } from "react";
+import { useRouter } from 'next/router';
+
+/* <---------------- COMPONENTES MATERIAL UI --------------------> */
+import Avatar from '@mui/material/Avatar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import { Button } from "@mui/material";
 
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+/* <----------------------- ICONOS UI ---------------------------> */
 import CachedIcon from '@mui/icons-material/Cached';
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import PostProfileViewer from "@/components/viewer/PostProfileViewer";
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-import Avatar from '@mui/material/Avatar';
 
+/* <--------------------- COMPONENTES NAV ----------------------> */
+import NavBar from "@/components/nav/NavBar";
 
+/* <------------------- COMPONENTES FORM ---------------------> */
+import ProfileEditForm from '@/components/form/ProfileEditForm';
+
+/* <------------------- COMPONENTES VIEWER ---------------------> */
+import PostProfileViewer from "@/components/viewer/PostProfileViewer";
+
+/* <------------------------ CONTEXTO --------------------------> */
+import { useAuth } from "@/context/AuthContext";
+
+/* <----------------------- SERVICIOS  -------------------------> */
+import { getUserInformation, getUserFollowedHashtags, updateUser } from "@/services/user.service";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,35 +52,38 @@ function a11yProps(index) {
   };
 }
 
-
 const Profile = () => {
   const router = useRouter();
-  // Desestructuracion de id de usuario actual.
+  // Desectructuracion datos de usuario (user.id).
   const { user } = useAuth();
-  // Desectructuracion de id de perfil actual.
+  // Desesctructuracion de perfil de usuario y asignacion a variable `id`.
   const { profile: id } = router.query;
+  // Seteo de datos del perfil de usuario.
+  const [profile, setProfile] = useState({});
+  // Seteo de datos de hashtags.
+  const [hashtags, setHashtags] = useState([]);
+  // Seteo de secciones del perfil seleccionada, `0` por default.
+  const [section, setSection] = useState(0);
 
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  //<----------------------------- MANEJO DE CAMBIOS DE SECCION ----------------------------->
+  const handleSectionChange = (event, newValue) => {
+    setSection(newValue);
   };
 
-
-  
-  const [profile, setProfile] = useState({});
-  const [hashtags, setHashtags] = useState([]);
-
+  //<----------------------------------- DATOS DE USUARIO ----------------------------------->
   const fetchProfile = async () => {
     try {
       const response = await getUserInformation(id);
       const data = response.data.data;
       setProfile(data);
     } catch (error) {
-      console.log("FRONTEND: Error en Profile -> fetchProfile() -> id:",id, error);
+      console.log("FRONTEND: Error en Profile -> fetchProfile() -> id:", id, error);
     }
   };
+  // Estadistica de total de seguidos de usuario, incluye la suma de tanto como usuarios y hashtags
+  const totalSeguidos = (profile.followed ? profile.followed.length : 0) + (hashtags.length);
 
+  //<---------------------------------- HASHTAGS DE USUARIO --------------------------------->
   const fetchHashtags = async (ids) => {
     try {
       const response = await getUserFollowedHashtags(ids);
@@ -78,8 +94,9 @@ const Profile = () => {
     }
   };
 
-  const totalSeguidos = (profile.followed ? profile.followed.length : 0) + (hashtags.length);
-
+  //<---------------------------------- MANEJO DE CARGA DE DATOS  --------------------------------->
+  // Encargado de ejecutar solicitudes para cargar los datos cada 
+  // vez que cambie la id tanto como del usuario y del perfil.
   useEffect(() => {
     if (id) {
       fetchProfile();
@@ -87,141 +104,123 @@ const Profile = () => {
     }
   }, [id, user.id]);
 
+  //<---------------------------------- MANEJO DE DOCUMENTO  --------------------------------->
+  // Titulo de pagina, cargando hasta que carguen los datos del perfil de usuario.
   useEffect(() => {
     if (profile.name) {
-      document.title = `Perfil - ${profile.name} ${profile.surname}  `;
+      document.title = `Perfil - ${profile.name} ${profile.surname}`;
     } else {
       document.title = "Cargando perfil...";
     }
   }, [profile]);
+
+  const handleUpdateProfile = (updatedProfile) => {
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      ...updatedProfile,
+    }));
+  };
 
   return (
     <>
       <NavBar userId={user.id} />
 
       <section className="relative block h-[500px]">
-        <div
-          className="absolute top-0 w-full h-full bg-center bg-cover"
-          style={{
-            backgroundImage: "url('https://img.myloview.fr/images/black-and-white-pattern-on-white-background-abstract-design-700-176625414.jpg')",
-          }}
-        >
+        <div className="absolute top-0 w-full h-full bg-center bg-cover" style={{ backgroundImage: "url('https://img.myloview.fr/images/black-and-white-pattern-on-white-background-abstract-design-700-176625414.jpg')"}}>
           <span id="blackOverlay" className="w-full h-full absolute opacity-50 bg-black"></span>
         </div>
       </section>
 
       <section className="relative py-16 ">
         <div className="container mx-auto px-4">
-          <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64 ">
-              <div className="flex flex-wrap justify-center">
-
-                {/* Seccion de en medio - Imagen de usuario */}
-                <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-                    <div className="rounded-ful absolute -top-24 overflow-hidden h-56 w-56 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600">
-                      <Avatar src={`http://localhost:3001/uploads/profiles/${profile.profilePicture}`} sx={{ width: '100%', height: '100%' }}></Avatar>
-                      {/* <img alt="Profile" className="object-cover h-full w-full" 
-                        // src={ profile.profilePicture ? `http://localhost:3001/uploads/profiles/${profile.profilePicture}`: 'https://avatarfiles.alphacoders.com/654/65419.jpg'}
-                        src={ profile.profilePicture ? `http://localhost:3001/uploads/profiles/${profile.profilePicture}`: 'https://avatarfiles.alphacoders.com/654/65419.jpg'}
-
-                      /> */}
-                    </div>
-                </div>
-
-                {/* Seccion de la derecha - Botones */}
-                <div className="w-full lg:w-4/12 px-4 lg:order-3">
-                  <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto flex justify-center">
-
-                    {/* <button 
-                      className="bg-zinc-500 active:bg-zinc-600 uppercase text-white font-bold  text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
-                      seguir
-                    </button> */}
-                  {profile.badges?.length > 0 
-                      ? profile.badges.map((badge, index) => (
-                          <div key={index} className="flex flex-col items-center  p-4 rounded ">
-                            <img key={index} src={`data:image/png;base64,${badge.imageBadge}`} alt={badge.nameBadge} className="w-20 h-20 object-contain mb-2" title={`${badge.descriptionBadge}`} />
-                            {/* <h4 className="text-lg font-semibold">{badge.nameBadge}</h4> */}
-                            {/* <p className="text-gray-600">{badge.descriptionBadge}</p> */}
+            <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64 ">
+                  {/*<-------------------------------------------------------- CABECERA DE PERFIL -------------------------------------------------------->*/}
+                  <div className="flex flex-wrap justify-center">
+                        {/*<---------------- SECCION-CABECERA FOTO DE PERFIL------------------>*/}
+                        <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
+                          <div className="rounded-ful absolute -top-24 overflow-hidden h-56 w-56 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600">
+                            <Avatar src={`http://localhost:3001/uploads/profiles/${profile.profilePicture}`} sx={{ width: '100%', height: '100%' }}></Avatar>
                           </div>
-                    )) : <p>No hay insignias para mostrar</p>
-                  }
+                        </div>
+                        {/*<------------------ SECCION-CABECERA INSIGNIAS -------------------->*/}
+                        <div className="w-full lg:w-4/12 px-4 lg:order-3">
+                          <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto flex justify-center">
+                            {profile.badges?.length > 0 
+                              ? profile.badges.map((badge, index) => (
+                                  <div key={index} className="flex flex-col items-center p-4 rounded">
+                                    <img src={`data:image/png;base64,${badge.imageBadge}`} alt={badge.nameBadge} className="w-20 h-20 object-contain mb-2" title={`${badge.descriptionBadge}`} />
+                                  </div>
+                                )) : <p>No hay insignias para mostrar</p>
+                            }
+                          </div>
+                        </div>
+                        {/*<------------------ SECCION-CABECERA ESTADISTICAS ------------------>*/}
+                        <div className="w-full lg:w-4/12 px-4 lg:order-1">
+                            <div className="flex justify-center py-4 lg:pt-4 pt-8">
+                              <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
+                                <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.posts ? profile.posts.length : 0}</span>
+                                <span className="text-sm text-blueGray-400">Publicaciones</span>
+                              </div>
 
+                              <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
+                                <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{totalSeguidos}</span>
+                                <span className="text-sm text-blueGray-400">Seguidos</span>
+                              </div>
+                              
+                              <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
+                                <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.followers ? profile.followers.length : 0}</span>
+                                <span className="text-sm text-blueGray-400">Seguidores</span>
+                              </div>
+                            </div>
+                        </div>
                   </div>
-                </div>
+                  {/*<--------------------------------------------------------- CUERPO PERFIL --------------------------------------------------------->*/}
+                  <div className="text-center mt-10 pb-10">
+                         {/* <---------------- Nombre completo -----------------> */}
+                        <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700">
+                          {profile.name} {profile.surname}
+                        </h3>
+                        {/* <------------- Nombre de usuario ----------------->*/}
+                         <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold">
+                          Nombre de usuario: {profile.username}
+                        </div> 
+                        {/* <----------- Descripcion de usuario --------------> */}
+                        <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold">
+                          Descripcion: {profile.description ? profile.description : ':)' }
+                        </div>
 
-                {/* Seccion de la izquierda - informacion de usuario */}
-                <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                  <div className="flex justify-center py-4 lg:pt-4 pt-8">
+                        <ProfileEditForm profile={profile} onUpdateProfile={handleUpdateProfile} />  
 
-                    {/* Contador de publicaciones del usuario */}
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.posts ? profile.posts.length : 0}</span>
-                      <span className="text-sm text-blueGray-400">Publicaciones</span>
-                    </div>
-
-                    {/* Contador de comentarios del usuario */}
-                    {/* <div className="lg:mr-4 p-3 text-center">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.comments ? profile.comments.length : 0}</span>
-                      <span className="text-sm text-blueGray-400">Comments</span>
-                    </div> */}
-
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{totalSeguidos}</span>
-                      <span className="text-sm text-blueGray-400">Seguidos</span>
-                    </div>
-                    <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
-                      <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.followers ? profile.followers.length : 0}</span>
-                      <span className="text-sm text-blueGray-400">Seguidores</span>
-                    </div>
-
-                    
-
-
-
+                        {/* <-------- CABECERA DE SECCIONES --------> */}
+                        <Box sx={{ width: '100%', marginTop: 4 }}>
+                              <Box sx={{ borderTop: 1, borderBottom: 1, borderColor: 'divider' }}>
+                              {/*<---- Pestañas de secciones del perfil ---->*/}
+                                <Tabs centered value={section} onChange={handleSectionChange}>
+                                  <Tab icon={<ViewHeadlineIcon />}  {...a11yProps(0)} />
+                                  <Tab icon={<CachedIcon />}  {...a11yProps(1)} />
+                                  <Tab icon={<BookmarkIcon />} {...a11yProps(2)} />
+                                  <Tab icon={<WorkspacePremiumIcon />} {...a11yProps(3)} />
+                                </Tabs>
+                              </Box>
+                              {/*<---- SECCION PUBLICACIONES USUARIO ---->*/}
+                              <CustomTabPanel value={section} index={0}>
+                                  <PostProfileViewer id={id} userId={user.id} />
+                              </CustomTabPanel>
+                              {/*<--------- SECCION COMPARTIDOS --------->*/}
+                              <CustomTabPanel value={section} index={1}>
+                                  Item Two
+                              </CustomTabPanel>
+                              {/*<---------- SECCION GUARDADOS ----------> */}
+                              <CustomTabPanel value={section} index={2}>
+                                  Item Three
+                              </CustomTabPanel>
+                              {/*<----------- SECCION INSIGNIAS ---------> */}
+                              <CustomTabPanel value={section} index={3}>
+                                  Item Four
+                              </CustomTabPanel>
+                        </Box>
                   </div>
-                </div>
-              </div>
-
-              <div className="text-center mt-10 pb-10">
-                <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700">
-                  {profile.name} {profile.surname}
-                </h3>
-                <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold ">
-                  <i className="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-                  Nombre de usuario: {profile.username}
-                </div>
-                
-                <div className="mb-2 text-blueGray-600 mt-10">
-                  <i className="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>
-                  {profile.description ? profile.description : 'No hay descripcion'}
-                </div>
-
-                  <Box sx={{ width: '100%', marginTop: 4}}>
-                      <Box sx={{ borderTop:1, borderBottom: 1, borderColor: 'divider'}}>
-                        <Tabs centered value={value} onChange={handleChange}>
-                          <Tab icon={<ViewHeadlineIcon />}  {...a11yProps(0)} />
-                          <Tab icon={<CachedIcon />}  {...a11yProps(1)} />
-                          <Tab icon={<BookmarkIcon />} {...a11yProps(2)} />
-                          <Tab icon={<WorkspacePremiumIcon />} {...a11yProps(3)} />
-
-                        </Tabs>
-                      </Box>
-                      <CustomTabPanel value={value} index={0}>
-                        {/* <PostProfileViewer key={update} id={id} userId={user.id} updatePosts={updatePosts}/> */}
-                        <PostProfileViewer id={id} userId={user.id} />
-
-                      </CustomTabPanel>
-                      <CustomTabPanel value={value} index={1}>
-                        Item Two
-                      </CustomTabPanel>
-                      <CustomTabPanel value={value} index={2}>
-                        Item Three
-                      </CustomTabPanel>
-                      <CustomTabPanel value={value} index={3}>
-                        Item Four
-                      </CustomTabPanel>
-                  </Box>
-              </div>
-          </div>
+            </div>
         </div>
       </section>
     </>
