@@ -211,6 +211,78 @@ async function getUserFollowedHashtags(id){
     }
 }
 
+async function followUser(userId, userToFollowId) {
+    try {
+      const session = await User.startSession();
+      session.startTransaction();
+  
+      try {
+        const user = await User.findById(userId).session(session);
+        if (!user) throw new Error("No se encontró usuario asociado al id ingresado");
+  
+        const userToFollow = await User.findById(userToFollowId).session(session);
+        if (!userToFollow) throw new Error("No se encontró usuario a seguir");
+  
+        const isFollowing = user.followed.some(followedUser => followedUser.equals(userToFollowId));
+        if (isFollowing) throw new Error("Ya estás siguiendo a este usuario");
+  
+        user.followed.push(userToFollowId);
+        userToFollow.followers.push(userId);
+  
+        await user.save({ session });
+        await userToFollow.save({ session });
+  
+        await session.commitTransaction();
+        session.endSession();
+  
+        return [user, null];
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+      }
+    } catch (error) {
+      handleError(error, "user.service -> followUser");
+      return [null, error.message];
+    }
+  }
+
+async function unfollowUser(userId, userToUnfollowId) {
+    try {
+      const session = await User.startSession();
+      session.startTransaction();
+  
+      try {
+        const user = await User.findById(userId).session(session);
+        if (!user) throw new Error("No se encontró usuario asociado al id ingresado");
+  
+        const userToUnfollow = await User.findById(userToUnfollowId).session(session);
+        if (!userToUnfollow) throw new Error("No se encontró usuario a dejar de seguir");
+  
+        const isFollowing = user.followed.some(followedUser => followedUser.equals(userToUnfollowId));
+        if (!isFollowing) throw new Error("No estás siguiendo a este usuario");
+  
+        user.followed = user.followed.filter(followedUser => !followedUser.equals(userToUnfollowId));
+        userToUnfollow.followers = userToUnfollow.followers.filter(follower => !follower.equals(userId));
+  
+        await user.save({ session });
+        await userToUnfollow.save({ session });
+  
+        await session.commitTransaction();
+        session.endSession();
+  
+        return [user, null];
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+      }
+    } catch (error) {
+      handleError(error, "user.service -> unfollowUser");
+      return [null, error.message];
+    }
+}
+
 module.exports = {
     createUser,
     getUsers,
@@ -218,5 +290,7 @@ module.exports = {
     getUserImageByID,
     updateUser,
     deleteUser,
-    getUserFollowedHashtags
+    getUserFollowedHashtags,
+    followUser,
+    unfollowUser
 }

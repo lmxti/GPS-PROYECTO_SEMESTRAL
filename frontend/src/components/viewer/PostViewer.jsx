@@ -23,6 +23,7 @@ import SkeletonPost from "../common/SkeletonPost.jsx";
 /* <------------------- COMPONENTES VIEWER ---------------------> */
 import CommentForm from "../form/CommentsForm";
 import CommentViewer from "./CommentViewer";
+import ReportForm from "../form/ReportForm.jsx";
 
 /* <------------------- COMPONENTES MODAL ----------------------> */
 import ImageModal from "../modal/ImageModal";
@@ -118,7 +119,9 @@ const PostViewer = ( { userId } ) => {
                     <DeleteIcon fontSize="inherit" />
               </IconButton>
             ) : (
-              <p>...</p>
+              <IconButton aria-label="report" size="small">
+                    <ReportForm postId={post._id}/>
+              </IconButton>
             )}
           </div>
         </div>

@@ -150,6 +150,37 @@ async function getUserFollowedHashtags(req, res) {
     }
 }
 
+async function followUser(req, res) {
+    try {
+        const userId = req.user._id;
+        const userToFollowId = req.params.id;
+
+        const [updatedUser, error] = await UserService.followUser(userId, userToFollowId);
+
+        if (error) return respondError(req, res, 400, error);
+
+        respondSuccess(req, res, 200, updatedUser);
+    } catch (error) {
+        handleError(error, "user.controller -> followUser");
+        respondError(req, res, 500, "No se pudo seguir al usuario");
+    }
+}
+
+async function unfollowUser(req, res) {
+    try {
+        const userId = req.user._id;
+        const userToUnfollowId = req.params.id;
+
+        const [updatedUser, error] = await UserService.unfollowUser(userId, userToUnfollowId);
+
+        if (error) return respondError(req, res, 400, error);
+        respondSuccess(req, res, 200, updatedUser);
+    } catch (error) {
+        handleError(error, "user.controller -> unfollowUser");
+        respondError(req, res, 500, "No se pudo dejar de seguir al usuario");
+    }
+}
+
 module.exports = {
     createUser,
     getUsers,
@@ -157,5 +188,7 @@ module.exports = {
     getUserImageByID,
     updateUser,
     deleteUser,
-    getUserFollowedHashtags
+    getUserFollowedHashtags,
+    followUser,
+    unfollowUser
 }
