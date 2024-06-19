@@ -29,6 +29,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
+import ExploreIcon from '@mui/icons-material/Explore';
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { logout } from "../../services/auth.service.js"
@@ -151,7 +152,7 @@ export default function PrimarySearchAppBar( { userId }) {
           {/* <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block', fontStyle:'oblique' } }}>
             FORUM
           </Typography> */}
-          <Avatar alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} />
+          <Avatar className='cursor-pointer hover:bg-zinc-700 p-1 transition' alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} onClick={ () => { router.push('/')}} />
 
 
         {/* Barra de busqueda */}
@@ -170,6 +171,11 @@ export default function PrimarySearchAppBar( { userId }) {
             <IconButton size="large" color="inherit" onClick={() => router.push("/")}>
                 <HomeIcon />
             </IconButton>
+
+            <IconButton size="large" color="inherit">
+                <ExploreIcon />
+            </IconButton>
+
 
             {/* Mensajes */}
             {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">

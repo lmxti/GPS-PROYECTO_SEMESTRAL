@@ -85,7 +85,7 @@ async function createDefaultUsers() {
         email: "admin@localhost.com",
         password: await User.encryptPassword("admin"),
         roleUser: [admin._id],
-        badges: [{ badge: await badgeForRol(admin.nameRole) }]
+        badges: [{ badge: await badgeForRol(admin.nameRole), dateObtained: Date.now() }]
       }).save(),
       /* <-------------------------------- USUARIO  DEFAULT --------------------------------> */
       new User({
@@ -98,7 +98,7 @@ async function createDefaultUsers() {
         email: "user@localhost.com",
         password: await User.encryptPassword("user"),
         roleUser: [user._id],
-        badges: [{ badge: await badgeForRol(user.nameRole) }]
+        badges: [{ badge: await badgeForRol(user.nameRole), dateObtained: Date.now() }]
       }).save(),
       /* <--------------------------- USUARIO MODERADOR DEFAULT ---------------------------> */
       new User({
@@ -111,7 +111,7 @@ async function createDefaultUsers() {
         email: "moderador@localhost.com",
         password: await User.encryptPassword("moderador"),
         roleUser: [moderador._id],
-        badges: [{ badge: await badgeForRol(moderador.nameRole) }]
+        badges: [{ badge: await badgeForRol(moderador.nameRole), dateObtained: Date.now() }]
       }).save()
     ]);
     console.log("initial.setup -> createDefaultUsers: Se han creado los usuarios default del sistema: administrador, usuario y moderador");

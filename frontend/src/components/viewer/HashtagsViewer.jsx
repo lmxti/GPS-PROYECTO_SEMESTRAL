@@ -86,12 +86,12 @@ const HashtagsViewer = () => {
 
     return (
         <main className="hidden md:block">
-            {/* <div className="p-6 mx-4 border-b text-center">
+            <div className="p-6 mx-4 border-b text-center">
                 <p className='font-thin text-2xl text-center mb-4'>Hashtags</p>
                 <ul className="list-none p-0 flex flex-wrap gap-2">
                     {showHashtags()}
                 </ul>
-            </div> */}
+            </div>
 
             <div className="p-6 mx-4 border-b">
                 <p className='font-thin text-2xl text-center mb-4'>Hashtags</p>

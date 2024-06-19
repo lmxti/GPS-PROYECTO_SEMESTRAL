@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 
 const ImageModal = ({ images }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(null);
@@ -18,6 +18,25 @@ const ImageModal = ({ images }) => {
     const handlePrevImage = () => {
         setSelectedImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     };
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (selectedImageIndex !== null) {
+                if (event.key === 'ArrowRight') {
+                    handleNextImage();
+                } else if (event.key === 'ArrowLeft') {
+                    handlePrevImage();
+                } else if (event.key === 'Escape') {
+                    handleCloseModal();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedImageIndex]);
 
 
     const calculateGridColumns = (imageCount) => {

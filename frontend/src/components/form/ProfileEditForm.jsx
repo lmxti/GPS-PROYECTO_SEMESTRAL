@@ -17,9 +17,9 @@ const style = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
+    bgcolor: 'rgb(228 228 231)',
+    // border: '2px solid #000',
+    boxShadow: 10,
     p: 4,
   };
 
@@ -55,7 +55,7 @@ const style = {
   
     return (
       <div>
-        <Button onClick={handleOpen}>Editar perfil</Button>
+        <Button onClick={handleOpen} className="bg-gray-500 hover:bg-gray-400 text-white normal-case py-2 px-4">Editar perfil</Button>
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
           <Box sx={style}>
             
@@ -63,24 +63,24 @@ const style = {
             ? <div className="flex justify-center">
                 <CircularProgress size={50}/>
               </div>
-            : <form className="flex flex-col space-y-2">
-                <label htmlFor="name">Nombre real</label>
+            : <form className="flex flex-col space-y-4">
+                <label htmlFor="name" className="text-xs">Nombre real</label>
                 <input type="text" id="name" name="name" className="bg-zinc-100 p-2 rounded"  defaultValue={profile.name} onChange={handleInputChange} />
 
-                <label htmlFor="surname">Apellido</label>
+                <label htmlFor="surname" className="text-xs">Apellido</label>
                 <input type="text" id="surname" name="surname" className="bg-zinc-100 p-2 rounded" defaultValue={profile.surname} onChange={handleInputChange} />
 
-                <label htmlFor="username">Nombre de usuario</label>
+                <label htmlFor="username" className="text-xs">Nombre de usuario</label>
                 <input type="text" id="username" name="username" className="bg-zinc-100 p-2 rounded" defaultValue={profile.username} onChange={handleInputChange} />
 
-                <label htmlFor="description">Descripción</label>
+                <label htmlFor="description" className="text-xs">Descripción</label>
                 <input type="text" id="description" name="description" className="bg-zinc-100 p-2 rounded" defaultValue={profile.description} onChange={handleInputChange} />
-
-                <Button onClick={handleSubmit}>Guardar</Button>
-                <Button onClick={handleClose}>Cancelar</Button>
+                <div className="flex flex-col space-y-2">
+                  <Button className="bg-gray-500 hover:bg-gray-400 text-white normal-case py-2" onClick={handleSubmit}>Guardar</Button>
+                  <Button className="bg-gray-500 hover:bg-gray-400 text-white normal-case py-2" onClick={handleClose}>Cancelar</Button>
+                </div>
             </form>
         }
-
           </Box>
         </Modal>
       </div>

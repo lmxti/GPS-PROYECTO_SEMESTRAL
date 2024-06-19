@@ -25,12 +25,14 @@ import ProfileEditForm from '@/components/form/ProfileEditForm';
 
 /* <------------------- COMPONENTES VIEWER ---------------------> */
 import PostProfileViewer from "@/components/viewer/PostProfileViewer";
+import BadgesProfileViewer from '@/components/viewer/BadgesProfileViewer';
 
 /* <------------------------ CONTEXTO --------------------------> */
 import { useAuth } from "@/context/AuthContext";
 
 /* <----------------------- SERVICIOS  -------------------------> */
 import { getUserInformation, getUserFollowedHashtags, updateUser } from "@/services/user.service";
+import { Button } from '@mui/material';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -137,26 +139,24 @@ const Profile = () => {
                   {/*<-------------------------------------------------------- CABECERA DE PERFIL -------------------------------------------------------->*/}
                   <div className="flex flex-wrap justify-center">
                         {/*<---------------- SECCION-CABECERA FOTO DE PERFIL------------------>*/}
-                        <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-                          <div className="rounded-ful absolute -top-24 overflow-hidden h-56 w-56 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600">
+                        <div className="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center items-center">
+                          <div className="absolute -top-32 overflow-hidden h-56 w-56 flex justify-center items-center rounded-full shadow-lg shadow-zinc-600 select-none">
                             <Avatar src={`http://localhost:3001/uploads/profiles/${profile.profilePicture}`} sx={{ width: '100%', height: '100%' }}></Avatar>
                           </div>
                         </div>
                         {/*<------------------ SECCION-CABECERA INSIGNIAS -------------------->*/}
                         <div className="w-full lg:w-4/12 px-4 lg:order-3">
                           <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto flex justify-center">
-                            {profile.badges?.length > 0 
-                              ? profile.badges.map((badge, index) => (
-                                  <div key={index} className="flex flex-col items-center p-4 rounded">
-                                    <img src={`data:image/png;base64,${badge.imageBadge}`} alt={badge.nameBadge} className="w-20 h-20 object-contain mb-2" title={`${badge.descriptionBadge}`} />
-                                  </div>
-                                )) : <p>No hay insignias para mostrar</p>
-                            }
+                              { user.id === profile._id 
+                                  ? <ProfileEditForm profile={profile} onUpdateProfile={handleUpdateProfile} /> 
+                                  : <Button className='bg-gray-500 hover:bg-gray-400 text-white normal-case py-2 px-4'>Seguir</Button>
+                              }
+                              
                           </div>
                         </div>
                         {/*<------------------ SECCION-CABECERA ESTADISTICAS ------------------>*/}
-                        <div className="w-full lg:w-4/12 px-4 lg:order-1">
-                            <div className="flex justify-center py-4 lg:pt-4 pt-8">
+                        <div className="w-full lg:w-4/12 px-4 lg:order-1 flex justify-center items-center">
+                            <div className="flex justify-center py-2 px-2 lg:pt-4 my-1">
                               <div className="lg:mr-4 p-3 text-center hover:bg-zinc-200 rounded transition ease-linear select-none">
                                 <span className="text-xl font-bold block uppercase tracking-wide text-blueGray-600">{profile.posts ? profile.posts.length : 0}</span>
                                 <span className="text-sm text-blueGray-400">Publicaciones</span>
@@ -175,21 +175,27 @@ const Profile = () => {
                         </div>
                   </div>
                   {/*<--------------------------------------------------------- CUERPO PERFIL --------------------------------------------------------->*/}
-                  <div className="text-center mt-10 pb-10">
-                         {/* <---------------- Nombre completo -----------------> */}
-                        <h3 className="text-4xl font-semibold leading-normal mb-2 text-blueGray-700">
-                          {profile.name} {profile.surname}
-                        </h3>
-                        {/* <------------- Nombre de usuario ----------------->*/}
-                         <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold">
-                          Nombre de usuario: {profile.username}
-                        </div> 
-                        {/* <----------- Descripcion de usuario --------------> */}
-                        <div className="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold">
-                          Descripcion: {profile.description ? profile.description : ':)' }
-                        </div>
+                  <div className="pb-10">
 
-                        <ProfileEditForm profile={profile} onUpdateProfile={handleUpdateProfile} />  
+                        <div className='flex justify-center'>
+
+                          <div className=' px-8 py-2 rounded text-center mt-4'>
+                            {/* <------------- Nombre de usuario ----------------->*/}
+                            <div className="text-lg font-thin ">
+                              @{profile.username}
+                            </div> 
+                            {/* <---------------- Nombre completo -----------------> */}
+                            <h3 className="text-4xl font-semibold mb-4">
+                              {profile.name} {profile.surname}
+                            </h3>
+                            {/* <----------- Descripcion de usuario --------------> */}
+                            <div className="text-sm ">
+                              <h4 className='font-bold text-lg'>Sobre mi</h4>
+                              <p className='font-thin'>{profile.description ? profile.description : ':)' }</p>
+                            </div>
+                          </div>
+                          
+                        </div> 
 
                         {/* <-------- CABECERA DE SECCIONES --------> */}
                         <Box sx={{ width: '100%', marginTop: 4 }}>
@@ -216,7 +222,7 @@ const Profile = () => {
                               </CustomTabPanel>
                               {/*<----------- SECCION INSIGNIAS ---------> */}
                               <CustomTabPanel value={section} index={3}>
-                                  Item Four
+                                  <BadgesProfileViewer badges={profile.badges}/>
                               </CustomTabPanel>
                         </Box>
                   </div>
