@@ -59,3 +59,21 @@ export const updateUser = async(id, editedProfile) => {
         console.log("FRONTEND: Error en user.service -> updateUser()");
     }
 }
+
+export const followUser = async( idFollowed, idFollower) => {
+    try {
+        const response = await axios.post(`users/followUser/${idFollowed}`, {idFollower});
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> followUser()", error);
+    }
+}
+
+export const unfollowUser = async( idUnfollowed, idUnfollower) => {
+    try {
+        const response = await axios.delete(`users/unfollowUser/${idUnfollowed}`, idUnfollower);
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> unfollowUser()", error);
+        
+    }
+}

@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import { Button } from '@mui/material';
 
 /* <----------------------- ICONOS UI ---------------------------> */
 import CachedIcon from '@mui/icons-material/Cached';
@@ -31,8 +32,7 @@ import BadgesProfileViewer from '@/components/viewer/BadgesProfileViewer';
 import { useAuth } from "@/context/AuthContext";
 
 /* <----------------------- SERVICIOS  -------------------------> */
-import { getUserInformation, getUserFollowedHashtags, updateUser } from "@/services/user.service";
-import { Button } from '@mui/material';
+import { getUserInformation, getUserFollowedHashtags, updateUser, followUser } from "@/services/user.service";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -67,6 +67,10 @@ const Profile = () => {
   // Seteo de secciones del perfil seleccionada, `0` por default.
   const [section, setSection] = useState(0);
 
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+
   //<----------------------------- MANEJO DE CAMBIOS DE SECCION ----------------------------->
   const handleSectionChange = (event, newValue) => {
     setSection(newValue);
@@ -77,7 +81,10 @@ const Profile = () => {
     try {
       const response = await getUserInformation(id);
       const data = response.data.data;
+      console.log(data);
       setProfile(data);
+      setIsLoading(false);
+      setIsFollowing(data.followers.includes(user.id));
     } catch (error) {
       console.log("FRONTEND: Error en Profile -> fetchProfile() -> id:", id, error);
     }
@@ -95,6 +102,33 @@ const Profile = () => {
       console.log("FRONTEND: Error en Profile -> fetchHashtags()", error);
     }
   };
+
+  
+  const handleUpdateProfile = (updatedProfile) => {
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      ...updatedProfile,
+    }));
+  };
+
+  const handleFollow = async() => {
+    try {
+      await followUser(id, user.id);
+      setIsFollowing(true);
+    } catch (error) {
+      console.log("FRONTEND: Error en Profile -> handleFollow()", error);
+    }
+
+  };
+
+  const handleUnfollow = async() => {
+    // Lógica para dejar de seguir al usuario
+    // Actualizar el estado y llamar a la API si es necesario
+    setIsFollowing(false);
+    // Aquí iría la llamada a la API para dejar de seguir al usuario
+  };
+
+
 
   //<---------------------------------- MANEJO DE CARGA DE DATOS  --------------------------------->
   // Encargado de ejecutar solicitudes para cargar los datos cada 
@@ -115,13 +149,6 @@ const Profile = () => {
       document.title = "Cargando perfil...";
     }
   }, [profile]);
-
-  const handleUpdateProfile = (updatedProfile) => {
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      ...updatedProfile,
-    }));
-  };
 
   return (
     <>
@@ -146,13 +173,25 @@ const Profile = () => {
                         </div>
                         {/*<------------------ SECCION-CABECERA INSIGNIAS -------------------->*/}
                         <div className="w-full lg:w-4/12 px-4 lg:order-3">
+                        {!isLoading && (
                           <div className="py-6 px-3 mt-32 sm:mt-0 mx-auto flex justify-center">
-                              { user.id === profile._id 
-                                  ? <ProfileEditForm profile={profile} onUpdateProfile={handleUpdateProfile} /> 
-                                  : <Button className='bg-gray-500 hover:bg-gray-400 text-white normal-case py-2 px-4'>Seguir</Button>
-                              }
-                              
+                            {user.id === profile._id ? (
+                              <ProfileEditForm profile={profile} onUpdateProfile={handleUpdateProfile} />
+                            ) : (
+                              <>
+                                {isFollowing ? (
+                                  <Button className='bg-gray-500 hover:bg-gray-400 text-white normal-case py-2 px-4' onClick={handleUnfollow}>
+                                    Dejar de seguir
+                                  </Button>
+                                ) : (
+                                  <Button className='bg-gray-500 hover:bg-gray-400 text-white normal-case py-2 px-4' onClick={handleFollow}>
+                                    Seguir
+                                  </Button>
+                                )}
+                              </>
+                            )}
                           </div>
+                        )}
                         </div>
                         {/*<------------------ SECCION-CABECERA ESTADISTICAS ------------------>*/}
                         <div className="w-full lg:w-4/12 px-4 lg:order-1 flex justify-center items-center">

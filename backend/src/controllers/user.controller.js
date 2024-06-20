@@ -152,13 +152,10 @@ async function getUserFollowedHashtags(req, res) {
 
 async function followUser(req, res) {
     try {
-        const userId = req.user._id;
-        const userToFollowId = req.params.id;
-
-        const [updatedUser, error] = await UserService.followUser(userId, userToFollowId);
-
+        const { id } = req.params;
+        const { idFollower } = req.body;
+        const [updatedUser, error] = await UserService.followUser(idFollower, id);
         if (error) return respondError(req, res, 400, error);
-
         respondSuccess(req, res, 200, updatedUser);
     } catch (error) {
         handleError(error, "user.controller -> followUser");

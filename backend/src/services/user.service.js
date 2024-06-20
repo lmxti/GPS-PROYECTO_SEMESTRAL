@@ -213,34 +213,33 @@ async function getUserFollowedHashtags(id){
 
 async function followUser(userId, userToFollowId) {
     try {
-      const session = await User.startSession();
-      session.startTransaction();
-  
-      try {
-        const user = await User.findById(userId).session(session);
-        if (!user) throw new Error("No se encontró usuario asociado al id ingresado");
-  
-        const userToFollow = await User.findById(userToFollowId).session(session);
-        if (!userToFollow) throw new Error("No se encontró usuario a seguir");
-  
-        const isFollowing = user.followed.some(followedUser => followedUser.equals(userToFollowId));
-        if (isFollowing) throw new Error("Ya estás siguiendo a este usuario");
-  
+        const userToFollow = await User.findById(userToFollowId);
+        if (!userToFollow) return [null, "Usuario a seguir no encontrado"]
+
+        const user = await User.findById(userId);
+        if (!user) return [null, "Usuario no encontrado"];
+
+        const isFollowing = user.followed.some(
+            (followedUser) => followedUser.toString() === userToFollowId
+        );
+
+        if (isFollowing) {
+            return [null, "El usuario ya sigue a este usuario"];
+        }
+
         user.followed.push(userToFollowId);
-        userToFollow.followers.push(userId);
-  
-        await user.save({ session });
-        await userToFollow.save({ session });
-  
-        await session.commitTransaction();
-        session.endSession();
-  
+        await user.save();
+
+        const isFollowedByUser = userToFollow.followers.some(
+            (follower) => follower.toString() === userId
+        );
+
+        if (!isFollowedByUser) {
+            userToFollow.followers.push(userId);
+            await userToFollow.save();
+        }
+
         return [user, null];
-      } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
-        throw error;
-      }
     } catch (error) {
       handleError(error, "user.service -> followUser");
       return [null, error.message];
