@@ -67,7 +67,6 @@ const RegisterForm = ({ toggleForm }) => {
                 [name]: value
             });
         }
-        console.log(formData.profilePicture);
     };
 
     const handleSubmit = async (e) => {

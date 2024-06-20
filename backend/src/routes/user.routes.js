@@ -20,6 +20,6 @@ router.delete("/deleteUser/:id", userController.deleteUser);
 router.get("/getUserImageByID/:id", userController.getUserImageByID);
 router.get("/getUserFollowedHashtags/:id", userController.getUserFollowedHashtags);
 router.post("/followUser/:id", userController.followUser);
-router.delete("/unfollowUser/:id", userController.unfollowUser);
+router.put("/unfollowUser/:id", userController.unfollowUser);
 
 module.exports = router;

@@ -246,42 +246,35 @@ async function followUser(userId, userToFollowId) {
     }
   }
 
-async function unfollowUser(userId, userToUnfollowId) {
+  async function unfollowUser(userId, userToUnfollowId) {
     try {
-      const session = await User.startSession();
-      session.startTransaction();
-  
-      try {
-        const user = await User.findById(userId).session(session);
-        if (!user) throw new Error("No se encontró usuario asociado al id ingresado");
-  
-        const userToUnfollow = await User.findById(userToUnfollowId).session(session);
-        if (!userToUnfollow) throw new Error("No se encontró usuario a dejar de seguir");
-  
-        const isFollowing = user.followed.some(followedUser => followedUser.equals(userToUnfollowId));
-        if (!isFollowing) throw new Error("No estás siguiendo a este usuario");
-  
-        user.followed = user.followed.filter(followedUser => !followedUser.equals(userToUnfollowId));
-        userToUnfollow.followers = userToUnfollow.followers.filter(follower => !follower.equals(userId));
-  
-        await user.save({ session });
-        await userToUnfollow.save({ session });
-  
-        await session.commitTransaction();
-        session.endSession();
-  
+        // Busqueda de usuario a dejar de seguir
+        const userToUnfollow = await User.findById(userToUnfollowId);
+        if (!userToUnfollow) return [null, "Usuario a dejar de seguir no encontrado"];
+
+        // Busqueda de usuario que realiza la accion.
+        const user = await User.findById(userId);
+        if (!user) return [null, "Usuario no encontrado"];
+
+        const isFollowing = user.followed.some( (followedUser) => followedUser.toString() === userToUnfollowId );
+
+        if (!isFollowing) return [null, "El usuario no sigue a este usuario"]
+
+        // Remover userToUnfollowId de la lista de seguidos del usuario
+        user.followed = user.followed.filter( (followedUser) => followedUser.toString() !== userToUnfollowId );
+        await user.save();
+
+        // Remover userId de la lista de seguidores del usuario a dejar de seguir
+        userToUnfollow.followers = userToUnfollow.followers.filter( (follower) => follower.toString() !== userId);
+        await userToUnfollow.save();
+
         return [user, null];
-      } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
-        throw error;
-      }
     } catch (error) {
-      handleError(error, "user.service -> unfollowUser");
-      return [null, error.message];
+    handleError(error, "user.service -> unfollowUser");
+    return [null, error.message];
     }
 }
-
+  
 module.exports = {
     createUser,
     getUsers,

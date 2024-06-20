@@ -32,7 +32,7 @@ import BadgesProfileViewer from '@/components/viewer/BadgesProfileViewer';
 import { useAuth } from "@/context/AuthContext";
 
 /* <----------------------- SERVICIOS  -------------------------> */
-import { getUserInformation, getUserFollowedHashtags, updateUser, followUser } from "@/services/user.service";
+import { getUserInformation, getUserFollowedHashtags, updateUser, followUser, unfollowUser } from "@/services/user.service";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -81,7 +81,6 @@ const Profile = () => {
     try {
       const response = await getUserInformation(id);
       const data = response.data.data;
-      console.log(data);
       setProfile(data);
       setIsLoading(false);
       setIsFollowing(data.followers.includes(user.id));
@@ -96,8 +95,11 @@ const Profile = () => {
   const fetchHashtags = async (ids) => {
     try {
       const response = await getUserFollowedHashtags(ids);
-      const data = response.data.data;
-      setHashtags(data);
+      if (response.data.data) {
+        const data = response.data.data;
+        setHashtags(data);
+      }
+
     } catch (error) {
       console.log("FRONTEND: Error en Profile -> fetchHashtags()", error);
     }
@@ -121,12 +123,16 @@ const Profile = () => {
 
   };
 
-  const handleUnfollow = async() => {
-    // Lógica para dejar de seguir al usuario
-    // Actualizar el estado y llamar a la API si es necesario
-    setIsFollowing(false);
-    // Aquí iría la llamada a la API para dejar de seguir al usuario
+  const handleUnfollow = async () => {
+    try {
+      await unfollowUser(id, user.id);
+      setIsFollowing(false);
+    } catch (error) {
+      console.log("FRONTEND: Error en Profile -> handleUnfollow()", error);
+    }
   };
+  
+
 
 
 

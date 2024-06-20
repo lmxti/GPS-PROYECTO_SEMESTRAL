@@ -165,11 +165,9 @@ async function followUser(req, res) {
 
 async function unfollowUser(req, res) {
     try {
-        const userId = req.user._id;
-        const userToUnfollowId = req.params.id;
-
-        const [updatedUser, error] = await UserService.unfollowUser(userId, userToUnfollowId);
-
+        const { id } = req.params;
+        const { idUnfollower } = req.body
+        const [updatedUser, error] = await UserService.unfollowUser(idUnfollower, id);
         if (error) return respondError(req, res, 400, error);
         respondSuccess(req, res, 200, updatedUser);
     } catch (error) {

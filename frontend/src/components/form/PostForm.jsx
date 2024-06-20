@@ -52,11 +52,13 @@ const PostForm = ( { updatePosts, userId } ) => {
   const getDataHashtags = async () =>{
     try {
       const response = await getHashtags();
-      const optionsHashtags = response.data.data.data.map(hashtag => ({
-        value: hashtag.nameHashtag,
-        label: hashtag.nameHashtag
-      }))
-      setHashtagValues(optionsHashtags);
+      if (response.data.data.data) {
+        const optionsHashtags = response.data.data.data.map(hashtag => ({
+          value: hashtag.nameHashtag,
+          label: hashtag.nameHashtag
+        }))
+        setHashtagValues(optionsHashtags);
+      }
     } catch (error) {
       console.log(error);
     }

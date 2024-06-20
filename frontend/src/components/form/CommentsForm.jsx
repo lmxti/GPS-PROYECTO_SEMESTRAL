@@ -38,7 +38,6 @@ const CreateComments = ({ postId }) => {
       ...prevComment,
       userComment: e.target.value,
     }));
-    console.log(postId);
   };
 
   const handleImageChange = (e) => {
@@ -46,7 +45,6 @@ const CreateComments = ({ postId }) => {
       ...prevComment,
       imageComment: e.target.files[0],
     }));
-    console.log(postId);
   };
 
   const onSubmit = async (e) => {

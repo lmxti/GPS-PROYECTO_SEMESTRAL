@@ -21,8 +21,6 @@ const { ACCESS_JWT_SECRET, REFRESH_JWT_SECRET} = require("../config/env.config")
 async function login(credentials){
     try {
         const { email, password } = credentials;
-        console.log(email, password);
-
         // Busqueda y verificacion de usuario
         const userFound = await User.findOne({email: email})
             .populate("roleUser")

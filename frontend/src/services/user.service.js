@@ -71,7 +71,8 @@ export const followUser = async( idFollowed, idFollower) => {
 
 export const unfollowUser = async( idUnfollowed, idUnfollower) => {
     try {
-        const response = await axios.delete(`users/unfollowUser/${idUnfollowed}`, idUnfollower);
+        const response = await axios.put(`users/unfollowUser/${idUnfollowed}`, {idUnfollower});
+        return response;
     } catch (error) {
         console.log("FRONTEND: Error en user.service -> unfollowUser()", error);
         
