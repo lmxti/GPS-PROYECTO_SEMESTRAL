@@ -13,7 +13,6 @@ export default function BadgesProfileViewer({ badges }) {
 
     useEffect(() => {
         setBadgeList(badges);
-        console.log(badges);
     }, [badges]);
 
     return (

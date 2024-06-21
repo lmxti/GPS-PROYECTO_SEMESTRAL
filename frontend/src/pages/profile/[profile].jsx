@@ -56,7 +56,7 @@ function a11yProps(index) {
 
 const Profile = () => {
   const router = useRouter();
-  // Desectructuracion datos de usuario (user.id).
+  // Desectructuracion datos de usuario que esta navegando (user.id).
   const { user } = useAuth();
   // Desesctructuracion de perfil de usuario y asignacion a variable `id`.
   const { profile: id } = router.query;
@@ -66,15 +66,10 @@ const Profile = () => {
   const [hashtags, setHashtags] = useState([]);
   // Seteo de secciones del perfil seleccionada, `0` por default.
   const [section, setSection] = useState(0);
-
+  // Seteo booleano de seguimiento de usuario.
   const [isFollowing, setIsFollowing] = useState(false);
+  // Seteo de estado de carga de datos, por default cargando.
   const [isLoading, setIsLoading] = useState(true);
-
-
-  //<----------------------------- MANEJO DE CAMBIOS DE SECCION ----------------------------->
-  const handleSectionChange = (event, newValue) => {
-    setSection(newValue);
-  };
 
   //<----------------------------------- DATOS DE USUARIO ----------------------------------->
   const fetchProfile = async () => {
@@ -90,29 +85,17 @@ const Profile = () => {
   };
   // Estadistica de total de seguidos de usuario, incluye la suma de tanto como usuarios y hashtags
   const totalSeguidos = (profile.followed ? profile.followed.length : 0) + (hashtags.length);
-
-  //<---------------------------------- HASHTAGS DE USUARIO --------------------------------->
-  const fetchHashtags = async (ids) => {
-    try {
-      const response = await getUserFollowedHashtags(ids);
-      if (response.data.data) {
-        const data = response.data.data;
-        setHashtags(data);
-      }
-
-    } catch (error) {
-      console.log("FRONTEND: Error en Profile -> fetchHashtags()", error);
-    }
-  };
-
   
+  // <------------------------------ MANEJO DE DATOS DE USUARIO ----------------------------->
+
   const handleUpdateProfile = (updatedProfile) => {
     setProfile((prevProfile) => ({
       ...prevProfile,
       ...updatedProfile,
     }));
   };
-
+  // Funcion encargada de enviar solicitud http para seguir usuario, `id` corresponde
+  // al usuario a seguir, mientras que `user.id` es el usuario que esta navegando.
   const handleFollow = async() => {
     try {
       await followUser(id, user.id);
@@ -120,9 +103,9 @@ const Profile = () => {
     } catch (error) {
       console.log("FRONTEND: Error en Profile -> handleFollow()", error);
     }
-
   };
-
+    // Funcion encargada de enviar solicitud http para seguir usuario, `id` corresponde
+  // al usuario a dejar de seguir, mientras que `user.id` es el usuario que esta navegando.
   const handleUnfollow = async () => {
     try {
       await unfollowUser(id, user.id);
@@ -132,9 +115,23 @@ const Profile = () => {
     }
   };
   
+  //<---------------------------------- HASHTAGS DE USUARIO --------------------------------->
+  const fetchHashtags = async (ids) => {
+    try {
+      const response = await getUserFollowedHashtags(ids);
+      if (response.data.data) {
+        const data = response.data.data;
+        setHashtags(data);
+      }
+    } catch (error) {
+      console.log("FRONTEND: Error en Profile -> fetchHashtags()", error);
+    }
+  };
 
-
-
+  //<----------------------------- MANEJO DE CAMBIOS DE SECCION ----------------------------->
+  const handleSectionChange = (event, newValue) => {
+    setSection(newValue);
+  };
 
   //<---------------------------------- MANEJO DE CARGA DE DATOS  --------------------------------->
   // Encargado de ejecutar solicitudes para cargar los datos cada 
@@ -145,7 +142,7 @@ const Profile = () => {
       fetchHashtags(user.id);
     }
   }, [id, user.id]);
-
+  
   //<---------------------------------- MANEJO DE DOCUMENTO  --------------------------------->
   // Titulo de pagina, cargando hasta que carguen los datos del perfil de usuario.
   useEffect(() => {
@@ -161,7 +158,7 @@ const Profile = () => {
       <NavBar userId={user.id} />
 
       <section className="relative block h-[500px]">
-        <div className="absolute top-0 w-full h-full bg-center bg-cover" style={{ backgroundImage: "url('https://img.myloview.fr/images/black-and-white-pattern-on-white-background-abstract-design-700-176625414.jpg')"}}>
+        <div className="absolute top-0 w-full h-full bg-fixed bg-center bg-cover" style={{ backgroundImage: "url('https://img.myloview.fr/images/black-and-white-pattern-on-white-background-abstract-design-700-176625414.jpg')"}}>
           <span id="blackOverlay" className="w-full h-full absolute opacity-50 bg-black"></span>
         </div>
       </section>
@@ -236,7 +233,7 @@ const Profile = () => {
                             {/* <----------- Descripcion de usuario --------------> */}
                             <div className="text-sm ">
                               <h4 className='font-bold text-lg'>Sobre mi</h4>
-                              <p className='font-thin'>{profile.description ? profile.description : ':)' }</p>
+                              <p className='font-thin text-lg'>{profile.description ? profile.description : 'Sin descripción ඞ' }</p>
                             </div>
                           </div>
                           
