@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 
 /* <---------------------- COMPONENTES ------------------------> */
-import UserAvatar from '../UserAvatar.jsx';
+import UserAvatar from "../common/UserAvatar.jsx";
 
 
 /* <---------------- COMPONENTES MATERIAL UI ------------------> */
@@ -29,6 +29,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
+import ExploreIcon from '@mui/icons-material/Explore';
 
 /* <----------------------- SERVICIOS  -----------------------> */
 import { logout } from "../../services/auth.service.js"
@@ -87,11 +88,14 @@ export default function PrimarySearchAppBar( { userId }) {
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
-      <MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
+      <MenuItem onClick={()=>{
+        router.push(`/profile/${userId}`);
+        handleMenuClose();
+      }}>Perfil</MenuItem>
       <MenuItem onClick={handleMenuClose}>Mi cuenta</MenuItem>
       <MenuItem onClick={ () => {
           logout()
-          router.push("/");
+          router.push('/auth');
         }
         }>Cerrar sesión
 
@@ -141,13 +145,15 @@ export default function PrimarySearchAppBar( { userId }) {
 
   return (
       <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="sticky">
+      <AppBar position="sticky" className='bg-zinc-800'>
         <Toolbar>
         
         {/* Texto barra de navegacion */}
-          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-            Proyecto GPS
-          </Typography>
+          {/* <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block', fontStyle:'oblique' } }}>
+            FORUM
+          </Typography> */}
+          <Avatar className='cursor-pointer hover:bg-zinc-700 p-1 transition' alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} onClick={ () => { router.push('/')}} />
+
 
         {/* Barra de busqueda */}
           <Search>
@@ -162,26 +168,35 @@ export default function PrimarySearchAppBar( { userId }) {
           {/* Mensajes, notificaciones y Avatar */}
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
 
+            <IconButton size="large" color="inherit" onClick={() => router.push("/")}>
+                <HomeIcon />
+            </IconButton>
+
+            <IconButton size="large" color="inherit">
+                <ExploreIcon />
+            </IconButton>
+
+
             {/* Mensajes */}
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+            {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="error">
                 <MailIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* Notificaciones*/}
-            <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
+            {/* <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* Favoritos*/}
-            <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
+            {/* <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={2} color="error">
                 <FavoriteIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
 
             {/* Avatar */}
             <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">

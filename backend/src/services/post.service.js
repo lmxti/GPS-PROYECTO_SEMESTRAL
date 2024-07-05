@@ -37,6 +37,9 @@ async function createPost(post, files = []) {
         const newPost = new Post({ title, description, images:fileNames, author, hashtags: hashtagsIDs })
         await newPost.save();
 
+        userExists.posts.push(newPost._id);
+        await userExists.save();
+
         checkAchievementsPost(author);
 
         return [newPost, null]
@@ -111,19 +114,59 @@ async function getPostByID(id) {
  * @param {string} id id del usuario del cual se obtendran publicaciones
  * @returns {Promise<Array>} Promesa que resuelve un arreglo que contiene `[posts, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-async function getUserPosts(id){
+async function getUserPosts(id) {
     try {
-        const user = await User.findById({ _id: id })
+        const user = await User.findById(id)
             .select("-password")
             .populate("roleUser")
             .exec();
-        if(!user) return [ null, "No se encontro usuario"]
-        const posts = await Post.find({ author: user._id});
-        return [ posts, null]
+        if (!user) return [null, "No se encontró usuario"];
+
+        const posts = await Post.find({ author: user._id });
+        if (!posts.length) return [null, "No se encontraron publicaciones"];
+
+        // Obtén los IDs únicos de los autores (solo será uno en este caso)
+        const authorIds = [user._id];
+
+        // Busca los autores por sus IDs y obtén solo sus nombres
+        const authors = await User.find({ _id: { $in: authorIds } }, 'name');
+
+        // ID de hashtags por publicacion
+        const HashtagsIds = posts.reduce((acc, post) => {
+            post.hashtags.forEach(hashtag => acc.add(hashtag)); // Agregar todos los hashtags de todas las publicaciones
+            return acc;
+        }, new Set());
+
+        // Busca los hashtags por sus IDs y obtén solo sus nombres
+        const hashtags = await Hashtag.find({ _id: { $in: [...HashtagsIds] } }, 'nameHashtag');
+
+        // Mapea los hashtags para acceder a ellos por su ID
+        const hashtagsMap = hashtags.reduce((acc, hashtag) => {
+            acc[hashtag._id] = { id: hashtag._id, name: hashtag.nameHashtag };
+            return acc;
+        }, {});
+
+        // Convierte el array de autores en un objeto para un acceso rápido
+        const authorsMap = authors.reduce((acc, author) => {
+            acc[author._id] = { id: author._id, name: author.name };
+            return acc;
+        }, {});
+
+        const publicationData = posts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            author: { id: post.author, name: authorsMap[post.author].name },
+            hashtags: post.hashtags.map(hashtagId => hashtagsMap[hashtagId])
+        }));
+
+        return [publicationData, null];
+
     } catch (error) {
-        handleError(error, "post.service -> getUserPosts")
+        handleError(error, "post.service -> getUserPosts");
+        return [null, "Error al obtener publicaciones del usuario"];
     }
 }
+
 /**
  * Servicio para actualizar los campos de una publicación existente.
  * @param {string} id - ID de la publicación a actualizar.
@@ -154,6 +197,10 @@ async function deletePost(id){
     try {
         const postDeleted = await Post.findByIdAndDelete(id);
         if(!postDeleted) return [null, `No se encontro publicacion de id: ${id}`];
+        await User.updateOne(
+            { _id: postDeleted.author },
+            { $pull: { posts: id } }
+        );
         return [postDeleted, null];
     } catch (error) {
         handleError(error, "post.service -> deletePost");

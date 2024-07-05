@@ -138,11 +138,52 @@ async function deleteUser(req, res){
     }
 }
 
+async function getUserFollowedHashtags(req, res) {
+    try {
+        const { id } = req.params;
+        const [followedHashtags, error] = await UserService.getUserFollowedHashtags(id);
+        if (error) return respondError(req, res, 404, error);
+        respondSuccess(req, res, 200, followedHashtags);
+    } catch (error) {
+        handleError(error, "user.controller -> getUserFollowedHashtags");
+        respondError(req, res, 500, "No se pudo obtener los hashtags seguidos por el usuario");
+    }
+}
+
+async function followUser(req, res) {
+    try {
+        const { id } = req.params;
+        const { idFollower } = req.body;
+        const [updatedUser, error] = await UserService.followUser(idFollower, id);
+        if (error) return respondError(req, res, 400, error);
+        respondSuccess(req, res, 200, updatedUser);
+    } catch (error) {
+        handleError(error, "user.controller -> followUser");
+        respondError(req, res, 500, "No se pudo seguir al usuario");
+    }
+}
+
+async function unfollowUser(req, res) {
+    try {
+        const { id } = req.params;
+        const { idUnfollower } = req.body
+        const [updatedUser, error] = await UserService.unfollowUser(idUnfollower, id);
+        if (error) return respondError(req, res, 400, error);
+        respondSuccess(req, res, 200, updatedUser);
+    } catch (error) {
+        handleError(error, "user.controller -> unfollowUser");
+        respondError(req, res, 500, "No se pudo dejar de seguir al usuario");
+    }
+}
+
 module.exports = {
     createUser,
     getUsers,
     getUserByID,
     getUserImageByID,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserFollowedHashtags,
+    followUser,
+    unfollowUser
 }

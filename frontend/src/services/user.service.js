@@ -33,6 +33,48 @@ export const getUserImage = async (id) => {
         const imageUrl = `data:image/jpeg;base64,${base64String}`;
         return imageUrl;
     } catch (error) {
-        console.log("FRONTEND: Error en user.service -> getUserImage()", error);
+        if (error.response && error.response.status === 404) {
+            // Si el servidor devuelve un 404, significa que el usuario no tiene imagen de perfil
+            return null; // Puedes retornar una URL de imagen predeterminada en su lugar
+        } else {
+            console.log("FRONTEND: Error en user.service -> getUserImage()", error);
+            throw error; // Lanza el error para que pueda ser manejado en el componente
+        }
     }
 };
+
+export const getUserFollowedHashtags = async (id) => {
+    try {
+        return axios.get(`users/getUserFollowedHashtags/${id}`);
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> getUserFollowedHashtags()");
+    }
+}
+
+export const updateUser = async(id, editedProfile) => {
+    try {
+        const response = await axios.put(`users/updateUser/${id}`, editedProfile)
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> updateUser()");
+    }
+}
+
+export const followUser = async( idFollowed, idFollower) => {
+    try {
+        const response = await axios.post(`users/followUser/${idFollowed}`, {idFollower});
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> followUser()", error);
+    }
+}
+
+export const unfollowUser = async( idUnfollowed, idUnfollower) => {
+    try {
+        const response = await axios.put(`users/unfollowUser/${idUnfollowed}`, {idUnfollower});
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en user.service -> unfollowUser()", error);
+        
+    }
+}

@@ -33,8 +33,10 @@ const Auth = () => {
     }
 
     return (
-        <div className="min-h-screen  bg-slate-800 flex justify-center items-center text-black">
-            <div className='py-12 px-12  bg-white rounded-2xl shadow-xl z-20'>
+        <div className={`min-h-screen ${showLoginForm ? 'bg-zinc-500' : 'bg-slate-500'}  flex justify-center items-center relative overflow-hidden`}>
+            <div className="absolute w-60 h-60 rounded-xl bg-zinc-300 -top-5 -left-16 z-0 transform rotate-45 hidden md:block"></div>
+            <div className="absolute w-48 h-48 rounded-xl bg-zinc-300 -bottom-6 -right-10 transform rotate-12 hidden md:block"></div>
+            <div className='py-12 px-12 bg-white rounded-2xl shadow-xl z-20'>
                 <AnimatePresence mode='wait'>
                     {showLoginForm ? 
                     (
@@ -49,6 +51,8 @@ const Auth = () => {
                     )}
                 </AnimatePresence>
             </div>
+            <div className="w-40 h-40 absolute bg-zinc-300 rounded-full top-0 right-12 hidden md:block"></div>
+            <div className="w-20 h-40 absolute bg-zinc-300 rounded-full bottom-20 left-10 transform rotate-45 hidden md:block"></div>
         </div>
     );
 }

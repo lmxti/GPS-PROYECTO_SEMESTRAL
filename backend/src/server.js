@@ -17,7 +17,7 @@ async function setupServer(){
     server.use(morgan("dev"));
     server.use(express.urlencoded({ extended: true }));
     server.use("/api", indexRoutes);
-    server.use('/uploads/images', express.static(path.join(__dirname, 'uploads', 'images')));
+    server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
     server.listen(PORT, () => {
       console.log(`SERVIDOR => El servidor está corriendo en: http://localhost:${PORT}/api`);
     })

@@ -1,6 +1,6 @@
 const Post = require('../models/post.model');
 const User = require('../models/user.model');
-const { handleError } = require('../helpers/error');
+const { handleError } = require("../utils/errorHandler.js");
 
 /**
  * Servicio de busqueda de contenido en las publicaciones por usuario, hashtags, título y descripción

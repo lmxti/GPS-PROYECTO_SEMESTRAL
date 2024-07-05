@@ -2,35 +2,44 @@
 import { useState, useEffect } from "react";
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useRouter } from 'next/router';
 
-/* <---------------- COMPONENTES MATERIAL UI ------------------> */
-import Avatar from '@mui/material/Avatar';
-import Skeleton from '@mui/material/Skeleton';
+/* <---------------- COMPONENTES MATERIAL UI -------------------> */
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-
-/* <----------------------- ICONOS --------------------------> */
+/* <----------------------- ICONOS UI --------------------------> */
 import DeleteIcon from '@mui/icons-material/Delete';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import CommentIcon from '@mui/icons-material/Comment';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import IosShareIcon from '@mui/icons-material/IosShare';
 
-/* <----------------------- SERVICIOS  -----------------------> */
+/* <------------------- COMPONENTES COMMON ---------------------> */
+import UserAvatar from "../common/UserAvatar.jsx";
+import SkeletonPost from "../common/SkeletonPost.jsx";
+
+
+/* <------------------- COMPONENTES VIEWER ---------------------> */
+import CommentForm from "../form/CommentsForm";
+import CommentViewer from "./CommentViewer";
+import ReportForm from "../form/ReportForm.jsx";
+
+/* <------------------- COMPONENTES MODAL ----------------------> */
+import ImageModal from "../modal/ImageModal";
+
+/* <----------------------- SERVICIOS  -------------------------> */
 import { getPosts, deletePost, markInteraction } from "@/services/post.service";
 
 
-
-import ImageModal from "../modal/ImageModal";
-import CommentViewer from "./CommentViewer";
-import CommentForm from "../form/CommentsForm";
-
-import UserAvatar from "../UserAvatar.jsx";
-
-
-const PostViewer = ( {userId} ) => {
+const PostViewer = ( { userId } ) => {
+  
+  const router = useRouter();
+  // Seteo de publicaciones
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true); // Nuevo estado para manejar la carga
+  // Seteo de estado de carga por default `true`
+  const [loading, setLoading] = useState(true);
+
 
   const getDataPosts = async () => {
     try {
@@ -38,7 +47,6 @@ const PostViewer = ( {userId} ) => {
       if (response.data.data) {
         const sortedPosts = response.data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setPosts(sortedPosts);
-        console.log(sortedPosts);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -47,65 +55,24 @@ const PostViewer = ( {userId} ) => {
     }
   };
 
+  // <--------- MANEJO DE FECHAS DE PUBLICACION --------->
   const formatRelativeDate = (dateString) => {
-    // Conversion de cadena de fecha en un objeto de tipo 'Date'
     const date = parseISO(dateString);
-    // Retorno de diferencia relativa a fecha actual (suffix, locale marca el idioma)
-    return formatDistanceToNow(date, { addSuffix: true, locale: es }); // Retorna la diferencia relativa con la fecha actual
+    return formatDistanceToNow(date, { addSuffix: true, locale: es });
   };
-
-  const showSkeletons = () => (
-    <div >
-      {Array.from(new Array(3)).map((_, index) => (
-        <div key={index} className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mb-4 p-4">
-
-          <div className="flex w-full items-center justify-between border-b pb-3">
-            <div className="flex items-center space-x-3">
-              <Skeleton variant="circular" width={45} height={40} />
-              <Skeleton variant="text" width={250} />
-            </div>
-
-          <div className="flex items-center space-x-8">
-              <Skeleton variant="text" width={50} />
-          </div>
-        </div>
-
-
-          <div>
-            <Skeleton variant="rectangular" width={'100%'}  height={200} />
-          </div>
-          
-
-          <div className="px-4 py-2">
-            <div className="flex space-x-4 md:space-x-8">
-              <Skeleton variant="rounded" width={200} height={40} />
-              <Skeleton variant="rounded" width={200} height={40} />
-              <Skeleton variant="rounded" width={150} height={40} />
-              <Skeleton variant="rounded" width={150} height={40} />
-
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
+  // <--------- MANEJO DE ELIMINACION DE PUBLICACION --------->
   const handleDeletePost = async (postId) => {
     try {
       await deletePost(postId);
       setPosts(posts.filter(post => post._id !== postId));
-
     } catch (error) {
       console.error("Error deleting post:", error);
     }
   };
-
+  // <--------- MANEJO DE INTERACCION CON PUBLICACION --------->
   const handleReaction = async (postId, reactionType) => {
     try {
-      // Llama a markInteraction para enviar la interacción del usuario al servidor
       const response = await markInteraction(postId, { id: userId, type: reactionType });
-  
-      // Actualiza el estado local de las publicaciones con la respuesta del servidor
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post._id === response.data._id ? response.data : post
@@ -117,31 +84,27 @@ const PostViewer = ( {userId} ) => {
     }
   };
 
-
-  const renderInteractionButton = (post, reactionType, buttonText) => {
+  // <--------- RENDER DE BOTONES DE INTERACCION DE PUBLICACION --------->
+  const renderInteractionButton = (post, reactionType) => {
     const isReacted = post.interactions.some((interaction) => interaction.user === userId && interaction.type === reactionType );
     const count = post.interactions.filter(interaction => interaction.type === reactionType).length;
-  
     return (
-      <Button onClick={() => handleReaction(post._id, reactionType)}
-        className={`rounded-lg border px-3 py-1 text-xs font-semibold bg-sky-600 hover:bg-sky-900 text-white ${isReacted ? "bg-sky-900" : "bg-sky-600"}`}
+      <Button className={`text-black text-xs gap-2 px-3 hover:bg-zinc-300 ${reactionType === 'helpful' ? 'rounded-l-full' :'rounded-r-full'} ${isReacted ? "bg-zinc-300" : ""}`}
+              onClick={() => handleReaction(post._id, reactionType)}
       >
-        {buttonText === 'Útil' ?<TaskAltIcon/> : <RemoveCircleOutlineIcon/>}
-        {buttonText} ({count})
+        {reactionType === 'helpful' ? <ThumbUpIcon className="text-black"/> : <ThumbDownIcon className="text-black"/>} ({count})
+        
       </Button>
     );
   };
   
   
-
-
-
   const showPosts = ( ) => {
     return posts.map((post) => (
-      <div key={post._id} className={`max-w-3xl mx-auto bg-zinc-100 shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
+      <div key={post._id} className={`max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden my-4 p-4`}>
 
         <div className="flex w-full items-center justify-between border-b pb-3">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3" onClick={()=> router.push(`/profile/${post.author.id}`)}>
             <UserAvatar userId={post.author.id} />
             <div>
               <p className="text-lg font-bold text-slate-700">{post.author.name}</p>
@@ -156,7 +119,9 @@ const PostViewer = ( {userId} ) => {
                     <DeleteIcon fontSize="inherit" />
               </IconButton>
             ) : (
-              <p>...</p>
+              <IconButton aria-label="report" size="small">
+                    <ReportForm postId={post._id}/>
+              </IconButton>
             )}
           </div>
         </div>
@@ -168,24 +133,32 @@ const PostViewer = ( {userId} ) => {
 
         <ImageModal images={post.images} />
 
-        <div className="flex flex-wrap border-b pb-3 pt-4">
+        <div className="flex flex-wrap border-b pb-3 pt-4 gap-2">
           {post.hashtags.map((hashtag, index) => (
             <button key={index} className="rounded-2xl border bg-neutral-100 px-3 py-1 text-xs font-semibold">#{hashtag.name}</button>
           ))}
         </div>
 
-        <div className="px-4 py-2 flex justify-between">
-          <div className="flex space-x-4 ">
+        <div className="p-0 sm:px-4 py-4 flex justify-between">
+          <div className="flex space-x-2 ">
 
-          {renderInteractionButton(post, "helpful", "Útil")}
-          {renderInteractionButton(post, "nothelpful", "No útil")}
-          <Button className="bg-sky-600 hover:bg-sky-900 text-white">
-            <CommentIcon/>
-          </Button>
+            <div className="bg-zinc-200 rounded-full flex">
+              {renderInteractionButton(post, "helpful",)}
+              {renderInteractionButton(post, "nothelpful")}
+            </div>
+
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black rounded-full">
+              <CommentIcon/>
+            </Button>
+
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black text-xs normal-case px-4 font-bold rounded-full">
+                <IosShareIcon/>
+                <span className="hidden sm:block">Compartir</span>
+            </Button>
           </div>
 
           <div>
-            <Button className="bg-sky-600 hover:bg-sky-900 text-white">
+            <Button className="bg-zinc-200 hover:bg-zinc-300 text-black rounded-full">
               <BookmarkIcon/>
             </Button>
           </div>
@@ -193,7 +166,7 @@ const PostViewer = ( {userId} ) => {
         </div>
 
         
-        <div className="flex-wrap border-b pb-3 pt-4">
+        <div className="flex-wrap border-b pb-3 ">
           <CommentForm postId={post._id} />
         </div>
 
@@ -211,7 +184,7 @@ const PostViewer = ( {userId} ) => {
 
   return (
     <div>
-      {loading ? showSkeletons() : (Array.isArray(posts) && posts.length > 0 ? showPosts() : showSkeletons()  )}
+      {loading ? <SkeletonPost count={3}/>: (Array.isArray(posts) && posts.length > 0 ? showPosts() :  <SkeletonPost count={3}/>  )}
     </div>
   );
 };

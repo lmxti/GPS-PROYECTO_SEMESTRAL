@@ -2,37 +2,65 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-/* <----------------------- SERVICIOS  --------------------------> */
-import { login } from '../../services/auth.service.js'
+/* <---------------- COMPONENTES MATERIAL UI ------------------> */
+import { FormControl, FormGroup, InputLabel, OutlinedInput, InputAdornment, IconButton, Button } from '@mui/material';
 
-const LoginForm = ( { toggleForm } ) => {
+/* <----------------------- ICONOS --------------------------> */
+import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 
+/* <----------------------- SERVICIOS  -----------------------> */
+import { login } from "../../services/auth.service.js"
+
+const LoginForm = ({ toggleForm }) => {
     const router = useRouter();
-    const [credentials, setCredentials ] = useState({ email: "", password: "" });
+    const [credentials, setCredentials] = useState({ email: "", password: "" });
+    const [emailError, setEmailError] = useState(false);
 
-    const handleChange = (e) =>{
+    const handleChange = (e) => {
         const { name, value } = e.target;
-        setCredentials( prevState => ({
+        setCredentials(prevState => ({
             ...prevState,
-            [name]:value
+            [name]: value
         }));
+
+        // Validar el formato del correo electrónico
+        if (name === 'email' && value.trim() !== '') {
+            const isValidEmail = validateEmail(value);
+            setEmailError(!isValidEmail);
+        } else {
+            setEmailError(false); // Restablecer el estado de emailError si el campo está vacío
+        }
+    };
+
+    const validateEmail = (email) => {
+        // Expresión regular para validar el formato del correo electrónico
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            // console.log("Las credenciales son: ", credentials);
             await login(credentials);
             router.push("/")
-
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    // Determinar si el botón de envío debe estar deshabilitado
+    const isSubmitDisabled = !validateEmail(credentials.email) || credentials.password === '';
 
     return (
-        <div className=''>     
+        <div className='flex flex-col'>
             <div>
                 <h1 className="text-3xl font-bold text-center mb-4 cursor-pointer">
                     Inicia sesión
@@ -43,33 +71,61 @@ const LoginForm = ( { toggleForm } ) => {
             </div>
 
             <form onSubmit={onSubmit}>
-                <div className="space-y-4">
-                    <input type="email" name="email" placeholder="Email" required
-                        onChange={handleChange} value={credentials.email}
-                        className="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
-                    <input type="password" name="password" placeholder="Contraseña" required
-                        onChange={handleChange} value={credentials.password}
-                        className="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
-                </div>
+                <FormControl component="fieldset" className='w-full'>
+                    <FormGroup>
+                        <FormControl variant="outlined" margin="normal">
+                            <InputLabel error={emailError} htmlFor="email">Correo electrónico</InputLabel>
+                            <OutlinedInput 
+                                required
+                                id="email"
+                                name='email'
+                                type="text"
+                                label="Correo electrónico"
+                                onChange={handleChange}
+                                value={credentials.email}
+                                error={emailError} 
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <AccountCircle />
+                                    </InputAdornment>}
+                            />
+                        </FormControl>
 
+                        <FormControl variant="outlined" margin="normal">
+                            <InputLabel htmlFor="password">Contraseña</InputLabel>
+                            <OutlinedInput
+                                required
+                                id="password"
+                                name='password'
+                                type={showPassword ? 'text' : 'password'}
+                                label="Contraseña"
+                                onChange={handleChange}
+                                value={credentials.password}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword}>
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>}
+                            />
+                        </FormControl>
 
-                <div className="text-center mt-6">
-                    <button className="py-3 w-64 text-xl text-white bg-purple-400 rounded-2xl">
-                        Iniciar sesión
-                    </button>
-                </div>
+                        <Button variant="contained" color="primary" type="submit" disabled={isSubmitDisabled} className='mt-4 py-4 normal-case'>
+                            Iniciar sesión
+                        </Button>
+
+                    </FormGroup>
+                </FormControl>
             </form>
 
-            <p className="mt-4 text-sm">
+            <div className="mt-4 text-sm">
                 ¿No tienes una cuenta?
                 <span className="underline cursor-pointer" onClick={toggleForm}>
                     Registrate
                 </span>
-            </p>
+            </div>
         </div>
     )
 }
-
-
 
 export default LoginForm;

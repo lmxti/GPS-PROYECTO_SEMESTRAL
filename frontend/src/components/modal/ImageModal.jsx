@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 
 const ImageModal = ({ images }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(null);
@@ -19,6 +19,26 @@ const ImageModal = ({ images }) => {
         setSelectedImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     };
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (selectedImageIndex !== null) {
+                if (event.key === 'ArrowRight') {
+                    handleNextImage();
+                } else if (event.key === 'ArrowLeft') {
+                    handlePrevImage();
+                } else if (event.key === 'Escape') {
+                    handleCloseModal();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedImageIndex]);
+
+
     const calculateGridColumns = (imageCount) => {
         if (imageCount === 1) {
             return 'grid-cols-1';
@@ -35,22 +55,39 @@ const ImageModal = ({ images }) => {
         <>
             {selectedImageIndex !== null && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="fixed inset-0 bg-black opacity-80" onClick={handleCloseModal}></div>
-                    <div className="relative w-[600px] h-[600px] bg-white p-4">
-                        <span className="absolute top-0 -right-14 cursor-pointer text-3xl bg-white rounded px-3 py-2" onClick={handleCloseModal}>&times;</span>
-                        <img src={images[selectedImageIndex]} alt="Full-size Image" className="w-full h-full object-contain" />
-                        {images.length > 1 && (
-                            <>
-                                <button onClick={handlePrevImage} className="absolute top-1/2 -left-24 transform -translate-y-1/2 bg-white p-2 rounded">Anterior</button>
-                                <button onClick={handleNextImage} className="absolute top-1/2 -right-24 transform -translate-y-1/2 bg-white p-2 rounded">Siguiente</button>
-                            </>
-                        )}
+                    <div className="fixed inset-0 bg-black opacity-60" onClick={handleCloseModal}></div>
+                    <div className="relative bg-white w-[600px]">
+                        <div className="flex justify-between px-4 py-4">
+                            <p className="font-thin text-2xl">Proyecto GPS</p>
+                            <p onClick={handleCloseModal} className="bg-zinc-200 transition-colors cursor-pointer hover:bg-zinc-400 font-bold px-4 py-2 rounded-xl">&times;</p>
+                        </div>
+
+                        <div className="flex items-center justify-center p-4 w-[600px] h-[600px] relative">
+                            { images.length  > 1 && (
+                                <button onClick={handlePrevImage} className="h-3/4 absolute left-4 z-10 px-2 text-white rounded-full hover:bg-opacity-75">
+                                    <svg className="w-5 h-5 rounded-full bg-zinc-400 text-white sm:w-9 sm:h-9 dark:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" strokeLinejoin stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                            )}
+
+                            <img src={images[selectedImageIndex]} alt="Full-size Image" className="w-full h-full object-contain" />
+
+                            { images.length  > 1 && (
+                                <button onClick={handleNextImage} className="h-3/4 absolute right-4 z-10 px-2 text-white rounded-full hover:bg-opacity-75">
+                                    <svg className="w-5 h-5 rounded-full bg-zinc-400 text-white sm:w-9 sm:h-9 dark:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" strokeLinejoin stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            )}
+                            
+                        </div>
                     </div>
                 </div>
             )}
             <div className={`grid ${calculateGridColumns(images.length)} gap-4`}>
                 {images.map((imageUrl, index) => (
-                    <img key={index} src={imageUrl} alt={`Thumbnail ${index}`} onClick={() => handleClickImage(index)} className="w-full h-full object-cover p-1 bg-slate-200 shadow-md cursor-pointer" />
+                    <img key={index} src={imageUrl} alt={`Thumbnail ${index}`} onClick={() => handleClickImage(index)} className="w-full h-full object-cover shadow-md cursor-pointer" />
                 ))}
             </div>
         </>

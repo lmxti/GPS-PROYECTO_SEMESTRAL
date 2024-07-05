@@ -1,6 +1,7 @@
 /* <----------------------- MODELOS --------------------------> */
 const User = require("../models/user.model");
 const Role = require("../models/role.model");
+const Badge = require("../models/badge.model.js")
 
 /* <----------------------- FUNCIONES ------------------------> */
 // handleError: Funcion de registro y manejo de errores de manera centralizada 
@@ -98,9 +99,24 @@ async function getUserByID(id){
         const user = await User.findById({ _id: id })
             .select("-password")
             .populate("roleUser")
+            .populate("badges.badge", "nameBadge descriptionBadge imageBadge")
             .exec();
         if(!user) return [null, "No existe un usuario asociado al id ingresado"];
-        return [user, null]
+        // Mapea los badges para acceder a ellos por su ID
+        const badgesMap = user.badges.map(badgeEntry => ({
+            nameBadge: badgeEntry.badge.nameBadge,
+            descriptionBadge: badgeEntry.badge.descriptionBadge,
+            imageBadge: badgeEntry.badge.imageBadge,
+            dateObtained: badgeEntry.dateObtained
+        }));
+
+        // Construir el objeto de respuesta
+        const responseUser = {
+            ...user.toObject(),
+            badges: badgesMap
+        };
+
+        return [responseUser, null]
     } catch (error) {
         handleError(error, "user.service -> getUser");
     }
@@ -186,11 +202,88 @@ async function deleteUser(id){
     }
 }
 
+async function getUserFollowedHashtags(id){
+    try {
+        const user = await User.findById(id).populate("followedHashtags").exec();
+        if(!user) return [null, "No se encontro usuario asociado al id ingresado"];
+        return [user.followedHashtags, null];
+    } catch (error) {
+        handleError(error, "user.service -> getUserFollowedHashtags");
+    }
+}
+
+async function followUser(userId, userToFollowId) {
+    try {
+        const userToFollow = await User.findById(userToFollowId);
+        if (!userToFollow) return [null, "Usuario a seguir no encontrado"]
+
+        const user = await User.findById(userId);
+        if (!user) return [null, "Usuario no encontrado"];
+
+        const isFollowing = user.followed.some(
+            (followedUser) => followedUser.toString() === userToFollowId
+        );
+
+        if (isFollowing) {
+            return [null, "El usuario ya sigue a este usuario"];
+        }
+
+        user.followed.push(userToFollowId);
+        await user.save();
+
+        const isFollowedByUser = userToFollow.followers.some(
+            (follower) => follower.toString() === userId
+        );
+
+        if (!isFollowedByUser) {
+            userToFollow.followers.push(userId);
+            await userToFollow.save();
+        }
+
+        return [user, null];
+    } catch (error) {
+      handleError(error, "user.service -> followUser");
+      return [null, error.message];
+    }
+  }
+
+  async function unfollowUser(userId, userToUnfollowId) {
+    try {
+        // Busqueda de usuario a dejar de seguir
+        const userToUnfollow = await User.findById(userToUnfollowId);
+        if (!userToUnfollow) return [null, "Usuario a dejar de seguir no encontrado"];
+
+        // Busqueda de usuario que realiza la accion.
+        const user = await User.findById(userId);
+        if (!user) return [null, "Usuario no encontrado"];
+
+        const isFollowing = user.followed.some( (followedUser) => followedUser.toString() === userToUnfollowId );
+
+        if (!isFollowing) return [null, "El usuario no sigue a este usuario"]
+
+        // Remover userToUnfollowId de la lista de seguidos del usuario
+        user.followed = user.followed.filter( (followedUser) => followedUser.toString() !== userToUnfollowId );
+        await user.save();
+
+        // Remover userId de la lista de seguidores del usuario a dejar de seguir
+        userToUnfollow.followers = userToUnfollow.followers.filter( (follower) => follower.toString() !== userId);
+        await userToUnfollow.save();
+
+        return [user, null];
+    } catch (error) {
+    handleError(error, "user.service -> unfollowUser");
+    return [null, error.message];
+    }
+}
+  
 module.exports = {
     createUser,
     getUsers,
     getUserByID,
     getUserImageByID,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserFollowedHashtags,
+    followUser,
+    unfollowUser
 }

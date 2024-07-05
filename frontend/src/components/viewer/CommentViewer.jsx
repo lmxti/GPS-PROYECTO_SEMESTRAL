@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 
 /* <----------------------- COMPONENTES --------------------------> */
-import UserAvatar from "../UserAvatar";
+import UserAvatar from "../common/UserAvatar";
 
 /* <----------------------- ICONOS --------------------------> */
 import IconButton from '@mui/material/IconButton';
@@ -61,40 +61,38 @@ const ShowComments = ({ postId, userId }) => {
       {comments && comments.length > 0 ? (
         <>
           {comments.slice(0, showCount).map((comment) => (
-            <div key={comment._id} className="mb-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <UserAvatar userId={comment.userId.id} />
-                  <p className="font-semibold text-slate-800">
-                    {comment.userId.name}
-                  </p>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-slate-700">
-                    {comment.userComment}
-                  </p>
-                  <div className="mt-2 flex flex-wrap space-x-2">
+            <div key={comment._id} className="flex justify-between space-x-2 mb-2">
+
+              <UserAvatar userId={comment.userId.id} />
+
+              <div className="bg-zinc-100 px-2 py-3 rounded w-full">
+                  <p className="font-semibold text-slate-800">{comment.userId.name}</p>
+                  <p className="text-zinc-800">{comment.userComment}</p>
+
+                  <div className="mt-2 flex flex-wrap space-x-2 ml-211">
                     {comment.imageComment.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`comment-${index}`}
-                        className="object-cover rounded-md"
-                      />
+                      <img key={index} src={image} alt={`comment-${index}`} className="w-32 h-32 object-cover rounded-md"/>
                     ))}
                   </div>
-                </div>
-                <div>
-                  {comment.userId.id === userId ? (
-                    <IconButton aria-label="delete" size="small" onClick={() => handleDeleteComment(comment._id)}>
-                      <DeleteIcon fontSize="inherit" />
-                    </IconButton>
-                  ) : (
-                    <p>...</p>
-                  )}
-                  </div>
               </div>
+
+              <div className="">
+                {comment.userId.id === userId ? (
+                      <IconButton aria-label="delete" size="small" onClick={() => handleDeleteComment(comment._id)}>
+                        <DeleteIcon fontSize="inherit" />
+                      </IconButton>
+                    ) : (
+                      <p>...</p>
+                    )}
+              </div>
+
+
             </div>
+
+
+
+
+
           ))}
           <div className="flex justify-between">
             {showCount < comments.length && (
@@ -106,10 +104,7 @@ const ShowComments = ({ postId, userId }) => {
               </button>
             )}
             {showCount > 3 && (
-              <button
-                className="text-red-500 hover:text-red-700"
-                onClick={() => setShowCount(3)}
-              >
+              <button className="text-red-500 hover:text-red-700" onClick={() => setShowCount(3)}>
                 Mostrar menos comentarios
               </button>
             )}

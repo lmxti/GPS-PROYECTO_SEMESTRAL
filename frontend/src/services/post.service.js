@@ -23,9 +23,27 @@ export const getPosts = async() => {
     }
 }
 
+export const getUserPosts = async (id) => {
+    try {
+      const response = await axios.get(`/posts/getUserPosts/${id}`);
+      return response.data; // Asumiendo que la respuesta tiene los datos en response.data
+    } catch (error) {
+      console.error('Error al obtener publicaciones del usuario:', error);
+    }
+  };
+
+export const updatePost = async( postId, editedPost ) =>{
+    try {
+        const response = await axios.put(`/posts/updatePost/${postId}`, editedPost)
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> updatePost", error);
+    }
+}
+
 export const deletePost = async(postId) => {
     try {
-        const response = await axios.delete(`/posts/deletePost/${postId}`)
+        const response = await axios.delete(`/posts/deletePost/${postId}`, )
         return response;
     } catch (error) {
         console.log("FRONTEND: Error en post.service -> getPosts", error);

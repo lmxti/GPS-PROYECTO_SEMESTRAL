@@ -23,31 +23,36 @@ export default function Home() {
   
   const { user: { id: userId } } = useAuth();
 
+
   const updatePosts = () => {
     setUpdate(!update);
   };
+  
+  useEffect( () =>{
+    document.title = 'Inicio'
+  })
 
 
   return (
     <main>
-      <NavBar userId={userId}/>
-      <div className = "grid grid-cols-5 ">
+        <NavBar userId={userId}/>
+        <div className = "flex container justify-center mt-4">
 
-        <div className = "col-start-1 col-end-2 sticky top-0 h-screen overflow-y-auto">
-            <SideNav/>
-            <HashtagsViewer/>
-            <ResourcesViewer/>
-        </div>
+          <div className='grid grid-cols-1 md:grid-cols-4 md:gap-4'>
 
-        <div className = "col-start-2 col-end-5 space-y-4">
-          <PostForm updatePosts={updatePosts} userId={userId}/>
-          <PostViewer key={update} userId={userId}/>
-        </div>
+            <div className='md:col-span-1 md:border-r-2 px-2'>
+                  <SideNav/>
+                  <HashtagsViewer/>
+                  <ResourcesViewer/>
+            </div>
 
+            <div className='md:col-span-3'>
+              <PostForm updatePosts={updatePosts} userId={userId}/>
+              <PostViewer key={update} userId={userId} type='ALL'/>
+            </div>
 
-        <div className = "col-start-5 col-end-6">
-        </div>
-        
+          </div>
+
       </div>
     </main>
   );
