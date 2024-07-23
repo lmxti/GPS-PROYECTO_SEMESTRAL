@@ -373,6 +373,28 @@ async function getPostsFollowed( userId ){
     }
 }
 
+async function getPostsByHashtag( hashtagId ){
+    try {
+        const hashtagFound = await Hashtag.findById(hashtagId);
+        if(!hashtagFound) return [null, `No se encontro hashtag de id: ${hashtagId}`];
+
+        const posts = await Post.find({ hashtags: hashtagId })
+            .populate( { path: 'author', select: "_id name"})
+            .populate( { path: 'hashtags', select: "_id nameHashtag"})
+
+        if(!posts) return [null, "No se encontraron posts que contengan el hashtag"];
+
+        const publicationData = posts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+        }));
+
+        return [publicationData , null]
+    } catch (error) {
+        console.log("Error en post.service-> getPostByHashtag", error);
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
@@ -387,5 +409,6 @@ module.exports = {
     getSharedAndSavedPosts,
     sharePost,
     getSharedPosts,
-    getPostsFollowed
+    getPostsFollowed,
+    getPostsByHashtag
 }

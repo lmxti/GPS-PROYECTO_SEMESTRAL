@@ -26,7 +26,11 @@ const HomePostsViewer = ({ userId }) => {
       const updatePosts = () => {
         setUpdate(!update);
   };
-
+  
+  useEffect(() => {
+    getHomePosts();
+  }, [update]);
+  
   const getHomePosts = async () => {
     try {
       const response = await getPostsFollowed(userId);
@@ -36,13 +40,16 @@ const HomePostsViewer = ({ userId }) => {
       console.log("HomePostsViewer -> getHomePosts: Error get posts", error);
     }
   }
+  if(homePosts.length === 0){
+    return (
+      <div className="text-center text-xs mt-8">
+            <p>No sigues a nadie, prueba encontrar contenido en explorar :-)</p>
+        </div>
+    )
+  }
+  
 
-  useEffect(() => {
-    getHomePosts();
-  }, [update])
-
-
-
+  
   return <PostsCommonViewer userId={userId} data={homePosts} options={options} updatePosts={updatePosts} />
          
 };

@@ -125,3 +125,12 @@ export const getPostsFollowed = async( userId) => {
         console.log("FRONTEND: Error en post.service -> getPostsFollowed", error);
     }
 }
+
+export const getPostsByHashtag = async( hashtagId) => {
+    try {
+        const response = await axios.get(`/posts/getPostsByHashtag/${hashtagId}`);
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> getPostsByHashtag", error);
+    }
+}
