@@ -162,31 +162,18 @@ export default function PostsCommonViewer({userId, data, options, updatePosts  }
             }
             setSortedPosts(sortedArray);
         }, [posts, sortType]);
-    
-        if (!sortedPosts) {
-            return (
-                <SkeletonPost count={4}/>
-            )
-        }
-
-    /*<------------------- EFECTOS DE ACTUALIZACIÓN------------------->*/
+        /*<------------------- EFECTOS DE ACTUALIZACIÓN------------------->*/
         // CEfecto que se ejecuta cuando cambia la información o mejor dicho la data que recibe el componente, esto para actualizar las publicaciones mostradas.
         useEffect(() => {
             setPosts(data);
             sharedSavedData();
         }, [data]);
-
-    // Caso 1: No hay publicaciones para mostrar, se ven skeleton post por default
-    if(!posts){
-        return (
-            <SkeletonPost count={4}/>
-        )
-    }
-
-    return (
-        <div>
+            
+            
+            return (
+                <div>
             {sortedPosts.map((post) => (
-            <div key={post._id} className={`max-w-3xl mx-auto bg-zinc-50 shadow-md rounded-lg overflow-hidden my-4 p-4 text-left border`}>
+                <div key={post._id} className={`max-w-3xl mx-auto bg-zinc-50 shadow-md rounded-lg overflow-hidden my-4 p-4 text-left border`}>
                 <div className="flex w-full items-center justify-between border-b pb-3">
                     <div className="flex items-center space-x-3">
                         <div className="cursor-pointer" onClick={() => router.push(`/profile/${post.author._id}`)}>
