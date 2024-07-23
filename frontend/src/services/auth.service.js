@@ -18,11 +18,13 @@ export const login = async( { email, password } ) => {
             localStorage.setItem('user', JSON.stringify( { email, role, id } ));
             axios.defaults.headers.common[ 'Authorization'] = `Bearer ${ data.data.accessToken }`;
             cookies.set('jwt-auth', data.data.accessToken, { path: '/' });
+            return true;
         }
         console.log("Has iniciado sesion.");
     } catch (error) {
         console.log("No pudiste iniciar sesion.");
         console.log(error);
+        return false;
     }
 };
 

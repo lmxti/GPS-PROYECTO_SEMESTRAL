@@ -8,10 +8,11 @@ import RegisterForm from '@/components/form/RegisterForm';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useAuth } from "@/context/AuthContext";
+
 
 const Auth = () => {
     const router = useRouter();
-
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [showLoginForm, setShowLoginForm] = useState(true);
 
@@ -25,8 +26,8 @@ const Auth = () => {
 
     if(userLoggedIn){
         router.push("/")
-
     }
+    
 
     const toggleForm  = () => {
         setShowLoginForm(!showLoginForm);

@@ -41,8 +41,10 @@ const LoginForm = ({ toggleForm }) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(credentials);
-            router.push("/")
+            const logged = await login(credentials);
+            if (logged) {
+                router.push("/")
+            }
         } catch (error) {
             console.log(error);
         }

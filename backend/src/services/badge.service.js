@@ -97,24 +97,38 @@ async function deleteBadge(id){
  * @param {string} idUser - ID del usuario al que se le asignará la insignia.
  * @returns {Promise<Array>} Promesa que contiene un array con el usuario y su insignia asignada `[userFound, null]` y en caso de error devuelve `[null, error]`
  */
-async function assignBadge(idBadge, idUser){
+async function assignBadge(n_badge, idUser) {
     try {
-        const badgeFound = await Badge.findById(idBadge);
-        if(!badgeFound) return [null, "No se encontro insignia"]
-
+        // Buscar una sola insignia por nombre
+        const badgeFound = await Badge.findOne({ nameBadge: n_badge });
+        if (!badgeFound) return [null, "No se encontró la insignia"];
+        // Buscar el usuario por ID
         const userFound = await User.findById(idUser);
-        if(!userFound) return [null, "No se encontro usuario"]
-
-        const userHasThisBadge = userFound.badges.some(item => item.badge.toString() === idBadge);
+        if (!userFound) return [null, "No se encontró el usuario"];
+        // Verificar si el usuario ya tiene esta insignia
+        const userHasThisBadge = userFound.badges.some(item => item.badge.toString() === badgeFound._id.toString());
         if (userHasThisBadge) return [null, "El usuario ya tiene esta insignia"];
-        userFound.badges.push({badge: idBadge, dateObtained: Date.now()})
+        // Agregar la insignia al usuario
+        userFound.badges.push({
+            badge: badgeFound._id,
+            dateObtained: Date.now()
+        });
+        // Guardar los cambios en la base de datos
         await userFound.save();
-        return [userFound, null];
+        // Volver a cargar el usuario con la insignia poblada
+        const updatedUser = await User.findById(idUser)
+            .populate({
+                path: 'badges.badge',
+                select: 'nameBadge descriptionBadge imageBadge'
+            });
+
+        return [updatedUser, null];
     } catch (error) {
         handleError(error, 'badge.service -> assignBadge');
         return [null, 'No fue posible dar insignia'];
     }
 }
+
 
 module.exports = {
     createBadge,

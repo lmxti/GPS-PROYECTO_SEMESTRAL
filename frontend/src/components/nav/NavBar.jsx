@@ -1,26 +1,16 @@
-/* <----------------------- FUNCIONES -------------------------> */
+// src/components/PrimarySearchAppBar.jsx
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-
-
-/* <---------------------- COMPONENTES ------------------------> */
 import UserAvatar from "../common/UserAvatar.jsx";
-
-
-/* <---------------- COMPONENTES MATERIAL UI ------------------> */
-import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Avatar from '@mui/material/Avatar';
-
-/* <----------------------- ICONOS --------------------------> */
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -29,36 +19,51 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
-import ExploreIcon from '@mui/icons-material/Explore';
+import LoginIcon from '@mui/icons-material/Login';
+import { logout } from "../../services/auth.service.js";
+import { search } from '@/services/search.service.js';
+import { useAuth } from "@/context/AuthContext";
+import { Search, SearchIconWrapper, StyledInputBase, SearchResultsContainer  } from '../../styles/components/navbar.styles.js';
+import SearchResultItem from '../common/SearchResultItem.jsx';
 
-/* <----------------------- SERVICIOS  -----------------------> */
-import { logout } from "../../services/auth.service.js"
-import { getUserInformation, getUserImage } from "../../services/user.service.js"
-
-
-export default function PrimarySearchAppBar( { userId }) {
-
+export default function PrimarySearchAppBar() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
-  const [dataUser, setDataUser] = useState('');
-  const [imageUser, setImageUser] = useState('');
-
-  const getDataUser = async () => {
+  const handleSearch = async (searchQuery) => {
     try {
-      const response = await getUserInformation(userId);
-      setDataUser(response.data.data);
-      
-    } catch (error) {
-      console.log(error);
+      setError(null);
+      const data = await search(searchQuery);
+      console.log(data.data.data);
+      setResults(data.data.data);
+    } catch (err) {
+      setError('Ocurrió un error al buscar. Por favor, intenta de nuevo.');
+      setResults([]);
     }
   };
 
-  useEffect( () => {
-    getDataUser();
-  },[]);
+  const handleQueryChange = (event) => {
+    const newQuery = event.target.value;
+    setQuery(newQuery);
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+    // Limpiar el timeout anterior
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Establecer un nuevo timeout
+    const timeoutId = setTimeout(() => {
+      handleSearch(newQuery);
+    }, 1000); // Ajusta el tiempo según sea necesario
+
+    setSearchTimeout(timeoutId);
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -82,34 +87,30 @@ export default function PrimarySearchAppBar( { userId }) {
 
   const menuId = 'primary-search-account-menu';
 
-  // Menu normal
   const renderMenu = (
     <Menu anchorEl={anchorEl} id={menuId} keepMounted open={isMenuOpen} onClose={handleMenuClose}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
     >
-      <MenuItem onClick={()=>{
-        router.push(`/profile/${userId}`);
+      <MenuItem onClick={() => {
+        router.push(`/profile/${user.id}`);
         handleMenuClose();
       }}>Perfil</MenuItem>
       <MenuItem onClick={handleMenuClose}>Mi cuenta</MenuItem>
-      <MenuItem onClick={ () => {
-          logout()
+      <MenuItem onClick={() => {
+          logout();
           router.push('/auth');
-        }
-        }>Cerrar sesión
-
+        }}>Cerrar sesión
       </MenuItem>
-
     </Menu>
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
 
-  // Menu movil
   const renderMobileMenu = (
     <Menu anchorEl={mobileMoreAnchorEl} id={mobileMenuId} keepMounted open={isMobileMenuOpen} onClose={handleMobileMenuClose}
-       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}  transformOrigin={{ vertical: 'top', horizontal: 'right' }} 
+       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}  
+       transformOrigin={{ vertical: 'top', horizontal: 'right' }} 
     >
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
@@ -121,14 +122,12 @@ export default function PrimarySearchAppBar( { userId }) {
       </MenuItem>
 
       <MenuItem>
-
         <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
           <Badge badgeContent={17} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
         <p>Notifications</p> 
-
       </MenuItem>
 
       <MenuItem onClick={handleProfileMenuOpen}>
@@ -137,127 +136,56 @@ export default function PrimarySearchAppBar( { userId }) {
         </IconButton>
         <p>Perfil</p>
       </MenuItem>
-
     </Menu>
   );
 
-
-
   return (
-      <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="sticky" className='bg-zinc-800'>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="sticky" className='bg-zinc-700'>
         <Toolbar>
-        
-        {/* Texto barra de navegacion */}
-          {/* <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block', fontStyle:'oblique' } }}>
-            FORUM
-          </Typography> */}
-          <Avatar className='cursor-pointer hover:bg-zinc-700 p-1 transition' alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} onClick={ () => { router.push('/')}} />
-
-
-        {/* Barra de busqueda */}
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }}/>
-          </Search>
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          {/* Mensajes, notificaciones y Avatar */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-
-            <IconButton size="large" color="inherit" onClick={() => router.push("/")}>
-                <HomeIcon />
-            </IconButton>
-
-            <IconButton size="large" color="inherit">
-                <ExploreIcon />
-            </IconButton>
-
-
-            {/* Mensajes */}
-            {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton> */}
-
-            {/* Notificaciones*/}
-            {/* <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
-
-            {/* Favoritos*/}
-            {/* <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={2} color="error">
-                <FavoriteIcon />
-              </Badge>
-            </IconButton> */}
-
-            {/* Avatar */}
-            <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
-              <UserAvatar userId={userId} />
-            </IconButton>
-            
+          <Avatar className='cursor-pointer hover:bg-zinc-700 p-1 transition' alt="Logo" src="/icons/ovni1.png" sx={{ width: 60, height: 60 }} onClick={() => { router.push('/')}} />
+          <Box sx={{ position: 'relative' }}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} onChange={handleQueryChange}/>
+            </Search>
+            {query && (
+              <SearchResultsContainer>
+                {results.length ? (
+                  results.map(user => (
+                    <SearchResultItem
+                      key={user._id}
+                      name={user.name}
+                      id={user._id}
+                      username={user.username}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2" sx={{ p: 2 }}>No se encontraron resultados.</Typography>
+                )}
+              </SearchResultsContainer>
+            )}
           </Box>
-
-      	  {/* Boton mas opciones (tres puntos) en pantalla mas pequeña */}
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton size="large" color="inherit" onClick={() => router.push("/")}>
+              <HomeIcon />
+            </IconButton>
+            <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
+              <UserAvatar userId={user.id} />
+            </IconButton>
+          </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton size="large" aria-label="show more" aria-controls={mobileMenuId} aria-haspopup="true" onClick={handleMobileMenuOpen} color="inherit">
               <MoreIcon />
             </IconButton>
           </Box>
-
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
+      {user && renderMobileMenu}
+      {user && renderMenu}
     </Box>
   );
-
-
 }
-
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
-}));

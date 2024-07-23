@@ -23,6 +23,15 @@ export const getPosts = async() => {
     }
 }
 
+export const getPost = async(id) =>{
+    try {
+        const response = await axios.get(`/posts/getPostByID/${id}`)
+        return response.data
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> getPost", error);
+    }
+}
+
 export const getUserPosts = async (id) => {
     try {
       const response = await axios.get(`/posts/getUserPosts/${id}`);
@@ -57,7 +66,62 @@ export const markInteraction = async (postId, userAndInteraction) => {
       return response;
     } catch (error) {
       console.log("FRONTEND: Error en post.service -> markInteraction", error);
-      throw error; // Asegúrate de manejar el error donde llames a esta función
+      throw error;
     }
   };
+
+export const savePostAsFavorite = async( postId, userId) => {
+    try {
+        const response = await axios.post(`/posts/savePostAsFavorite/${postId}`, {userId});
+        return response;
+    } catch (error) {
+      console.log("FRONTEND: Error en post.service -> savePostAsFavorite", error);
+    }
+}
   
+
+export const getUserFavoritePosts = async(userId) =>{
+    try {
+        const response = await axios.get(`/posts/getUserFavoritePosts/${userId}`);
+        return response;
+    } catch (error) {
+      console.log("FRONTEND: Error en post.service -> getUserFavoritePosts", error);
+    }
+}
+
+export const getSharedSavedPosts = async(userId) =>{
+    try {
+        const response = await axios.get(`/posts/getSharedAndSavedPosts/${userId}`);
+        return response;
+    } catch (error) {
+      console.log("FRONTEND: Error en post.service -> getSharedSavedPosts", error); 
+    }
+}
+
+export const sharePost = async( postId, userId) => {
+    try {
+        const response = await axios.post(`/posts/sharePost/${postId}`, {userId});
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> sharePost", error);
+    }
+}
+
+export const getSharedPosts = async( postId) => {
+    try {
+        const response = await axios.get(`/posts/getSharedPosts/${postId}`);
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> getSharedPosts", error);
+        
+    }
+}
+
+export const getPostsFollowed = async( userId) => {
+    try {
+        const response = await axios.get(`/posts/getPostsFollowed/${userId}`);
+        return response;
+    } catch (error) {
+        console.log("FRONTEND: Error en post.service -> getPostsFollowed", error);
+    }
+}

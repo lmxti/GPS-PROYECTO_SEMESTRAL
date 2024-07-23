@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef  } from "react";
 import Button from "@mui/material/Button";
 import IconButton from '@mui/material/IconButton';
 import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
@@ -15,8 +15,9 @@ import UserAvatar from "../common/UserAvatar.jsx";
 import { createComment } from "@/services/comments.service.js";
 import { useAuth } from "@/context/AuthContext.jsx";
 
-const CreateComments = ({ postId }) => {
+const CreateComments = ({ postId, postStatus, autoFocus  }) => {
   const { user } = useAuth();
+  const inputRef = useRef(null);
 
   const [comment, setComment] = useState({
     userId: user.id,
@@ -24,6 +25,12 @@ const CreateComments = ({ postId }) => {
     userComment: "",
     imageComment: null,
   });
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus]);
 
   useEffect(() => {
     setComment((prevComment) => ({
@@ -74,6 +81,22 @@ const CreateComments = ({ postId }) => {
     }
   };
 
+  if (postStatus === false) {
+    return (
+      <div className="flex space-x-2 items-center">
+        <UserAvatar userId={user.id}/> 
+        <FormControl variant="outlined" className="w-full text-center">
+          <OutlinedInput 
+            className="bg-zinc-200"
+            value="Publicación cerrada, no se permiten comentarios"
+            disabled
+            fullWidth
+          />
+        </FormControl>
+      </div>
+    );
+  }
+
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -81,7 +104,13 @@ const CreateComments = ({ postId }) => {
           <UserAvatar userId={user.id}/> 
           <FormControl variant="outlined" className="w-full">
             <InputLabel htmlFor="userComment">Escribe un comentario</InputLabel>
-            <OutlinedInput id="userComment" name="userComment" value={comment.userComment} onChange={handleInputChange} label="Escribe un comentario"
+            <OutlinedInput 
+              id="userComment" 
+              name="userComment" 
+              value={comment.userComment} 
+              onChange={handleInputChange} 
+              label="Escribe un comentario"
+              inputRef={inputRef}
               endAdornment={
                 <InputAdornment position="end">
                   <label>

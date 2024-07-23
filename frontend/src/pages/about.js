@@ -1,19 +1,30 @@
-import React from 'react'
-import NavBar from "@/components/nav/NavBar";
-import Avatar from '@mui/material/Avatar';
+
 import Link from 'next/link';
+/* <---------------- COMPONENTES MATERIAL UI --------------------> */
+import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
+
+/* <------------------- ICONOS REACT-ICONS -----------------------> */
 import { FaReact } from "react-icons/fa";
 import { RiNextjsFill } from "react-icons/ri";
 import { SiMongodb } from "react-icons/si";
 import { SiExpress } from "react-icons/si";
 
+/* <--------------------- COMPONENTES NAV ----------------------> */
+import NavBar from "@/components/nav/NavBar";
+
+/* <------------------------ CONTEXTO --------------------------> */
+import { useAuth } from "@/context/AuthContext";
+
 export default function about() {
+  // Desectructuracion datos de usuario que esta navegando (user.id).
+  const { user } = useAuth();
+  
   return (
-    <div>
-        <NavBar/>
-        <div className="flex flex-col min-h-[100dvh] container mx-auto mt-4">
-            <header className="bg-fixed rounded-3xl p-8 bg-[url('/wallpapers/wallpaper-about2.png')] bg-cover bg-bottom">
+    <div className="bg-[url('/wallpapers/wallpaper-about2.png')] bg-cover bg-bottom bg-fixed">
+        <NavBar userId={user.id} />
+        <div className="flex flex-col min-h-[100dvh] container mx-auto">
+            <header className=" p-8">
                 <section className="container">
                     <div className="flex flex-col items-center text-center space-y-4 p-8">
                         <div className="flex items-center flex-row md:flex-col">
@@ -37,19 +48,19 @@ export default function about() {
                     Este proyecto esta basado y desarrollado en el stack de tecnologias <span className='font-bold'>M-E-R-N </span>
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full uppercase">
-                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-900 py-4 rounded-lg">
+                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-emerald-500 hover:bg-zinc-900 py-4 rounded-lg">
                             <SiMongodb size={100} />
                             <p>MongoDB</p>
                         </div>
-                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-900 py-4 rounded-lg">
+                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 py-4 rounded-lg">
                             <SiExpress size={100}/>
                             <p>Express.js</p>
                         </div>
-                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-900 py-4 rounded-lg">
+                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-cyan-500 hover:bg-zinc-900 py-4 rounded-lg">
                             <FaReact size={100} />
                             <p>React</p>
                         </div>
-                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-900 py-4 rounded-lg">
+                        <div className="flex flex-col items-center space-y-2 bg-zinc-600/10 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 py-4 rounded-lg">
                             <RiNextjsFill size={100}/>
                             <p>Next.js</p>
                         </div>
@@ -89,8 +100,8 @@ export default function about() {
 
         </main>
 
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 Proyecto de GPS - FORO.</p>
+      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t text-zinc-200">
+        <p className="text-xs ">&copy; 2024 Proyecto de GPS - FORO.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Términos de Servicio

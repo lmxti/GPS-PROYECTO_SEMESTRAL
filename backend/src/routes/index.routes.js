@@ -9,6 +9,7 @@ const badgeRoutes = require('./badge.routes.js');
 const hashtagRoutes = require('./hashtag.routes.js');
 const commentRoutes = require("./comment.routes.js");
 const reportRoutes = require("./report.routes.js");
+const searchRoutes = require("./search.routes.js");
 
 /* <------------------------ MIDDLEWARES ---------------------------> */
 const authenticationMiddleware  = require("../middlewares/authentication.middleware.js");
@@ -24,5 +25,7 @@ router.use("/badges", badgeRoutes);
 router.use("/hashtags", hashtagRoutes);
 router.use("/comments", commentRoutes);
 router.use("/reports", reportRoutes);
+
+router.use("/search", searchRoutes);
 
 module.exports = router;

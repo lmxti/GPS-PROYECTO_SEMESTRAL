@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema(
         roleUser: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
         // Publicaciones del usuario, por defecto es un array vacio "[]"
         posts: [ { type: mongoose.Schema.Types.ObjectId,ref: "Post"} ],
+        // Publicaciones guardadas en favoritos del usuario, por defecto array vacio "[]"
+        savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
+        // Publicaciones compartidas del usuario
+        sharedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post"}],
         // Insignias del usuario, por defecto es un array vacio "[]"
         badges: [
              { 

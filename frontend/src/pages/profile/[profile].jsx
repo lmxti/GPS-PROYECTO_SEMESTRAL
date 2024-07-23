@@ -25,8 +25,10 @@ import NavBar from "@/components/nav/NavBar";
 import ProfileEditForm from '@/components/form/ProfileEditForm';
 
 /* <------------------- COMPONENTES VIEWER ---------------------> */
-import PostProfileViewer from "@/components/viewer/PostProfileViewer";
-import BadgesProfileViewer from '@/components/viewer/BadgesProfileViewer';
+import PostProfileViewer from "@/components/viewer/PostProfileViewer.jsx"
+import SharedPostsViewer from '@/components/viewer/SharedPostsViewer';
+import SavedPostsViewer from '@/components/viewer/SavedPostsViewer';
+import BadgesProfileViewer from '@/components/viewer/BadgesProfileViewer.jsx';
 
 /* <------------------------ CONTEXTO --------------------------> */
 import { useAuth } from "@/context/AuthContext";
@@ -100,6 +102,7 @@ const Profile = () => {
     try {
       await followUser(id, user.id);
       setIsFollowing(true);
+      fetchProfile();
     } catch (error) {
       console.log("FRONTEND: Error en Profile -> handleFollow()", error);
     }
@@ -110,6 +113,7 @@ const Profile = () => {
     try {
       await unfollowUser(id, user.id);
       setIsFollowing(false);
+      fetchProfile();
     } catch (error) {
       console.log("FRONTEND: Error en Profile -> handleUnfollow()", error);
     }
@@ -142,6 +146,9 @@ const Profile = () => {
       fetchHashtags(user.id);
     }
   }, [id, user.id]);
+  
+
+  
   
   //<---------------------------------- MANEJO DE DOCUMENTO  --------------------------------->
   // Titulo de pagina, cargando hasta que carguen los datos del perfil de usuario.
@@ -246,26 +253,35 @@ const Profile = () => {
                                 <Tabs centered value={section} onChange={handleSectionChange}>
                                   <Tab icon={<ViewHeadlineIcon />}  {...a11yProps(0)} />
                                   <Tab icon={<CachedIcon />}  {...a11yProps(1)} />
-                                  <Tab icon={<BookmarkIcon />} {...a11yProps(2)} />
-                                  <Tab icon={<WorkspacePremiumIcon />} {...a11yProps(3)} />
+                                  <Tab icon={<WorkspacePremiumIcon />} {...a11yProps(2)} />
+                                  {!isLoading && user.id === profile._id && 
+                                    <Tab icon={<BookmarkIcon />} {...a11yProps(3)} />
+                                  }
+                                  
                                 </Tabs>
                               </Box>
                               {/*<---- SECCION PUBLICACIONES USUARIO ---->*/}
-                              <CustomTabPanel value={section} index={0}>
-                                  <PostProfileViewer id={id} userId={user.id} />
-                              </CustomTabPanel>
+                              { !isLoading && user.id && id &&
+                                <CustomTabPanel value={section} index={0}>
+                                  <PostProfileViewer key={id} id={id} userId={user.id} />
+                                </CustomTabPanel>
+                              }
                               {/*<--------- SECCION COMPARTIDOS --------->*/}
-                              <CustomTabPanel value={section} index={1}>
-                                  Item Two
-                              </CustomTabPanel>
-                              {/*<---------- SECCION GUARDADOS ----------> */}
-                              <CustomTabPanel value={section} index={2}>
-                                  Item Three
-                              </CustomTabPanel>
+                              { !isLoading && user.id && id &&
+                                <CustomTabPanel value={section} index={1}>
+                                  <SharedPostsViewer id={id} userId={user.id}/>
+                                </CustomTabPanel>
+                              }
                               {/*<----------- SECCION INSIGNIAS ---------> */}
-                              <CustomTabPanel value={section} index={3}>
+                              <CustomTabPanel value={section} index={2}>
                                   <BadgesProfileViewer badges={profile.badges}/>
                               </CustomTabPanel>
+                              {/*<---------- SECCION GUARDADOS ----------> */}
+                              {!isLoading && user.id === profile._id &&
+                                <CustomTabPanel value={section} index={3}>
+                                    <SavedPostsViewer userId={user.id}/>
+                                </CustomTabPanel>
+                              }
                         </Box>
                   </div>
             </div>

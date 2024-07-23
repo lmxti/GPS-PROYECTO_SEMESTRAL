@@ -12,9 +12,12 @@ const { saveImageProfile } = require("../utils/generalUtils.js");
 
 /* <----------------------- TRIGGERS ------------------------> */
 const { badgeForRol } = require("../triggers/badge.trigger.js");
+/* <----------------------- TRIGGERS ------------------------> */
+const { checkAchievementsFollows, checkAchievementsDescription } = require("../triggers/achievements.trigger.js");
 
 const fs = require('fs');
 const path = require('path');
+const { log } = require("console");
 
 /** 
     * Servicio para crear un usuario utilizando datos proporcionados por el parametro 'user'
@@ -93,31 +96,25 @@ async function getUsers(){
  * @param {string} id - id de usuario a obtener 
  * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[user, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
-async function getUserByID(id){
+async function getUserByID(id) {
     try {
-        const user = await User.findById({ _id: id })
+        const user = await User.findById(id)
             .select("-password")
             .populate("roleUser")
-            .populate("badges.badge", "nameBadge descriptionBadge imageBadge")
+            .populate({
+                path: 'badges.badge',
+                select: 'nameBadge descriptionBadge imageBadge'
+            })
             .exec();
-        if(!user) return [null, "No existe un usuario asociado al id ingresado"];
-        // Mapea los badges para acceder a ellos por su ID
-        const badgesMap = user.badges.map(badgeEntry => ({
-            nameBadge: badgeEntry.badge.nameBadge,
-            descriptionBadge: badgeEntry.badge.descriptionBadge,
-            imageBadge: badgeEntry.badge.imageBadge,
-            dateObtained: badgeEntry.dateObtained
-        }));
 
-        // Construir el objeto de respuesta
-        const responseUser = {
-            ...user.toObject(),
-            badges: badgesMap
-        };
+        if (!user) return [null, "No existe un usuario asociado al id ingresado"];
 
-        return [responseUser, null]
+        const userJson = user.toObject();
+
+        return [userJson, null];
     } catch (error) {
-        handleError(error, "user.service -> getUser");
+        handleError(error, "user.service -> getUserByID");
+        return [null, "Error al obtener el usuario"];
     }
 }
 /**
@@ -180,6 +177,11 @@ async function updateUser(id, body) {
         if (username === userFound.username) delete updateFields.username;
 
         const userUpdated = await User.findByIdAndUpdate(id,updateFields,{ new: true });
+
+        if(description && description.trim() !== ""){
+            await checkAchievementsDescription(id);
+        }
+
         return [userUpdated, null];
     } catch (error) {
         handleError(error, "user.service -> updateUser");
@@ -213,30 +215,37 @@ async function getUserFollowedHashtags(id){
 
 async function followUser(userId, userToFollowId) {
     try {
+        // Busqueda de usuario al que seguir
         const userToFollow = await User.findById(userToFollowId);
         if (!userToFollow) return [null, "Usuario a seguir no encontrado"]
 
+        // Busquedad de usuario que sigue
         const user = await User.findById(userId);
         if (!user) return [null, "Usuario no encontrado"];
 
+        // Verificacion si lo sigue ya en su lista de seguidos
         const isFollowing = user.followed.some(
             (followedUser) => followedUser.toString() === userToFollowId
         );
+        // Caso 1: Ya lo sigue, por lo que retorna el mensaje respectivo
+        if (isFollowing) return [null, "El usuario ya sigue a este usuario"];
 
-        if (isFollowing) {
-            return [null, "El usuario ya sigue a este usuario"];
-        }
+        // Caso2: No lo sigue
 
+        // Se agrega el usuario seguido a la lista de seguidos del usuario que sigue
         user.followed.push(userToFollowId);
         await user.save();
 
+        // Verificacion de seguidores en usuario a seguir
         const isFollowedByUser = userToFollow.followers.some(
             (follower) => follower.toString() === userId
         );
-
         if (!isFollowedByUser) {
+            // Agregamos el usuario que sigue a la lista de seguidores del seguido
             userToFollow.followers.push(userId);
             await userToFollow.save();
+            // Verificacion de logros de seguidor
+            checkAchievementsFollows(userId);
         }
 
         return [user, null];
@@ -270,7 +279,7 @@ async function followUser(userId, userToFollowId) {
 
         return [user, null];
     } catch (error) {
-    handleError(error, "user.service -> unfollowUser");
+        handleError(error, "user.service -> unfollowUser");
     return [null, error.message];
     }
 }

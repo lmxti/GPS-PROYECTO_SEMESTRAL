@@ -100,13 +100,13 @@ async function getUserPosts(req, res){
 async function updatePost(req, res){
     try {
         const { id } = req.params;
-        const { title, description, author, hashtags  } = req.body;
+        const { title, description, author, hashtags, status  } = req.body;
         let base64Image = null;
         if (req.file) {
             const imageBuffer = req.file.buffer;
             base64Image = imageBuffer.toString("base64");
         }
-        const post = { title, description, author, hashtags};
+        const post = { title, description, author, hashtags, status};
         const [updatedPost, postError] = await PostService.updatePost(id, post);
         if(postError) return respondError(req, res, 400, postError);
         if(!updatedPost) return respondError(req, res, 400, "No se encontro publicacion");
@@ -134,6 +134,8 @@ async function deletePost(req, res) {
         handleError(error, "post.controller -> deletePost");
     }
 }
+
+//<---------------------------------------------------- CONTROLADORES ESPECIALES ---------------------------------------------------->
 /**
  * Agrega o quita reaccion(helful o nothelpful) de usuario a publicacion utilizando el servicio 'PostService.markPostInteraction()'
  * que recibe el id de publicacion como parametro de la solicitud y el id junto a la reaccion que provienen del cuerpo de la solicitud(body)
@@ -147,7 +149,6 @@ async function markPostInteraction(req, res){
         const { id, type } = req.body;
         const { error: errorIdUser} = userIdSchema.validate({id});
         if(errorIdUser) return respondError(req, res, 400, errorIdUser.message);
-
         const [interaction, interactionError] = await PostService.markPostInteraction(postId, id, type);
         if(interactionError) return respondError(req, res, 400, interactionError);
         if(!interaction) return respondError(req, res, 400, "No existen datos de interaccion");
@@ -158,6 +159,90 @@ async function markPostInteraction(req, res){
     }
 }
 
+
+async function savePostAsFavorite(req, res){
+    try {
+        const { postId } = req.params;
+        const { userId} = req.body;
+        const [savePost, savePostError] = await PostService.savePostAsFavorite(userId, postId);
+        if(savePostError) return respondError(req, res, 400,  savePostError);
+        if(!savePost) return respondError(req,res, 400, "La publicacion no se agrego a favoritos");
+        respondSuccess(req, res, 201, savePost);
+    } catch (error) {
+        handleError(error, 'post.controller -> savePostAsFavorite');
+        respondError(req, res, 500, 'Publicacion no se agrego a favoritos');
+        
+    }
+}
+
+async function getUserFavoritePosts(req, res){
+    try {
+        const {userId} = req.params;
+        const [posts, errorPosts] = await PostService.getUserFavoritePosts(userId);
+        if(errorPosts) return respondError(req, res, 400,  errorPosts);
+        if(!posts) return respondError(req,res, 400, "No se encontro favoritos");
+        respondSuccess(req, res, 200, posts);
+    } catch (error) {
+        handleError(error, 'post.controller -> getUserFavoritePosts');
+        respondError(req, res, 500, 'No se encontro  favoritos');
+    }
+}
+
+async function getSharedAndSavedPosts(req, res){
+    try {
+        const {userId} = req.params;
+        const [sharedSaved, errorSharedSaved] = await PostService.getSharedAndSavedPosts(userId);
+        if(errorSharedSaved) return respondError(req, res, 400, errorSharedSaved);
+        if(!sharedSaved) return respondError(req,res, 400, "No se encontro compartidos/favoritos");
+        respondSuccess(req, res, 200, sharedSaved);
+    } catch (error) {
+        handleError(error, 'post.controller -> getSharedAndSavedPosts');
+        respondError(req, res, 500, 'No se encontro compartidos ni guardados');
+    }
+}
+
+async function sharePost(req, res){
+    try {
+        const { postId } = req.params;
+        const { userId} = req.body;
+        console.log(postId, userId);
+        const [sharePost, sharePostError] = await PostService.sharePost(userId, postId);
+        if(sharePostError) return respondError(req, res, 400,  sharePostError);
+        if(!sharePost) return respondError(req,res, 400, "La publicacion no se compartio");
+        respondSuccess(req, res, 201, sharePost);
+    } catch (error) {
+        handleError(error, 'post.controller -> sharePost');
+        respondError(req, res, 500, 'No se encontro compartidos');
+    }
+}
+
+async function getSharedPosts(req, res){
+    try {
+        const {userId} = req.params;
+        const [posts, errorPosts] = await PostService.getSharedPosts(userId);
+        if(errorPosts) return respondError(req, res, 400,  errorPosts);
+        if(!posts) return respondError(req,res, 400, "No se encontro compartidos");
+        respondSuccess(req, res, 200, posts);
+    } catch (error) {
+        handleError(error, 'post.controller -> getSharedPosts');
+        respondError(req, res, 500, 'No se encontro compartidos');
+    }
+}
+
+async function getPostsFollowed(req, res){
+    try {
+        const { userId } = req.params
+        const [posts, errorPosts] = await PostService.getPostsFollowed(userId);
+        if(errorPosts) return respondError(req, res, 400,  errorPosts);
+        if(!posts) return respondError(req,res, 400, "No se encontraron publicaciones para usuario");
+        respondSuccess(req, res, 200, posts);
+    } catch (error) {
+        handleError(error, 'post.controller -> getPostsFollowed');
+        respondError(req, res, 500, 'No se encontraron publicaciones para el usuario');
+    }
+}
+
+
 module.exports = {
     createPost,
     getPosts,
@@ -165,5 +250,12 @@ module.exports = {
     getUserPosts,
     updatePost,
     deletePost,
-    markPostInteraction
+    // Controladores especiales
+    markPostInteraction,
+    savePostAsFavorite,
+    getUserFavoritePosts,
+    getSharedAndSavedPosts,
+    sharePost,
+    getSharedPosts,
+    getPostsFollowed
 }

@@ -52,47 +52,30 @@ async function createPost(post, files = []) {
  * @returns {Promise<Array>} Promesa que resuelve a un arreglo que contiene `[posts, null] si tiene éxito o `[null, mensaje de error]` si falla.
  */
 async function getPosts() {
-    try{
+    try {
         const posts = await Post.find()
-        if(!posts) return [null, "No se encontraron publicaciones"];
-
-        // Obtén los IDs únicos de los autores
-        const authorIds = [...new Set(posts.map(post => post.author))];
-        // Busca los autores por sus IDs y obtén solo sus nombres
-        const authors = await User.find({ _id: { $in: authorIds } }, 'name');
-
-        // ID de hashtags por publicacion
-        const HashtagsIds = posts.reduce((acc, post) => {
-            post.hashtags.forEach(hashtag => acc.add(hashtag)); // Agregar todos los hashtags de todas las publicaciones
-            return acc;
-        }, new Set());
-
-        // Busca los hashtags por sus IDs y obtén solo sus nombres
-        const hashtags = await Hashtag.find({ _id: { $in: [...HashtagsIds] } }, 'nameHashtag');
-
-        // Mapea los hashtags para acceder a ellos por su ID
-        const hashtagsMap = hashtags.reduce((acc, hashtag) => {
-            acc[hashtag._id] = { id: hashtag._id, name: hashtag.nameHashtag };
-            return acc;
-        }, {});
-
-        // Convierte el array de autores en un objeto para un acceso rápido
-        const authorsMap = authors.reduce((acc, author) => {
-            acc[author._id] = { id: author._id, name: author.name };
-            return acc;
-        }, {});
+            .populate({
+                path: 'author',
+                select: '_id name'
+            })
+            .populate({
+                path: 'hashtags',
+                select: '_id nameHashtag'
+            })
+        if (!posts) {
+            return [null, "No se encontraron publicaciones"];
+        }
 
         const publicationData = posts.map(post => ({
             ...post.toObject(),
             images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
-            author: { id: post.author, name: authorsMap[post.author].name },
-            hashtags: post.hashtags.map(hashtagId => hashtagsMap[hashtagId])
         }));
 
-        return[publicationData, null];
+        return [publicationData, null];
 
-    }catch(error){
+    } catch (error) {
         handleError(error, "post.service -> getPosts");
+        return [null, error.message];
     }
 }
 /**
@@ -102,9 +85,22 @@ async function getPosts() {
  */
 async function getPostByID(id) {
     try {
-        const post = await Post.findById({ _id: id});
+        // Busqueda de publicacion de usuario por `id`
+        const post = await Post.findById({ _id: id})
+            .populate('hashtags')
+            .populate({
+                path: "author",
+                select: '_id name'
+            })
         if(!post) return [null, `No se encontro la publicacion de id: ${id}`];
-        return [post, null]
+
+
+        const publicationData = {
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+        };
+
+        return [publicationData, null]
     } catch (error) {
         handleError(error, "post.service -> getPostByID");
     }
@@ -119,44 +115,20 @@ async function getUserPosts(id) {
         const user = await User.findById(id)
             .select("-password")
             .populate("roleUser")
-            .exec();
+            .exec()
+
         if (!user) return [null, "No se encontró usuario"];
 
-        const posts = await Post.find({ author: user._id });
+        const posts = await Post.find({ author: user._id })
+            .populate({ path: "author", select: "_id name" })
+            .populate({ path: "hashtags", select: "_id nameHashtag" })
+            .exec();
+
         if (!posts.length) return [null, "No se encontraron publicaciones"];
-
-        // Obtén los IDs únicos de los autores (solo será uno en este caso)
-        const authorIds = [user._id];
-
-        // Busca los autores por sus IDs y obtén solo sus nombres
-        const authors = await User.find({ _id: { $in: authorIds } }, 'name');
-
-        // ID de hashtags por publicacion
-        const HashtagsIds = posts.reduce((acc, post) => {
-            post.hashtags.forEach(hashtag => acc.add(hashtag)); // Agregar todos los hashtags de todas las publicaciones
-            return acc;
-        }, new Set());
-
-        // Busca los hashtags por sus IDs y obtén solo sus nombres
-        const hashtags = await Hashtag.find({ _id: { $in: [...HashtagsIds] } }, 'nameHashtag');
-
-        // Mapea los hashtags para acceder a ellos por su ID
-        const hashtagsMap = hashtags.reduce((acc, hashtag) => {
-            acc[hashtag._id] = { id: hashtag._id, name: hashtag.nameHashtag };
-            return acc;
-        }, {});
-
-        // Convierte el array de autores en un objeto para un acceso rápido
-        const authorsMap = authors.reduce((acc, author) => {
-            acc[author._id] = { id: author._id, name: author.name };
-            return acc;
-        }, {});
 
         const publicationData = posts.map(post => ({
             ...post.toObject(),
             images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
-            author: { id: post.author, name: authorsMap[post.author].name },
-            hashtags: post.hashtags.map(hashtagId => hashtagsMap[hashtagId])
         }));
 
         return [publicationData, null];
@@ -216,7 +188,7 @@ async function deletePost(id){
 async function markPostInteraction(postId, userId, interactionType){
     try {
         const postExist = await Post.findById(postId);
-        if(!postExist) return [null, `No se encontro publicacion de id: ${id}`];
+        if(!postExist) return [null, `No se encontro publicacion de id: ${postId}`];
         const userExist = await User.findById(userId);
         if(!userExist) return [null, `No se encontro usuario de id: ${userId}`];
         if (interactionType !== "helpful" && interactionType !== "nothelpful") return [null, "El tipo de interacción debe ser 'helpful' o 'nothelpful'"]
@@ -243,6 +215,164 @@ async function markPostInteraction(postId, userId, interactionType){
     }
 }
 
+//<---------------------------------------------------- SERVICIOS ESPECIALES ---------------------------------------------------->
+/**
+ * @description Funcion que permite guardar publicaciones (privadas)
+ * @param {string} userId - Numero de identificacion de usuario
+ * @param {string} postId - Numero de identificacion de publicacion a guardar.
+ * @returns 
+ */
+async function savePostAsFavorite(userId, postId){
+    try {
+        const userFound = await User.findById(userId);
+        if(!userFound) return [null, 'Usuario no encontrado'];
+        
+        const postFound = await Post.findById(postId);
+        if(!postFound) return [null, 'Publicacion no encontrada'];
+
+        // Verificar si el post ya está guardado como favorito por el usuario
+        const isSaved = userFound.savedPosts.includes(postId);
+
+        if (isSaved) {
+            // Si ya está guardado, quitarlo de los favoritos
+            console.log("Ya la tenia guardado, se quito de favoritos");
+            userFound.savedPosts = userFound.savedPosts.filter(savedPost => savedPost.toString() !== postId);
+        } else {
+            // Si no está guardado, añadirlo a los favoritos
+            console.log("No lo tenia guardado, se agrego a favoritos");
+            userFound.savedPosts.push(postFound.id);
+        }
+        await userFound.save();
+        return [userFound, null];
+
+    } catch (error) {
+        handleError(error, "post.service -> savePostAsFavorite");
+        return [null, error.message];
+    }
+}
+/**
+ * @description Funcion que obtiene las publicaciones favoritas de usuario
+ * @param {string} userId - Numero de identificacion de usuario 
+ */
+async function getUserFavoritePosts(userId){
+    try {
+        const user = await User.findById(userId).populate({
+            path: 'savedPosts',
+            populate: [{
+                path: 'author',
+                select: '_id name'
+            },{
+                path: 'hashtags',
+                select: '_id nameHashtag'
+            }]
+        });
+        if (!user) return [null, `No se encontró el usuario con id: ${userId}`];
+
+        const favoritePosts = user.savedPosts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`)
+        }));
+
+        return [favoritePosts, null];
+    } catch (error) {
+        handleError(error, "post.service -> getUserFavoritePosts");
+        return [null, error.message];
+    }
+}
+/**
+ * @description Funcion que obtiene las id de las publicaciones que ha compartido/guardado.
+ * @param {string} userId - Numero de identificacion de usuario 
+ * @returns 
+ */
+async function getSharedAndSavedPosts(userId){
+    try {
+        const sharedSaved = await User.findById(userId).select(`savedPosts sharedPosts`);
+        if(!sharedSaved) return [null, `No se encontraron compartidos ni guardados`];
+        return [sharedSaved, null];
+    } catch (error) {
+        handleError(error, "post.service -> getSharedAndSavedPosts");
+        return [null, error.message];
+    }
+}
+
+async function sharePost(userId, postId){
+    try {
+        const userFound = await User.findById(userId);
+        if(!userFound)  return [null, "Usuario no encontrado"];
+        const postFound = await Post.findById(postId);
+        if(!postFound) return [null, "Publicacion no encontrada"];
+
+        // Verificacion si la publicacion ya ha sido compartida.
+        const isShared = userFound.sharedPosts.includes(postId);
+
+        if (isShared) {
+            // Si ya esta compartida, quitarla
+            console.log("Ya la habia compartido, se quito de compartidos");
+            userFound.sharedPosts = userFound.sharedPosts.filter(sharedPost => sharedPost.toString() !== postId);
+        } else {
+            console.log("No la tenia compartida, se compartio ahora");
+            userFound.sharedPosts.push(postFound.id)
+        }
+        await userFound.save();
+        return [userFound, null];
+
+    } catch (error) {
+        handleError(error, "post.service -> sharePost");
+        return [null, error.message];
+    }
+}
+
+async function getSharedPosts(userId){
+    try {
+        const user = await User.findById(userId).populate({
+            path: 'sharedPosts',
+            populate: [{
+                path: 'author',
+                select: '_id name'
+            },{
+                path: 'hashtags',
+                select: '_id nameHashtag'
+            }]
+        });
+        if (!user) return [null, `No se encontró el usuario con id: ${userId}`];
+
+        const sharedPosts = user.sharedPosts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`)
+        }));
+
+        return [sharedPosts, null];
+    } catch (error) {
+        handleError(error, "post.service -> getUserFavoritePosts");
+        return [null, error.message];
+    }
+}
+
+async function getPostsFollowed( userId ){
+    try {
+        const userFound = await User.findById(userId)
+        .select('followed followedHashtags')
+        .exec();
+        const posts = await Post.find({
+            $or: [ 
+                { author: {$in: userFound.followed}},
+                { hashtags: {$in: userFound.followedHashtags}}
+            ]
+        }).populate({ path: "author", select: "_id name" })
+        .populate({ path: "hashtags", select: "_id nameHashtag" })
+        .exec();
+        if(!posts) return [null, "No se encontraron posts de personas/hashtags seguidos por usuario"];
+        
+        const publicationData = posts.map(post => ({
+            ...post.toObject(),
+            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+        }));
+        return [publicationData , null]
+    } catch (error) {
+        console.log("Error en service", error);
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
@@ -250,5 +380,12 @@ module.exports = {
     getUserPosts,
     updatePost,
     deletePost,
-    markPostInteraction
+    markPostInteraction,
+    // Servicios especiales
+    savePostAsFavorite,
+    getUserFavoritePosts,
+    getSharedAndSavedPosts,
+    sharePost,
+    getSharedPosts,
+    getPostsFollowed
 }

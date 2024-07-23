@@ -3,8 +3,8 @@ import Avatar from '@mui/material/Avatar';
 import { getUserImage } from "../../services/user.service.js"
 
 const UserAvatar = ({ userId }) => {
-  const [image, setImage] = useState('');
 
+  const [image, setImage] = useState('');
   useEffect(() => {
     const fetchUserImage = async () => {
       try {
@@ -19,7 +19,7 @@ const UserAvatar = ({ userId }) => {
   }, [userId]);
 
   return (
-    <Avatar src={image} />
+    <Avatar className="cursor-pointer" src={image} />
   );
 };
 

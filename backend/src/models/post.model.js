@@ -16,7 +16,6 @@ const postSchema = new mongoose.Schema(
         status: { type: Boolean, default: true},
 
         /*<---------- Relaciones con otros modelos ----------> */
-
         // Autor de la publicación
         author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
         // Hashtag que tiene publicación
