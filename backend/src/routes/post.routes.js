@@ -27,6 +27,7 @@ router.post("/sharePost/:postId", postController.sharePost);
 router.get("/getSharedPosts/:userId", postController.getSharedPosts);
 
 router.get("/getPostsFollowed/:userId", postController.getPostsFollowed);
+router.get("/getPostsByHashtag/:hashtagId", postController.getPostsByHashtag);
 
 
 

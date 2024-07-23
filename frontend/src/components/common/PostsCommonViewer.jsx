@@ -207,7 +207,9 @@ export default function PostsCommonViewer({userId, data, options, updatePosts  }
                 { options.show_hashtags && (
                     <div className="flex flex-wrap border-b pb-3 pt-4 space-x-2">
                         {post.hashtags.map((hashtag, index) => (
-                            <button key={index} className="rounded-2xl border bg-neutral-100 px-3 py-1 text-xs font-semibold">#{hashtag.nameHashtag}</button>
+                            <button key={index} className="rounded-2xl border bg-neutral-100 px-3 py-1 text-xs font-semibold" onClick={() => router.push(`/hashtag/${hashtag._id}`)}>
+                                #{hashtag.nameHashtag} 
+                            </button>
                         ))}
                     </div>
                 )}
