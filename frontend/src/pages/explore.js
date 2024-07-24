@@ -28,6 +28,10 @@ export default function explore() {
 
               {/*<------ Seccion de en medio ------>*/}
               <div className="md:col-span-2">
+                <div className='text-center select-none'>
+                  <h2 className='font-thin text-2xl'>Explorar</h2>
+                  <p className='font-thin'>En está sección puedes encontrar contenido para explorar</p>
+                </div>
                 <ExplorePostsViewer userId={user.id} />
               </div>
 

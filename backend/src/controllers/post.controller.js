@@ -245,11 +245,9 @@ async function getPostsFollowed(req, res){
 async function getPostsByHashtag(req, res){
     try {
         const { hashtagId } = req.params;
-        console.log("Controlador -> Received hashtagId:", hashtagId);
         const [posts, errorPosts] = await PostService.getPostsByHashtag( hashtagId );
         if(errorPosts) return respondError(req, res, 400,  errorPosts);
         if(!posts) return respondError(req,res, 400, "No se encontraron publicaciones con el hashtag");
-        console.log("Controlador -> Received posts:", posts);
         respondSuccess(req, res, 200, posts);
     } catch (error) {
         handleError(error, 'post.controller -> getPostByHashtag');

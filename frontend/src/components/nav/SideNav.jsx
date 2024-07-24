@@ -21,15 +21,15 @@ const SideNav = ( { userId }) => {
     { href: "/", icon: <HomeOutlinedIcon className="h-8 w-8" />, label: "Inicio" },
     { href: "/explore", icon: <ExploreOutlinedIcon className="h-8 w-8" />, label: "Explorar" },
     { href: `/profile/${userId}`, icon: <PersonOutlineOutlinedIcon className="h-8 w-8" />, label: "Perfil" },
-    { href: "/search-users", icon: <PersonSearchOutlinedIcon className="h-8 w-8" />, label: "Buscar Usuarios" },
+    // { href: "/search-users", icon: <PersonSearchOutlinedIcon className="h-8 w-8" />, label: "Buscar Usuarios" },
 
   ];
 
   const resourceLinks = [
     { href: "/about", icon: <InfoOutlinedIcon className="h-8 w-8" />, label: "Acerca de" },
-    { href: "/help", icon: <HelpOutlineOutlinedIcon className="h-8 w-8" />, label: "Ayuda" },
+    { href: "/#", icon: <HelpOutlineOutlinedIcon className="h-8 w-8" />, label: "Ayuda" },
     { href: "/privacy-policy", icon: <LockOutlinedIcon className="h-8 w-8" />, label: "Políticas de privacidad" },
-    { href: "/content-policy", icon: <DescriptionOutlinedIcon className="h-8 w-8" />, label: "Políticas de contenido" }
+    { href: "/#", icon: <DescriptionOutlinedIcon className="h-8 w-8" />, label: "Políticas de contenido" }
   ];
 
   return (

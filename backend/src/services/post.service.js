@@ -355,7 +355,7 @@ async function getPostsFollowed( userId ){
         .exec();
         const posts = await Post.find({
             $or: [ 
-                { author: {$in: userFound.followed}},
+                { author: { $in: [...userFound.followed, userId] }},
                 { hashtags: {$in: userFound.followedHashtags}}
             ]
         }).populate({ path: "author", select: "_id name" })
@@ -388,8 +388,9 @@ async function getPostsByHashtag( hashtagId ){
             ...post.toObject(),
             images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
         }));
+        
 
-        return [publicationData , null]
+        return [{ posts: publicationData, hashtag: hashtagFound }, null];
     } catch (error) {
         console.log("Error en post.service-> getPostByHashtag", error);
     }

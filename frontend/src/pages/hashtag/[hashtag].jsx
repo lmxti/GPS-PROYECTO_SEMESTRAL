@@ -1,5 +1,5 @@
 /* <----------------------- FUNCIONES --------------------------> */
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useRouter } from 'next/router';
@@ -13,6 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 /* <--------------------- COMPONENTES NAV ----------------------> */
 import NavBar from "@/components/nav/NavBar";
 
+
 /* <----------------------- SERVICIOS  -------------------------> */
 import { getPostsByHashtag } from "@/services/post.service";
 
@@ -20,16 +21,14 @@ export default function Hashtag () {
     const router = useRouter();
     // Desectructuracion datos de usuario que esta navegando (user.id).
     const { user } = useAuth();
-    // Desestructuracion de identificador de hashtag y asignacion en variable `hashtagId`
-    // const { hashtag: hashtagId } = router.query;
-    // Seteo de datos de solicitud de publicaciones de hashtag
-    const [postsHashtags, setPostsHashtags] = useState([]);
+    // Desestructuracion de identificador de hashtag y asignacion en variable `id`.
+    const { hashtag: id} = router.query;
 
-    // Seteo de estado de carga de datos, por default cargando.
+    const [posts, setPosts] = useState([]);
+    const [hashtag, setHashtag] = useState('');
+    
     const [isLoading, setIsLoading] = useState(true);
-    // Seteo de variable de actualizacion de datos
-    const [update, setUpdate] = useState(false);
-
+    // Opciones para mostrar
     const [options, setOptions] = useState({
         show_images: true,
         show_hashtags: true,
@@ -39,41 +38,57 @@ export default function Hashtag () {
         show_comments: true,
         show_icon_share: true,
         show_icon_save_post: true,
-    })
-    
-    const fetchPostsHashtag = async() =>{
-        if (!router.isReady) return; // Asegúrate de que el router esté listo
-        const { hashtag: hashtagId } = router.query;
-        try{
-            const response = await getPostsByHashtag(hashtagId);
-            console.log(response.data.data);
-            setPostsHashtags(response.data.data);
-            setIsLoading(false);
-        } catch(error){
-            console.log("FRONTEND: Error en Post -> fetchPostsHashtag() -> hashtagId:", hashtagId, error);
-        }
-    }
+    });
+    // Seteo de variable de actualizacion de datos
+    const [update, setUpdate] = useState(false);
     // Funcion encargada de cambiar el estado de variable de actualizacion
     const updatePosts = () => {
         setUpdate(!update);
     };
 
-    useEffect(() => {
-        fetchPostsHashtag();
+  /*<------------------------- SOLICITUDES HTTP------------------------->*/
+    const fetchPosts = async() =>{
+        try {
+            const response = await getPostsByHashtag(id);
+            setPosts(response.data.data.posts)
+            setHashtag(response.data.data.hashtag); 
+        } catch (error) {
+            console.log("FRONTEND: Error en [Hashtag] -> fetchPosts() -> id:", id, error);
+        }
+    }
+  /*<------------------- EFECTOS DE ACTUALIZACIÓN------------------->*/
+    useEffect( ()=> {
+        if (id) {
+            fetchPosts();
+        }
+    }, [id]);
+
+    useEffect( () => {
+        fetchPosts();
     }, [update]);
 
 
-    /*<------------------- EFECTOS DE ACTUALIZACIÓN------------------->*/
-    useEffect(() => {
-        fetchPostsHashtag();
-    }, [router.query.hashtag, router.isReady]); 
-
-    if (isLoading) return <div>Loading...</div>;
-    
     return (
         <>
             <NavBar userId={user.id}/>
-                <PostsCommonViewer userId={user.id} data={postsHashtags} options={options} updatePosts={updatePosts} />
+            <div className="max-w-3xl mx-auto my-4 p-8 flex justify-between items-center bg-zinc-500 rounded shadow-md select-none">
+                <h2 className="text-4xl font-semibold text-zinc-200 hover:text-zinc-50 flex">
+                    <span className="font-bold tracking-wider">#</span>{hashtag.nameHashtag}
+                </h2>
+                <div className="text-right text-zinc-200 text-xl">
+                    <p>
+                        {posts 
+                            ? <p className="font-bold tracking-wider hover:text-zinc-50">Publicaciones: <span className="font-normal">{posts.length}</span></p> 
+                            : <p>0 publicaciones</p>}
+                    </p>
+                    <p>
+                        {hashtag.followedBy 
+                            ? <p className="font-bold tracking-wider hover:text-zinc-50">Seguidores: <span className="font-normal">{hashtag.followedBy.length}</span></p>
+                            : 'Seguidores: 0 '}
+                    </p>
+                </div>
+            </div>
+            <PostsCommonViewer userId={user.id} data={posts} options={options} updatePosts={updatePosts} />
         </>
     )
 }
