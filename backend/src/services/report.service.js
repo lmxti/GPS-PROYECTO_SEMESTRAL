@@ -1,6 +1,7 @@
 const Report = require("../models/report.model.js");
 const User = require("../models/user.model.js");
 const Post = require("../models/post.model.js");
+const { URL_PROYECTO, PORT } = require('../config/env.config.js');
 
 const { handleError } = require("../utils/errorHandler.js");
 
@@ -59,7 +60,7 @@ async function getReports() {
             const post = report.postReport;
             const formattedReports = post ? {
                 ...post.toObject(),
-                images: post.images ? post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`) : []
+                images: post.images ? post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`) : []
             } : null;
             return {
                 ...report.toObject(),

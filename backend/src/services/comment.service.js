@@ -10,6 +10,9 @@ const { handleError } = require("../utils/errorHandler.js")
 /* <----------------------- UTILS ------------------------> */
 const { saveImagePost } = require("../utils/generalUtils.js");
 
+/* <----------------------- URLS ------------------------> */
+const { URL_PROYECTO, PORT } = require ('../config/env.config.js');
+
 /**
  * Servicio para crear un comentario e incorporarlo a publicacion, recibe el id de publicacion para revisar
  * si admite comentarios basado en el 'status' del post.
@@ -70,7 +73,7 @@ async function getComment(id) {
       .exec();
       const commentData = {
         ...comment.toObject(),
-        imageComment: comment.imageComment.map(image => `http://localhost:3001/uploads/images/${image}`),
+        imageComment: comment.imageComment.map(image => `${URL_PROYECTO}${PORT}/uploads/images/${image}`),
         userId: { id: comment.userId._id, name: comment.userId.name, username: comment.userId.username }
       };
       if (!comment) return [null, "Comentario no encontrado"];
@@ -145,7 +148,7 @@ async function getCommentsByPost(postId) {
     const commentsWithImages = comments.map(comment => {
       const commentData = {
         ...comment.toObject(),
-        imageComment: comment.imageComment.map(image => `http://localhost:3001/uploads/images/${image}`),
+        imageComment: comment.imageComment.map(image => `${URL_PROYECTO}${PORT}/uploads/images/${image}`),
         userId: { id: comment.userId._id, name: comment.userId.name, username: comment.userId.username }
       }
       return commentData;

@@ -13,6 +13,9 @@ const { saveImagePost, saveHashtagsPost } = require("../utils/generalUtils.js");
 /* <----------------------- TRIGGERS ------------------------> */
 const { checkAchievementsPost } = require("../triggers/achievements.trigger.js");
 
+/* <----------------------- URLS ------------------------> */
+const { URL_PROYECTO, PORT } = require('../config/env.config.js');
+
 /**
  * Servicio para crear una publicacion utilizando datos proporcionados
  * @param {Object} post - Objeto que contiene datos de publicacion a crear
@@ -68,7 +71,7 @@ async function getPosts() {
 
         const publicationData = posts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`),
         }));
 
         return [publicationData, null];
@@ -97,7 +100,7 @@ async function getPostByID(id) {
 
         const publicationData = {
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`),
         };
 
         return [publicationData, null]
@@ -128,7 +131,7 @@ async function getUserPosts(id) {
 
         const publicationData = posts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`),
         }));
 
         return [publicationData, null];
@@ -270,7 +273,7 @@ async function getUserFavoritePosts(userId){
 
         const favoritePosts = user.savedPosts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`)
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`)
         }));
 
         return [favoritePosts, null];
@@ -338,7 +341,7 @@ async function getSharedPosts(userId){
 
         const sharedPosts = user.sharedPosts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`)
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`)
         }));
 
         return [sharedPosts, null];
@@ -365,7 +368,7 @@ async function getPostsFollowed( userId ){
         
         const publicationData = posts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`),
         }));
         return [publicationData , null]
     } catch (error) {
@@ -386,7 +389,7 @@ async function getPostsByHashtag( hashtagId ){
 
         const publicationData = posts.map(post => ({
             ...post.toObject(),
-            images: post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`),
+            images: post.images.map(imageName => `${URL_PROYECTO}${PORT}/uploads/images/${imageName}`),
         }));
         
 

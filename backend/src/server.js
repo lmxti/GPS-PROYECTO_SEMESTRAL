@@ -1,4 +1,4 @@
-const { PORT } = require('./config/env.config.js')
+const { PORT, URL_PROYECTO, URL_FRONTEND } = require('./config/env.config.js')
 const express = require('express')
 const cors = require("cors");
 const morgan = require("morgan");
@@ -12,14 +12,14 @@ async function setupServer(){
   try {
     const server = express();
     server.use(express.json());
-    server.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+    server.use(cors({ origin: URL_FRONTEND, credentials: true }));
     server.use(cookieParser());
     server.use(morgan("dev"));
     server.use(express.urlencoded({ extended: true }));
     server.use("/api", indexRoutes);
     server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
     server.listen(PORT, () => {
-      console.log(`SERVIDOR => El servidor está corriendo en: http://localhost:${PORT}/api`);
+      console.log(`SERVIDOR => El servidor está corriendo en: ${URL_PROYECTO}${PORT}/api`);
     })
 
   } catch (error) {
