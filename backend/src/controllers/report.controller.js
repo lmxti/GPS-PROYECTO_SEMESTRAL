@@ -104,6 +104,20 @@ async function getReportsByType(req, res) {
     }
 }
 
+async function updateReportStatus(req, res){
+    try {
+        const {id} = req.params;
+        const {newStatus, reviewNotes} = req.body;
+        const [updateReport, error] = await ReportService.updateReportStatus(id, newStatus, reviewNotes);
+        if(error) return respondError(req, res, 400, error);
+        if(!updateReport) return respondError(req, res, 404, 'Reporte no encontrado');
+        respondSuccess(req, res, 200, {message: 'Reporte actualizado', data: updateReport});
+    } catch (error) {
+        handleError(error, 'report.controller -> updateReportStatus');
+        respondError(req, res, 500, 'No se pudo actualizar el reporte');
+    }
+}
+
 module.exports = {
     createReport,
     getReports,
@@ -113,4 +127,5 @@ module.exports = {
     getReportsByUser,
     getReportsByPost,
     getReportsByType,
+    updateReportStatus
 };

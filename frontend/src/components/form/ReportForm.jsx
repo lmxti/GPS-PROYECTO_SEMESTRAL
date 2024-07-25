@@ -3,6 +3,8 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import IconButton from "@mui/material/IconButton";
 import ReportIcon from "@mui/icons-material/Report";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 /* <----------------------- FUNCIONES --------------------------> */
 import { useState } from "react";
@@ -23,6 +25,9 @@ const CreateReport = ({ postId }) => {
     contentReport: "",
     reportType: "",
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const predefinedReport = [
     "Spam",
@@ -47,19 +52,29 @@ const CreateReport = ({ postId }) => {
     setOpen(false);
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
       await createReport(report);
+      setSnackbarMessage("Reporte enviado exitosamente.");
+      setSnackbarSeverity("success");
     } catch (error) {
-      console.log(error);
+      const errorMessage = error.response?.data?.message || "Error al enviar el reporte. Intentelo nuevamente.";
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
     } finally {
+      setSnackbarOpen(true);
       setReport({
         userReport: user.id,
         postReport: postId,
         contentReport: "",
         reportType: "",
       });
+      handleClose();
     }
   };
 
@@ -124,6 +139,21 @@ const CreateReport = ({ postId }) => {
           </form>
         </div>
       </Modal>
+
+      {/* Snackbar for success or error messages */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

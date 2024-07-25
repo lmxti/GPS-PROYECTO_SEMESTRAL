@@ -12,40 +12,67 @@ async function createReport(report){
             userReport,
             postReport
         } = report;
-        const userFound = await User
-        .findById(userReport)
-        .exec();
-        if(!userFound) return [null, "Usuario no encontrado"];
-        const postFound = await Post
-        .findById(postReport)
-        .exec();
-        if(!postFound) return [null, "Publicacion no encontrada"];
+
+        const existingReport = await Report.findOne({ userReport, postReport }).exec();
+        if (existingReport) {
+            return [null, "El usuario ya ha reportado esta publicación"];
+        }
+
+        const userFound = await User.findById(userReport).exec();
+        if (!userFound) return [null, "Usuario no encontrado"];
+
+        const postFound = await Post.findById(postReport).exec();
+        if (!postFound) return [null, "Publicación no encontrada"];
+
         const newReport = new Report({
             reportType,
             contentReport,
             userReport,
             postReport
         });
+
         await newReport.save();
         return [newReport, null];
-    }
-    catch(error){
-        handleError(error, "report.service -> createReport")
+    } catch (error) {
+        handleError(error, "report.service -> createReport");
+        return [null, error.message];
     }
 }
 
-async function getReports(){
+
+async function getReports() {
     try {
         const reports = await Report.find()
-        .populate("userReport")
-        .populate("postReport")
-        .exec();
-        if(!reports) return [null, "No se encontraron reportes en la bbdd"];
-        return [reports, null];
+            .populate("userReport")
+            .populate({
+                path: 'postReport',
+                populate: {
+                    path: 'author',
+                    select: '_id name'
+                }
+            })
+            .exec();
+
+        if (!reports) return [null, "No se encontraron reportes en la bbdd"];
+
+        const formattedReports = reports.map(report => {
+            const post = report.postReport;
+            const formattedReports = post ? {
+                ...post.toObject(),
+                images: post.images ? post.images.map(imageName => `http://localhost:3001/uploads/images/${imageName}`) : []
+            } : null;
+            return {
+                ...report.toObject(),
+                postReport: formattedReports
+            };
+        }
+        );
+        return [formattedReports, null];
     } catch (error) {
-        handleError(error, "report.service -> getReports")
+        handleError(error, "report.service -> getReports");
     }
 }
+
 
 async function getReport(id){
     try {
@@ -63,8 +90,6 @@ async function getReport(id){
 async function updateReport(id, report){
     try {
         const {
-            reportType,
-            contentReport,
             userReport,
             postReport
         } = report;
@@ -131,6 +156,25 @@ async function getReportsByType(reportType){
     }
 }
 
+async function updateReportStatus(id, newStatus, reviewNotes) {
+    try {
+        const reportFound = await Report.findById(id);
+        if(!reportFound) return [null, "Reporte no encontrado"];
+
+        if(!['pendiente', 'en revision', 'resuelto', 'rechazado', 'en espera', 'cerrado']){
+            return [null, "Estado no valido"];
+        }
+        const updatedReport = await Report.findByIdAndUpdate(id, {
+            statusReport: newStatus,
+            reviewNotes
+        }, { new: true });
+        return [updatedReport, null];
+    } catch (error) {
+        handleError(error, "report.service -> updateReportStatus")
+        return [null, error];
+    }
+}
+
 
 
 module.exports = {
@@ -141,6 +185,7 @@ module.exports = {
     deleteReport,
     getReportsByUser,
     getReportsByPost,
-    getReportsByType
+    getReportsByType,
+    updateReportStatus
 };
 

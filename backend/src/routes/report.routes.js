@@ -19,5 +19,6 @@ router.delete("/deleteReport/:id", reportController.deleteReport);
 router.get("/getReportsByUser/:id", reportController.getReportsByUser);
 router.get("/getReportsByPost/:id", reportController.getReportsByPost);
 router.get("/getReportsByType/:reportType", reportController.getReportsByType);
+router.put("/updateReportStatus/:id", reportController.updateReportStatus);
 
 module.exports = router;

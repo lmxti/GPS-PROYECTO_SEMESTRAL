@@ -13,6 +13,8 @@ const reportSchema = new mongoose.Schema(
         contentReport: { type: String, required: true },
         // Fecha en que se realiza reporte
         dateReport: { type: Date, required: true, default: Date.now },
+        // Estado del reporte (pendiente, resuelto)
+        statusReport: { type: String, required: true, enum: ['pendiente', 'en revision', 'resuelto', 'rechazado', 'en espera', 'cerrado'], default: "pendiente" },
 
         /*<---------- Relaciones con otros modelos ----------> */
 

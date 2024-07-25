@@ -27,3 +27,11 @@ export const deleteComment = async (commentId) => {
         console.log(error);
     }
 }
+
+export const updateComment = async (commentId, commentData) => {
+    try{
+        return axios.put(`comments/updateComment/${commentId}`, commentData, headers)
+    } catch (error) {
+        console.log(error);
+    }
+}
