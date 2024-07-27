@@ -120,21 +120,19 @@ const CreateReport = ({ postId }) => {
               />
             </div>
             <div className="flex justify-end">
-              <Button
+              <button
                 type="submit"
-                variant="contained"
-                color="primary"
-                className="mr-2"
+                className="bg-zinc-300 hover:bg-neutral-400 text-black px-2 py-1 rounded"
               >
                 Reportar
-              </Button>
-              <Button
+              </button>
+              <button
+                type="button"
                 onClick={handleClose}
-                variant="outlined"
-                color="secondary"
+                className="bg-red-300 hover:bg-red-500 text-white px-2 py-1 rounded ml-2"
               >
                 Cancelar
-              </Button>
+              </button>
             </div>
           </form>
         </div>

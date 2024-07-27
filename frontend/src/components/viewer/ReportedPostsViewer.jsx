@@ -27,6 +27,7 @@ const ReportedPostsViewer = ({ userId }) => {
     setError(null);
     try {
       const response = await getReports();
+      console.log(response);
       if (Array.isArray(response.data.data.data)) {
         const seen = new Set();
         const reportedPostsData = response.data.data.data
@@ -58,6 +59,7 @@ const ReportedPostsViewer = ({ userId }) => {
                 name: report.userReport.name,
                 surname: report.userReport.surname,
                 username: report.userReport.username,
+                image: report.userReport.profilePicture,
               },
             },
           }));
@@ -121,7 +123,7 @@ const ReportedPostsViewer = ({ userId }) => {
           className="p-2 border rounded"
         >
           <option value="">Filtrar por estado de reporte</option>
-          {["Pendiente", "Resuelto", "Cerrado", "En revisión", "Rechazado", "En espera"].map(
+          {["Pendiente", "Resuelto", "Cerrado", "En revision", "Rechazado", "En espera"].map(
             (status) => (
               <option key={status} value={status.toLowerCase()}>
                 {status}

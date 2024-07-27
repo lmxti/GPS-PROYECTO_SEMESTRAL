@@ -96,7 +96,7 @@ const ShowComments = ({ postId, userId }) => {
                     <div className="flex justify-end space-x-2 mt-2">
                       <button
                         onClick={handleUpdateComment}
-                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                        className="bg-zinc-300 hover:bg-neutral-400 text-black px-2 py-1 rounded"
                       >
                         Actualizar
                       </button>
@@ -105,7 +105,7 @@ const ShowComments = ({ postId, userId }) => {
                           setEditCommentId(null);
                           setEditCommentText("");
                         }}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
+                        className="bg-red-300 hover:bg-red-500 text-white px-2 py-1 rounded"
                       >
                         Cancelar
                       </button>
