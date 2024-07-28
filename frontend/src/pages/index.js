@@ -48,7 +48,7 @@ export default function Home() {
               {/*<------ Seccion de en medio ------>*/}
               <div className="md:col-span-2">
                 <PostForm userId={user.id} updatePosts={updatePosts} />
-                <HomePostsViewer userId={user.id} />
+                <HomePostsViewer userId={user.id} key={update} />
               </div>
 
               {/*<------ Seccion de hashtags ------>*/}
