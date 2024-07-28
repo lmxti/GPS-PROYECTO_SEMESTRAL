@@ -324,8 +324,3 @@ setupAPI()
 
 - Lider de proyecto: [@lmxti](https://github.com/lmxti)
 - Programador: [@DJVegaG](https://github.com/DJVegaG)
-- Programador: [@Sebasaraneda](https://github.com/Sebasaraneda)
-- Programador: [@vcntsnhz](https://github.com/vcntsnhz)
-- Analista diseñador: [Javiernvc1](https://github.com/Javiernvc1)
-- Tester: [@VictorHM23](https://github.com/VictorHM23)
-
